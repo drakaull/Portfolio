@@ -1,0 +1,28 @@
+[project]
+name = "portfolio-backend"
+version = "0.1.0"
+description = "FastAPI backend of the portfolio"
+authors = [
+    { name = "Léonard Fontaine", email = "leonardfontaine01@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.143.0",
+    "pydantic-settings>=2.15.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.10",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
