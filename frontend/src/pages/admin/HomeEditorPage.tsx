@@ -11,6 +11,7 @@ import { MarkdownText } from '../../components/MarkdownText/MarkdownText.tsx'
 import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation, type Lang } from '../../i18n/useTranslation.ts'
 import adminStyles from './Admin.module.css'
+import { CvField } from './CvField.tsx'
 import styles from './HomeEditorPage.module.css'
 
 const LANGS: Lang[] = ['en', 'fr']
@@ -39,12 +40,14 @@ export function HomeEditorPage() {
   const [textLang, setTextLang] = useState<Lang>(lang)
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [invalid, setInvalid] = useState<HomeField[]>([])
+  const [hasCv, setHasCv] = useState(false)
 
   useEffect(() => {
     fetchAdminHome()
       .then((content) => {
         setSaved(toForm(content))
         setForm(toForm(content))
+        setHasCv(content.has_cv)
       })
       .catch(() => setLoadFailed(true))
   }, [])
@@ -206,6 +209,8 @@ export function HomeEditorPage() {
           />
           {fieldError('github_url')}
         </label>
+
+        <CvField hasCv={hasCv} onChange={setHasCv} />
 
         <div className={styles.actions}>
           <button

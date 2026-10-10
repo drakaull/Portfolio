@@ -150,3 +150,69 @@ describe('unsaved changes', () => {
     expect(await screen.findByRole('heading', { name: 'Administration' })).toBeDefined()
   })
 })
+
+describe('CV', () => {
+  const pdf = () => new File(['%PDF-1.7'], 'cv.pdf', { type: 'application/pdf' })
+  const fileInput = () => screen.findByLabelText(/Upload a CV|Replace the CV/)
+
+  function mockCvApi(hasCv: boolean, cvStatus = 204) {
+    return mockApi({
+      'GET /api/admin/me': signedIn,
+      'GET /api/admin/home': () => Response.json({ ...CONTENT, has_cv: hasCv }),
+      'PUT /api/admin/cv': () => new Response(null, { status: cvStatus }),
+      'DELETE /api/admin/cv': () => new Response(null, { status: 204 }),
+    })
+  }
+
+  test('uploads a PDF as multipart and shows it online', async () => {
+    const fetchMock = mockCvApi(false)
+    renderApp('/en/admin/home')
+    expect(await screen.findByText(/No CV online/)).toBeDefined()
+
+    fireEvent.change(await fileInput(), { target: { files: [pdf()] } })
+
+    expect(await screen.findByText('CV uploaded.')).toBeDefined()
+    expect(screen.getByRole('link', { name: 'View the CV' }).getAttribute('href')).toBe('/api/cv')
+    const [, init] = fetchMock.mock.calls.find(([url]) => url === '/api/admin/cv')!
+    expect(init?.method).toBe('PUT')
+    expect((init!.body as FormData).get('file')).toBeInstanceOf(File)
+  })
+
+  test('refuses a file over 5 MB without sending it', async () => {
+    const fetchMock = mockCvApi(false)
+    renderApp('/en/admin/home')
+    const big = new File([new Uint8Array(5 * 1024 * 1024 + 1)], 'cv.pdf', {
+      type: 'application/pdf',
+    })
+
+    fireEvent.change(await fileInput(), { target: { files: [big] } })
+
+    expect(await screen.findByText('The file is larger than 5 MB.')).toBeDefined()
+    expect(fetchMock.mock.calls.some(([url]) => url === '/api/admin/cv')).toBe(false)
+  })
+
+  test('explains when the server refuses a non-PDF', async () => {
+    mockCvApi(false, 415)
+    renderApp('/en/admin/home')
+
+    fireEvent.change(await fileInput(), { target: { files: [pdf()] } })
+
+    expect(await screen.findByText('This file is not a PDF.')).toBeDefined()
+    expect(screen.getByText(/No CV online/)).toBeDefined()
+  })
+
+  test('removes the CV after confirmation', async () => {
+    const fetchMock = mockCvApi(true)
+    renderApp('/en/admin/home')
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Remove the CV' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'DELETE')).toBe(false)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Remove the CV' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
+
+    expect(await screen.findByText('CV removed.')).toBeDefined()
+    expect(screen.getByText(/No CV online/)).toBeDefined()
+  })
+})

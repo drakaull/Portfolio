@@ -46,3 +46,31 @@ export async function saveAdminHome(form: HomeContentForm): Promise<SaveResult> 
     return { status: 'error' }
   }
 }
+
+export const CV_MAX_BYTES = 5 * 1024 * 1024
+
+export type CvResult = 'ok' | 'tooLarge' | 'notPdf' | 'expired' | 'error'
+
+const CV_STATUSES: Record<number, CvResult> = { 401: 'expired', 413: 'tooLarge', 415: 'notPdf' }
+
+export async function uploadCv(file: File): Promise<CvResult> {
+  // Convenience only: the server re-checks size, type and PDF signature.
+  if (file.size > CV_MAX_BYTES) return 'tooLarge'
+  const body = new FormData()
+  body.append('file', file)
+  try {
+    const response = await fetch('/api/admin/cv', { method: 'PUT', body })
+    return response.ok ? 'ok' : (CV_STATUSES[response.status] ?? 'error')
+  } catch {
+    return 'error'
+  }
+}
+
+export async function deleteCv(): Promise<CvResult> {
+  try {
+    const response = await fetch('/api/admin/cv', { method: 'DELETE' })
+    return response.ok ? 'ok' : (CV_STATUSES[response.status] ?? 'error')
+  } catch {
+    return 'error'
+  }
+}

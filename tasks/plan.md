@@ -29,7 +29,7 @@ Protected API to read/save the home content and upload/remove the CV, then an ad
 - [x] Task 3: Switch to the data router (refactor, no behaviour change)
 - [x] Task 4: Guarded admin layout and dashboard
 - [x] Task 5: Home editor (texts, links, preview, save, unsaved changes)
-- [ ] Task 6: CV upload and removal in the editor
+- [x] Task 6: CV upload and removal in the editor
 
 ### Checkpoint B: complete
 - [ ] Human browser check of the 6 spec success criteria
