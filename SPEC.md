@@ -28,7 +28,7 @@ Out of scope (later features): section content, experience detail page, admin, c
 
 | Concern | Choice | Status |
 |---|---|---|
-| Routing | `react-router` v7 (declarative mode) | new dependency |
+| Routing | `react-router` v8 (declarative mode) | new dependency |
 | Font | `@fontsource-variable/google-sans` (OFL-1.1) | new dependency |
 | UI translations | typed dictionaries + `useTranslation` hook, no library | no dependency |
 | Theme | CSS custom properties on `<html data-theme>` | no dependency |
