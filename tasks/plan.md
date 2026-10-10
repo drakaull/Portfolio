@@ -19,7 +19,7 @@ Single-admin authentication: account created by CLI, argon2 password, server-sid
 
 ### Phase 1: Backend
 - [x] Task 1: Auth domain rules and security helpers
-- [ ] Task 2: Admin users and sessions tables, migration and repository
+- [x] Task 2: Admin users and sessions tables, migration and repository
 - [ ] Task 3: `create-admin` command
 - [ ] Task 4: Login, logout, me endpoints with rate limiting
 
