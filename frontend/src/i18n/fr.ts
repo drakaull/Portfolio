@@ -5,6 +5,7 @@ export const fr: Record<TranslationKey, string> = {
   'nav.label': 'Principale',
   'nav.skip': 'Aller au contenu',
   'nav.menu': 'Menu',
+  'link.newTab': "s'ouvre dans un nouvel onglet",
   'theme.dark': 'Mode sombre',
   'home.loading': 'Chargement…',
   'home.error': "Ce contenu n'a pas pu être chargé. Réessayez plus tard.",

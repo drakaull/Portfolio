@@ -4,6 +4,7 @@ export const en = {
   'nav.label': 'Main',
   'nav.skip': 'Skip to content',
   'nav.menu': 'Menu',
+  'link.newTab': 'opens in a new tab',
   'theme.dark': 'Dark mode',
   'home.loading': 'Loading…',
   'home.error': 'This content could not be loaded. Please try again later.',
