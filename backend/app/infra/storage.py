@@ -49,6 +49,8 @@ async def save_cv(read: Callable[[int], Awaitable[bytes]]) -> None:
                 temp_file.write(chunk)
         if size == 0:
             raise NotAPdfError
+        # mkstemp creates the file as 0600; make it readable like a normal file (e.g. by nginx).
+        os.chmod(temp_name, 0o644)
         os.replace(temp_name, _cv_path())
     except BaseException:
         Path(temp_name).unlink(missing_ok=True)

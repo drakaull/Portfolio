@@ -1,3 +1,5 @@
+import stat
+import sys
 from collections.abc import AsyncIterator
 from pathlib import Path
 
@@ -86,3 +88,12 @@ async def test_anonymous_oversized_bodies_are_cut_off_before_parsing(
 
     assert response.status_code == 413
     assert list(storage_dir.iterdir()) == []
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="Windows does not use POSIX permissions")
+async def test_stored_cv_is_readable_by_other_processes(
+    admin_client: AsyncClient, storage_dir: Path
+) -> None:
+    await upload(admin_client, PDF)
+
+    assert stat.S_IMODE((storage_dir / "cv.pdf").stat().st_mode) == 0o644
