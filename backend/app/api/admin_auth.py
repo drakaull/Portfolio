@@ -2,7 +2,6 @@ import logging
 from datetime import UTC, datetime
 from typing import Annotated
 
-import anyio
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel, Field
 
@@ -10,7 +9,12 @@ from app.api.dependencies import ADMIN_COOKIE, get_admin_repository, require_adm
 from app.domain.auth import SESSION_LIFETIME, AdminUser
 from app.infra.rate_limit import login_limiter
 from app.infra.repositories.admin import AdminRepository
-from app.infra.security import burn_password_check, hash_token, new_session_token, verify_password
+from app.infra.security import (
+    burn_password_check_in_thread,
+    hash_token,
+    new_session_token,
+    verify_password_in_thread,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -52,12 +56,11 @@ async def login(
     login_limiter.record_failure(ip)
 
     credentials = await repository.get_credentials(body.username)
-    # argon2 is CPU-heavy: run it in a thread so other requests are not blocked meanwhile.
     if credentials is None:
-        await anyio.to_thread.run_sync(burn_password_check, body.password)
+        await burn_password_check_in_thread(body.password)
         valid = False
     else:
-        valid = await anyio.to_thread.run_sync(verify_password, credentials[1], body.password)
+        valid = await verify_password_in_thread(credentials[1], body.password)
 
     if not valid:
         logger.warning("Admin login failed for username=%r from ip=%s", body.username, ip)

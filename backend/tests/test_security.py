@@ -1,6 +1,11 @@
+import threading
+import time
+
+import anyio
 import pytest
 
 from app.domain.auth import WeakPasswordError, check_password_policy
+from app.infra import security
 from app.infra.security import hash_password, hash_token, new_session_token, verify_password
 
 
@@ -29,3 +34,26 @@ def test_session_token_and_hash() -> None:
     assert len(token) >= 43  # 32 random bytes, base64url
     assert token_hash == hash_token(token) != token
     assert new_session_token()[0] != token
+
+
+@pytest.mark.anyio
+async def test_at_most_two_password_checks_run_at_once(monkeypatch: pytest.MonkeyPatch) -> None:
+    running = peak = 0
+    lock = threading.Lock()
+
+    def slow_verify(password_hash: str, password: str) -> bool:
+        nonlocal running, peak
+        with lock:
+            running += 1
+            peak = max(peak, running)
+        time.sleep(0.05)
+        with lock:
+            running -= 1
+        return False
+
+    monkeypatch.setattr(security, "verify_password", slow_verify)
+    async with anyio.create_task_group() as group:
+        for _ in range(6):
+            group.start_soon(security.verify_password_in_thread, "hash", "password")
+
+    assert peak == 2

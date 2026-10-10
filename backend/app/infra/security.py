@@ -1,6 +1,7 @@
 import hashlib
 import secrets
 
+import anyio
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
 
@@ -25,6 +26,21 @@ def verify_password(password_hash: str, password: str) -> bool:
 def burn_password_check(password: str) -> None:
     """Spend the same work as a real verification, for unknown usernames."""
     verify_password(_DUMMY_HASH, password)
+
+
+# Each argon2 check uses 64 MiB: allow two at a time so a flood of logins cannot exhaust memory.
+_hashing_slots = anyio.CapacityLimiter(2)
+
+
+async def verify_password_in_thread(password_hash: str, password: str) -> bool:
+    """verify_password off the event loop, with bounded concurrency."""
+    return await anyio.to_thread.run_sync(
+        verify_password, password_hash, password, limiter=_hashing_slots
+    )
+
+
+async def burn_password_check_in_thread(password: str) -> None:
+    await anyio.to_thread.run_sync(burn_password_check, password, limiter=_hashing_slots)
 
 
 def hash_token(token: str) -> str:
