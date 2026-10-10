@@ -6,6 +6,7 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from app.infra import models  # noqa: F401  (registers the tables on Base.metadata)
 from app.infra.config import settings
 from app.infra.database import Base
 
@@ -18,7 +19,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# ORM models must be imported before this line for autogenerate to see their tables.
+# Every ORM model module must be imported above for autogenerate to see its tables.
 target_metadata = Base.metadata
 
 # Tests inject their own URL with config.set_main_option; otherwise use the app settings.
