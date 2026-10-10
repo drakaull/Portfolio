@@ -24,6 +24,11 @@ class AdminRepository:
         )
         return None if row is None else (_to_domain(row), row.password_hash)
 
+    async def first_username(self) -> str | None:
+        return await self._session.scalar(
+            select(AdminUserModel.username).order_by(AdminUserModel.id).limit(1)
+        )
+
     async def save_user(self, username: str, password_hash: str) -> AdminUser:
         """Create the user, or change their password and revoke all their sessions."""
         row = await self._session.scalar(

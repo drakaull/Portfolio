@@ -17,6 +17,16 @@ class WeakPasswordError(ValueError):
     pass
 
 
+class AdminAlreadyExistsError(Exception):
+    """The site has a single admin: a different username is most likely a typo."""
+
+    def __init__(self, existing_username: str) -> None:
+        super().__init__(
+            f"An admin already exists ('{existing_username}'). "
+            "Use that username to change its password."
+        )
+
+
 def check_password_policy(password: str) -> None:
     if len(password) < MIN_PASSWORD_LENGTH:
         raise WeakPasswordError(

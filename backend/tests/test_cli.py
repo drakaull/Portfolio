@@ -4,6 +4,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import cli
+from app.domain.auth import AdminAlreadyExistsError
 from app.infra.repositories.admin import AdminRepository
 from app.infra.security import verify_password
 
@@ -43,3 +44,26 @@ async def test_create_admin_stores_an_argon2_hash(session: AsyncSession) -> None
     user, password_hash = await AdminRepository(session).get_credentials("leonard")
     assert password_hash != "long-enough-pw"
     assert verify_password(password_hash, "long-enough-pw")
+
+
+@pytest.mark.anyio
+async def test_create_admin_refuses_a_second_account(session: AsyncSession) -> None:
+    await cli.create_admin(session, "leonard", "long-enough-pw")
+
+    with pytest.raises(AdminAlreadyExistsError, match="'leonard'"):
+        await cli.create_admin(session, "leonrad", "long-enough-pw")  # typo
+    await cli.create_admin(session, "leonard", "another-long-pw")  # same name: password change
+
+
+def test_create_admin_reports_a_second_account_cleanly(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    answer_prompts(monkeypatch, "long-enough-pw", "long-enough-pw")
+
+    async def refuse(*args: object) -> None:
+        raise AdminAlreadyExistsError("leonard")
+
+    monkeypatch.setattr(cli, "_save", refuse)
+
+    assert cli.main(["create-admin", "--username", "leonrad"]) == 1
+    assert "'leonard'" in capsys.readouterr().err
