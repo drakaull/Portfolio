@@ -20,7 +20,7 @@ First slice from database to screen: a single `home_content` row with translated
 ### Phase 1: Backend
 - [x] Task 1: Language helpers and HomeContent entity
 - [x] Task 2: home_content table, migration and repository
-- [ ] Task 3: GET /api/home endpoint
+- [x] Task 3: GET /api/home endpoint
 - [ ] Task 4: CV storage and GET /api/cv
 
 ### Checkpoint A: after Tasks 1–4
