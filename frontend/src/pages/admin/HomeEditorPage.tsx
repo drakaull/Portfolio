@@ -121,7 +121,7 @@ export function HomeEditorPage() {
       <h1 className={adminStyles.title}>{t('admin.home.title')}</h1>
 
       {blocker.state === 'blocked' && (
-        <div className={styles.unsaved} role="alertdialog" aria-labelledby="unsaved-message">
+        <div className={styles.confirm} role="alertdialog" aria-labelledby="unsaved-message">
           <p id="unsaved-message">{t('admin.home.unsaved')}</p>
           <button type="button" className={adminStyles.button} onClick={() => blocker.reset()}>
             {t('admin.home.stay')}
@@ -133,7 +133,7 @@ export function HomeEditorPage() {
       )}
 
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
-        <fieldset className={styles.texts}>
+        <fieldset className={styles.panel}>
           <legend>{t('admin.home.texts')}</legend>
           <div role="tablist" aria-label={t('admin.home.textLanguage')} className={styles.tabs}>
             {LANGS.map((code) => (

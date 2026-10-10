@@ -56,7 +56,7 @@ export function CvField({
   }
 
   return (
-    <fieldset className={styles.texts}>
+    <fieldset className={styles.panel}>
       <legend>{t('admin.cv.legend')}</legend>
       <p className={styles.hint}>
         {hasCv ? t('admin.cv.online') : t('admin.cv.none')}{' '}
@@ -81,7 +81,7 @@ export function CvField({
         </button>
       )}
       {confirmingRemoval && (
-        <div className={styles.unsaved} role="alertdialog" aria-labelledby="cv-remove-message">
+        <div className={styles.confirm} role="alertdialog" aria-labelledby="cv-remove-message">
           <p id="cv-remove-message">{t('admin.cv.confirmRemove')}</p>
           <button type="button" className={adminStyles.button} onClick={handleRemove}>
             {t('admin.cv.confirm')}
