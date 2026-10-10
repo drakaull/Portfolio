@@ -1,49 +1,50 @@
-# Implementation Plan: Feature 4 — Admin authentication
+# Implementation Plan: Feature 5 — Edit the home page from the admin
 
-Spec: [04-admin-auth.md](../specs/04-admin-auth.md) · Task list: [todo.md](todo.md) · Branch: `feature/admin-auth`
+Spec: [05-admin-home-editor.md](../specs/05-admin-home-editor.md) · Task list: [todo.md](todo.md) · Branch: `feature/admin-home-editor`
 
 ## Overview
 
-Single-admin authentication: account created by CLI, argon2 password, server-side sessions in PostgreSQL behind an `HttpOnly; Secure; SameSite=Strict` cookie, rate-limited login, and a bilingual protected `/:lang/admin` area with login and logout.
+Protected API to read/save the home content and upload/remove the CV, then an admin dashboard and a home editor (FR/EN tabs, Markdown live preview, server-side validation errors, unsaved-changes protection). The app moves to React Router's data router to make in-app navigation blocking possible.
 
 ## Architecture Decisions
 
-- **Token never stored**: the cookie holds a random 256-bit token; the database stores its SHA-256. A database leak gives no usable session.
-- **Constant-work login**: an unknown username still runs one argon2 verification against a dummy hash, so response time does not reveal which usernames exist.
-- **`require_admin` dependency** returns the domain `AdminUser`; every future admin route declares it, and a test lists admin routes to prove none is missing it.
-- **Cookie scoped to `Path=/api/admin`**: the browser sends it only to admin API calls, never to public endpoints.
-- **In-memory rate limiter keyed by client IP** (single process). In production behind a reverse proxy, the client IP must come from the proxy header (uvicorn `--proxy-headers` with a trusted proxy list); noted for the deployment feature.
-- **Admin routes reuse the `/:lang` prefix**, so the language switch and dictionaries work unchanged.
+- **Admin schemas mirror the domain**: `TranslatedIn` has exactly `en` (required, non-empty) and `fr` (may be empty) with `extra="forbid"`, so adding Dutch later means adding one field.
+- **Length limits live in the domain** (`domain/home.py`) and are read by the Pydantic schemas and exposed to the frontend through `maxLength` only as a convenience.
+- **CV writes are atomic**: chunks go to a temporary file in `storage_dir`, size and `%PDF-` signature are checked, then `os.replace` swaps it in. A failed upload never removes the current CV.
+- **Data router migration is a pure refactor first** (its own task, all existing tests green), before any feature uses `useBlocker`. Tests share one `renderApp(path)` helper built on `createMemoryRouter` with the same route list as production.
+- **Session guard in `AdminLayout`**: one `/api/admin/me` check for every admin page except login; pages receive the username from the layout.
+- **One `MarkdownPreview` usage**: the editor renders the intro with the same `react-markdown` call as the public page, so preview and site cannot drift.
 
 ## Task List
 
 ### Phase 1: Backend
-- [x] Task 1: Auth domain rules and security helpers
-- [x] Task 2: Admin users and sessions tables, migration and repository
-- [x] Task 3: `create-admin` command
-- [x] Task 4: Login, logout, me endpoints with rate limiting
+- [ ] Task 1: GET / PUT /api/admin/home
+- [ ] Task 2: PUT / DELETE /api/admin/cv
 
-### Checkpoint A: after Tasks 1–4
-- [x] ruff + pytest green, migration round-trip green
-- [ ] Human check: create the account with the CLI, sign in through `/docs`, `/api/admin/me` → 200, logout → 401
+### Checkpoint A: after Tasks 1–2
+- [ ] ruff + pytest green
+- [ ] Human check through `/docs`: edit the headline, see it on `/api/home`; upload a PDF, try a renamed non-PDF
 
 ### Phase 2: Frontend
-- [x] Task 5: Bilingual admin login page and protected admin area
+- [ ] Task 3: Switch to the data router (refactor, no behaviour change)
+- [ ] Task 4: Guarded admin layout and dashboard
+- [ ] Task 5: Home editor (texts, links, preview, save, unsaved changes)
+- [ ] Task 6: CV upload and removal in the editor
 
 ### Checkpoint B: complete
-- [x] Human browser check of the 6 spec success criteria
-- [x] Security review (security-auditor persona) + code review (`/review`)
+- [ ] Human browser check of the 6 spec success criteria
+- [ ] Security review (security-auditor) + code review (`/review`)
 - [ ] Merge into `develop` after approval
 
 ## Risks and Mitigations
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| A future admin route forgets `require_admin` | High | Test iterating over every `/api/admin/*` route except login/logout, asserting 401 without a cookie |
-| Brute force from many IPs | Med | 12+ character password policy and argon2 cost make online guessing impractical; limiter slows each IP |
-| Wrong client IP behind a proxy makes the limiter global or bypassable | Med | Documented for deployment (trusted proxy headers) |
-| Secure cookie refused on local HTTP | Low | Chromium and Firefox accept it on `localhost`; verified at Checkpoint A |
-| Password or token in logs | High | Log only username, IP and outcome; test asserts the password is absent from captured logs |
+| Upload bypasses type check with a renamed file | High | Magic-byte check on the content, not only the declared type; test with a fake PDF |
+| Partial write corrupts the live CV | Med | Temp file + atomic `os.replace`; test that a rejected upload keeps the previous CV |
+| Data router migration breaks existing pages | Med | Dedicated refactor task; all 46 frontend tests must stay green before moving on |
+| `useBlocker` fires after a successful save | Low | Blocker condition is "form differs from last saved state"; test navigation right after saving |
+| Session expires mid-edit and text is lost | Med | Form state kept on 401; message with sign-in link opening in a new tab |
 
 ## Open Questions
 
