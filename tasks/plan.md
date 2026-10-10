@@ -31,8 +31,8 @@ Single-admin authentication: account created by CLI, argon2 password, server-sid
 - [x] Task 5: Bilingual admin login page and protected admin area
 
 ### Checkpoint B: complete
-- [ ] Human browser check of the 6 spec success criteria
-- [ ] Security review (security-auditor persona) + code review (`/review`)
+- [x] Human browser check of the 6 spec success criteria
+- [x] Security review (security-auditor persona) + code review (`/review`)
 - [ ] Merge into `develop` after approval
 
 ## Risks and Mitigations
