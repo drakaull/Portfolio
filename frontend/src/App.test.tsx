@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { App } from './App.tsx'
@@ -70,7 +70,15 @@ describe('navbar', () => {
     const hrefs = within(nav)
       .getAllByRole('link')
       .map((link) => link.getAttribute('href'))
-    expect(hrefs).toEqual(['/fr', '/fr/experience', '/fr/skills', '/fr/projects', '/fr/contact'])
+    // Last link is the language switch.
+    expect(hrefs).toEqual([
+      '/fr',
+      '/fr/experience',
+      '/fr/skills',
+      '/fr/projects',
+      '/fr/contact',
+      '/en',
+    ])
   })
 
   test('marks the current section link with aria-current', () => {
@@ -82,6 +90,21 @@ describe('navbar', () => {
   test('offers a skip link to the main content', () => {
     renderAt('/en')
     expect(screen.getByRole('link', { name: 'Skip to content' }).getAttribute('href')).toBe('#main')
+  })
+})
+
+describe('language switch', () => {
+  test('switches to English and keeps the current section', () => {
+    renderAt('/fr/skills')
+    fireEvent.click(screen.getByRole('link', { name: 'English' }))
+    expect(heading().textContent).toBe('Skills')
+    expect(document.documentElement.lang).toBe('en')
+  })
+
+  test('switches to French from the home page', () => {
+    renderAt('/en')
+    fireEvent.click(screen.getByRole('link', { name: 'Français' }))
+    expect(heading().textContent).toBe('Accueil')
   })
 })
 
