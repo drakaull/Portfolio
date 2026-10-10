@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import delete, update
@@ -51,3 +53,23 @@ async def test_home_returns_404_without_content(client: AsyncClient, session: As
     response = await client.get("/api/home", params={"lang": "en"})
 
     assert response.status_code == 404
+
+
+async def test_cv_returns_404_and_no_cv_url_without_file(client: AsyncClient) -> None:
+    assert (await client.get("/api/cv")).status_code == 404
+    home = await client.get("/api/home", params={"lang": "en"})
+    assert home.json()["cv_url"] is None
+
+
+async def test_cv_is_served_inline_when_present(client: AsyncClient, storage_dir: Path) -> None:
+    (storage_dir / "cv.pdf").write_bytes(b"%PDF-1.7 fake")
+
+    response = await client.get("/api/cv")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/pdf"
+    assert response.headers["content-disposition"].startswith("inline")
+    assert "Leonard_Fontaine_CV.pdf" in response.headers["content-disposition"]
+    assert response.content == b"%PDF-1.7 fake"
+    home = await client.get("/api/home", params={"lang": "en"})
+    assert home.json()["cv_url"] == "/api/cv"

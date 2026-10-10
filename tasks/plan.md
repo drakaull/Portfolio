@@ -21,10 +21,10 @@ First slice from database to screen: a single `home_content` row with translated
 - [x] Task 1: Language helpers and HomeContent entity
 - [x] Task 2: home_content table, migration and repository
 - [x] Task 3: GET /api/home endpoint
-- [ ] Task 4: CV storage and GET /api/cv
+- [x] Task 4: CV storage and GET /api/cv
 
 ### Checkpoint A: after Tasks 1–4
-- [ ] ruff + pytest green, migration round-trip green
+- [x] ruff + pytest green, migration round-trip green
 - [ ] Human check: `/api/home?lang=fr`, `/api/home?lang=xx` (422), `/api/cv` with and without a PDF
 
 ### Phase 2: Frontend

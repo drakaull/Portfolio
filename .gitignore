@@ -3,6 +3,9 @@
 .env.*
 !.env.example
 
+# Uploaded files (CV, images): personal data, never committed
+backend/storage/
+
 # Python
 __pycache__/
 *.py[cod]

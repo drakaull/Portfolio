@@ -1,4 +1,5 @@
 from collections.abc import AsyncIterator
+from pathlib import Path
 
 import anyio
 import pytest
@@ -24,6 +25,13 @@ assert make_url(settings.database_url).database != TEST_DATABASE, (
 @pytest.fixture(scope="session")
 def anyio_backend() -> str:
     return "asyncio"
+
+
+@pytest.fixture(autouse=True)
+def storage_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Empty storage folder per test, so a real CV in backend/storage never affects tests."""
+    monkeypatch.setattr(settings, "storage_dir", tmp_path)
+    return tmp_path
 
 
 async def _create_test_database() -> None:
