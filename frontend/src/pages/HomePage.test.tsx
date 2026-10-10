@@ -1,7 +1,6 @@
-import { act, fireEvent, render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
-import { App } from '../App.tsx'
+import { renderApp } from '../test/renderApp.tsx'
 import type { HomeContent } from '../api/useHomeContent.ts'
 
 const CONTENT: Record<string, HomeContent> = {
@@ -57,23 +56,15 @@ function controlledApi() {
   }
 }
 
-function renderAt(path: string) {
-  render(
-    <MemoryRouter initialEntries={[path]}>
-      <App />
-    </MemoryRouter>,
-  )
-}
-
 describe('home page', () => {
   test('shows a loading message until the content arrives', () => {
-    renderAt('/en')
+    renderApp('/en')
     expect(screen.getByText('Loading…')).toBeDefined()
   })
 
   test('shows the content of the URL language', async () => {
     const fetchMock = mockApi()
-    renderAt('/fr')
+    renderApp('/fr')
 
     expect(await screen.findByText('Développeur fullstack')).toBeDefined()
     expect(screen.getByText('applications web').tagName).toBe('STRONG')
@@ -82,7 +73,7 @@ describe('home page', () => {
 
   test('refetches in the other language after switching', async () => {
     mockApi()
-    renderAt('/fr')
+    renderApp('/fr')
     await screen.findByText('Développeur fullstack')
 
     fireEvent.click(screen.getByRole('link', { name: 'English' }))
@@ -92,7 +83,7 @@ describe('home page', () => {
 
   test('does not show the previous language while the new one loads', async () => {
     const api = controlledApi()
-    renderAt('/fr')
+    renderApp('/fr')
     await api.answer('fr')
     await screen.findByText('Développeur fullstack')
 
@@ -104,7 +95,7 @@ describe('home page', () => {
 
   test('ignores a late answer for the previous language', async () => {
     const api = controlledApi()
-    renderAt('/fr')
+    renderApp('/fr')
     fireEvent.click(screen.getByRole('link', { name: 'English' }))
     await api.answer('en')
     await screen.findByText('Fullstack developer')
@@ -117,7 +108,7 @@ describe('home page', () => {
 
   test('shows HTML written in the introduction as text, never as markup', async () => {
     mockApi({ en: { intro: 'Hi <script>alert(1)</script><img src=x onerror=alert(1)>' } })
-    renderAt('/en')
+    renderApp('/en')
     await screen.findByText('Fullstack developer')
 
     expect(document.querySelector('main script, main img')).toBeNull()
@@ -125,7 +116,7 @@ describe('home page', () => {
 
   test('opens external links in a new tab safely', async () => {
     mockApi()
-    renderAt('/en')
+    renderApp('/en')
 
     const linkedin = await screen.findByRole('link', { name: /LinkedIn/ })
     expect(linkedin.getAttribute('href')).toBe('https://www.linkedin.com/in/someone')
@@ -136,7 +127,7 @@ describe('home page', () => {
 
   test('hides the CV link when there is no CV', async () => {
     mockApi({ en: { cv_url: null } })
-    renderAt('/en')
+    renderApp('/en')
     await screen.findByText('Fullstack developer')
 
     expect(screen.queryByRole('link', { name: /View my CV/ })).toBeNull()
@@ -144,7 +135,7 @@ describe('home page', () => {
 
   test('shows an error message when the API fails', async () => {
     mockApi(CONTENT, 500)
-    renderAt('/fr')
+    renderApp('/fr')
 
     expect((await screen.findByRole('alert')).textContent).toBe(
       "Ce contenu n'a pas pu être chargé. Réessayez plus tard.",
