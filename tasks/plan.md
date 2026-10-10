@@ -28,7 +28,7 @@ Single-admin authentication: account created by CLI, argon2 password, server-sid
 - [ ] Human check: create the account with the CLI, sign in through `/docs`, `/api/admin/me` → 200, logout → 401
 
 ### Phase 2: Frontend
-- [ ] Task 5: Bilingual admin login page and protected admin area
+- [x] Task 5: Bilingual admin login page and protected admin area
 
 ### Checkpoint B: complete
 - [ ] Human browser check of the 6 spec success criteria
