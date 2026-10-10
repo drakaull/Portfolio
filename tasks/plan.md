@@ -28,7 +28,7 @@ First slice from database to screen: a single `home_content` row with translated
 - [ ] Human check: `/api/home?lang=fr`, `/api/home?lang=xx` (422), `/api/cv` with and without a PDF
 
 ### Phase 2: Frontend
-- [ ] Task 5: Home page fetching and rendering the content
+- [x] Task 5: Home page fetching and rendering the content
 
 ### Checkpoint B: complete
 - [ ] Human check in the browser: both languages, links, CV, backend stopped → error message
