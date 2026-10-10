@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router'
 import { login, type LoginResult } from '../../api/admin.ts'
+import { Button } from '../../components/Button/Button.tsx'
 import { useTranslation } from '../../i18n/useTranslation.ts'
 import type { TranslationKey } from '../../i18n/en.ts'
 import styles from './Admin.module.css'
@@ -54,9 +55,9 @@ export function AdminLoginPage() {
             {t(error)}
           </p>
         )}
-        <button type="submit" className={styles.button} disabled={submitting}>
+        <Button type="submit" disabled={submitting}>
           {t('admin.login.submit')}
-        </button>
+        </Button>
       </form>
     </section>
   )

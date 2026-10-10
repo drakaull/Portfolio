@@ -28,7 +28,7 @@ Direction A ("Papier quadrillé") applied site-wide: refined tokens, graph-paper
 
 ### Phase 2: Pages
 - [x] Task 4: Home, section pages and 404
-- [ ] Task 5: Admin restyle and route transition
+- [x] Task 5: Admin restyle and route transition
 
 ### Checkpoint B: complete
 - [ ] Human browser check of the 5 spec success criteria

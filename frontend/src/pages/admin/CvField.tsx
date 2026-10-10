@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent } from 'react'
 import { deleteCv, uploadCv, type CvResult } from '../../api/adminHome.ts'
+import { Button } from '../../components/Button/Button.tsx'
 import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
 import adminStyles from './Admin.module.css'
@@ -83,9 +84,7 @@ export function CvField({
       {confirmingRemoval && (
         <div className={styles.confirm} role="alertdialog" aria-labelledby="cv-remove-message">
           <p id="cv-remove-message">{t('admin.cv.confirmRemove')}</p>
-          <button type="button" className={adminStyles.button} onClick={handleRemove}>
-            {t('admin.cv.confirm')}
-          </button>
+          <Button onClick={handleRemove}>{t('admin.cv.confirm')}</Button>
           <button
             type="button"
             className={styles.secondary}

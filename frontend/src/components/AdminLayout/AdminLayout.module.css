@@ -1,22 +1,21 @@
 .header {
-  display: flex;
   width: 100%;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.headerInner {
+  display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
   max-width: var(--content-width);
   margin-inline: auto;
-  padding: 1rem var(--gutter);
-  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) var(--gutter);
+  font-size: var(--text-sm);
 }
 
 .brand {
   margin-right: auto;
   font-weight: 700;
-}
-
-.back {
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
 }
 
 .main {

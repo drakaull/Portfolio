@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { logout } from '../../api/admin.ts'
+import { Button } from '../../components/Button/Button.tsx'
 import { useAdmin } from '../../components/RequireAdmin/useAdmin.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
 import styles from './Admin.module.css'
@@ -37,9 +38,7 @@ export function AdminDashboardPage() {
           </li>
         </ul>
       </nav>
-      <button type="button" className={styles.button} onClick={handleLogout}>
-        {t('admin.logout')}
-      </button>
+      <Button onClick={handleLogout}>{t('admin.logout')}</Button>
       {logoutFailed && (
         <p className={styles.error} role="alert">
           {t('admin.logoutError')}

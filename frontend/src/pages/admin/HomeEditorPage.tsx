@@ -7,6 +7,7 @@ import {
   type HomeContentForm,
   type HomeField,
 } from '../../api/adminHome.ts'
+import { Button } from '../../components/Button/Button.tsx'
 import { MarkdownText } from '../../components/MarkdownText/MarkdownText.tsx'
 import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation, type Lang } from '../../i18n/useTranslation.ts'
@@ -123,9 +124,7 @@ export function HomeEditorPage() {
       {blocker.state === 'blocked' && (
         <div className={styles.confirm} role="alertdialog" aria-labelledby="unsaved-message">
           <p id="unsaved-message">{t('admin.home.unsaved')}</p>
-          <button type="button" className={adminStyles.button} onClick={() => blocker.reset()}>
-            {t('admin.home.stay')}
-          </button>
+          <Button onClick={() => blocker.reset()}>{t('admin.home.stay')}</Button>
           <button type="button" className={styles.secondary} onClick={() => blocker.proceed()}>
             {t('admin.home.leave')}
           </button>
@@ -213,13 +212,9 @@ export function HomeEditorPage() {
         <CvField hasCv={hasCv} onChange={setHasCv} />
 
         <div className={styles.actions}>
-          <button
-            type="submit"
-            className={adminStyles.button}
-            disabled={!dirty || saveState === 'saving'}
-          >
+          <Button type="submit" disabled={!dirty || saveState === 'saving'}>
             {saveState === 'saving' ? t('admin.home.saving') : t('admin.home.save')}
-          </button>
+          </Button>
           <span role="status">{saveState === 'saved' && t('admin.home.saved')}</span>
         </div>
         {saveState === 'expired' && (
