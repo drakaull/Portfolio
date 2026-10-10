@@ -1,50 +1,49 @@
-# Implementation Plan: Feature 5 — Edit the home page from the admin
+# Implementation Plan: Feature 6 — Visual direction
 
-Spec: [05-admin-home-editor.md](../specs/05-admin-home-editor.md) · Task list: [todo.md](todo.md) · Branch: `feature/admin-home-editor`
+Spec: [06-visual-direction.md](../specs/06-visual-direction.md) · Task list: [todo.md](todo.md) · Branch: `feature/visual-direction`
 
 ## Overview
 
-Protected API to read/save the home content and upload/remove the CV, then an admin dashboard and a home editor (FR/EN tabs, Markdown live preview, server-side validation errors, unsaved-changes protection). The app moves to React Router's data router to make in-app navigation blocking possible.
+Direction A ("Papier quadrillé") applied site-wide: refined tokens, graph-paper background, Bricolage Grotesque for the name, JetBrains Mono for labels and dates, reusable blocks (Eyebrow, Button, TextLink, Badge, Reveal), CSS-only motion, favicon and footer, then a restyle of every existing page.
 
 ## Architecture Decisions
 
-- **Admin schemas mirror the domain**: `TranslatedIn` has exactly `en` (required, non-empty) and `fr` (may be empty) with `extra="forbid"`, so adding Dutch later means adding one field.
-- **Length limits live in the domain** (`domain/home.py`) and are read by the Pydantic schemas and exposed to the frontend through `maxLength` only as a convenience.
-- **CV writes are atomic**: chunks go to a temporary file in `storage_dir`, size and `%PDF-` signature are checked, then `os.replace` swaps it in. A failed upload never removes the current CV.
-- **Data router migration is a pure refactor first** (its own task, all existing tests green), before any feature uses `useBlocker`. Tests share one `renderApp(path)` helper built on `createMemoryRouter` with the same route list as production.
-- **Session guard in `AdminLayout`**: one `/api/admin/me` check for every admin page except login; pages receive the username from the layout.
-- **One `MarkdownPreview` usage**: the editor renders the intro with the same `react-markdown` call as the public page, so preview and site cannot drift.
+- **Tokens first, components second**: every visual value lives in `global.css` custom properties; blocks only reference tokens, so a later redesign stays a token change.
+- **Motion in CSS only** (transitions + keyframes on `transform`/`opacity`), one global `prefers-reduced-motion` rule that disables animations and transitions everywhere.
+- **`Reveal`** sets a `--reveal-index` per child via inline style; the stagger delay is computed in CSS. Content is visible at rest (animation `both` from a visible end state), never stuck hidden.
+- **Route fade-in** keyed on the pathname in the public `Layout` so only the page content animates, not the navbar.
+- **Path eyebrows come from the dictionaries** (`eyebrow.home`, `eyebrow.experience`…), so translations stay in one place.
+- **Visual verification is part of each task**: Playwright screenshots (light/dark, 1280/390 px) reviewed before committing.
 
 ## Task List
 
-### Phase 1: Backend
-- [x] Task 1: GET / PUT /api/admin/home
-- [x] Task 2: PUT / DELETE /api/admin/cv
+### Phase 1: Foundation
+- [ ] Task 1: Tokens, fonts, graph-paper background, global motion rules
+- [ ] Task 2: Building blocks (Eyebrow, Button, TextLink, Badge, Reveal)
+- [ ] Task 3: Navbar, footer and favicon
 
-### Checkpoint A: after Tasks 1–2
-- [x] ruff + pytest green
-- [ ] Human check through `/docs`: edit the headline, see it on `/api/home`; upload a PDF, try a renamed non-PDF
+### Checkpoint A: after Tasks 1–3
+- [ ] All frontend checks green; Playwright screenshots reviewed
+- [ ] Human check in the browser: background, navbar, footer, favicon, both themes
 
-### Phase 2: Frontend
-- [x] Task 3: Switch to the data router (refactor, no behaviour change)
-- [x] Task 4: Guarded admin layout and dashboard
-- [x] Task 5: Home editor (texts, links, preview, save, unsaved changes)
-- [x] Task 6: CV upload and removal in the editor
+### Phase 2: Pages
+- [ ] Task 4: Home, section pages and 404
+- [ ] Task 5: Admin restyle and route transition
 
 ### Checkpoint B: complete
-- [x] Human browser check of the 6 spec success criteria
-- [x] Security review (security-auditor) + code review (`/review`)
+- [ ] Human browser check of the 5 spec success criteria
+- [ ] Code review (`/review`) — no security-sensitive change, so no security audit
 - [ ] Merge into `develop` after approval
 
 ## Risks and Mitigations
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Upload bypasses type check with a renamed file | High | Magic-byte check on the content, not only the declared type; test with a fake PDF |
-| Partial write corrupts the live CV | Med | Temp file + atomic `os.replace`; test that a rejected upload keeps the previous CV |
-| Data router migration breaks existing pages | Med | Dedicated refactor task; all 46 frontend tests must stay green before moving on |
-| `useBlocker` fires after a successful save | Low | Blocker condition is "form differs from last saved state"; test navigation right after saving |
-| Session expires mid-edit and text is lost | Med | Form state kept on 401; message with sign-in link opening in a new tab |
+| Graph-paper texture hurts readability | Med | Very low contrast lines (`--color-grid`), checked in both themes on screenshots |
+| Entrance animations hide content if JS/CSS fails | Med | Keyframes end at the visible state; no element starts hidden outside the animation |
+| Three font families slow the first paint | Low | Variable fonts, Latin subsets only by `unicode-range`; Bricolage used for one element; measured in build output |
+| Restyle breaks existing tests (text/role queries) | Low | Behaviour and accessible names unchanged; full suite after each task |
+| Contrast regressions in dark mode | Med | Re-check AA ratios for any changed color; screenshots in dark mode |
 
 ## Open Questions
 
