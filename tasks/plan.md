@@ -17,10 +17,10 @@ Connect FastAPI to PostgreSQL asynchronously, add Alembic migrations and a test 
 ## Task List
 
 ### Phase 1: Database connection
-- [ ] Task 1: Async database session and health check
+- [x] Task 1: Async database session and health check
 
 ### Phase 2: Migrations
-- [ ] Task 2: Alembic setup and migration round-trip test
+- [x] Task 2: Alembic setup and migration round-trip test
 
 ### Checkpoint A: after Tasks 1–2
 - [ ] ruff + pytest green

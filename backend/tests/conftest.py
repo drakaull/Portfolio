@@ -1,6 +1,9 @@
 from collections.abc import AsyncIterator
 
+import anyio
 import pytest
+from alembic import command
+from alembic.config import Config
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import make_url, text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
@@ -35,9 +38,19 @@ async def _create_test_database() -> None:
     await admin.dispose()
 
 
+def alembic_config() -> Config:
+    """Alembic config targeting the test database."""
+    config = Config("alembic.ini")
+    url = TEST_DATABASE_URL.render_as_string(hide_password=False)
+    config.set_main_option("sqlalchemy.url", url.replace("%", "%%"))
+    return config
+
+
 @pytest.fixture(scope="session")
 async def engine() -> AsyncIterator[AsyncEngine]:
     await _create_test_database()
+    # Alembic's env.py calls asyncio.run(), which cannot run inside this event loop: use a thread.
+    await anyio.to_thread.run_sync(command.upgrade, alembic_config(), "head")
     test_engine = create_async_engine(TEST_DATABASE_URL)
     yield test_engine
     await test_engine.dispose()
