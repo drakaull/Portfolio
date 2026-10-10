@@ -42,6 +42,27 @@ describe('home page', () => {
   })
 })
 
+describe('section pages', () => {
+  test.each([
+    ['/en/experience', 'Experience'],
+    ['/fr/experience', 'Parcours'],
+    ['/en/skills', 'Skills'],
+    ['/fr/skills', 'Compétences'],
+    ['/en/projects', 'Projects'],
+    ['/fr/projects', 'Projets'],
+    ['/en/contact', 'Contact'],
+    ['/fr/contact', 'Contact'],
+  ])('%s renders its translated title', (path, title) => {
+    renderAt(path)
+    expect(heading().textContent).toBe(title)
+  })
+
+  test('sets the document title', () => {
+    renderAt('/fr/skills')
+    expect(document.title).toBe('Compétences · Léonard Fontaine')
+  })
+})
+
 describe('not found page', () => {
   test.each([
     ['/de', 'Page not found'],

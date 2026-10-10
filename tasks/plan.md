@@ -17,9 +17,9 @@ Turn the empty React app into the portfolio's frame: one URL per section with th
 ## Task List
 
 ### Phase 1: Foundation
-- [ ] Task 1: Design tokens, self-hosted font and theme bootstrap
-- [ ] Task 2: Localized routing with home and 404 pages
-- [ ] Task 3: Empty section pages
+- [x] Task 1: Design tokens, self-hosted font and theme bootstrap
+- [x] Task 2: Localized routing with home and 404 pages
+- [x] Task 3: Empty section pages
 
 ### Checkpoint A: after Tasks 1–3
 - [ ] Lint, format check, tests and build pass

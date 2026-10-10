@@ -2,6 +2,10 @@
 export const en = {
   'site.name': 'Léonard Fontaine',
   'home.title': 'Home',
+  'experience.title': 'Experience',
+  'skills.title': 'Skills',
+  'projects.title': 'Projects',
+  'contact.title': 'Contact',
   'notFound.title': 'Page not found',
   'notFound.back': 'Back to home',
 }
