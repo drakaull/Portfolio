@@ -1,6 +1,7 @@
 import logging
 from collections.abc import Iterator
 
+import anyio
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import select, update
@@ -69,6 +70,28 @@ async def test_eleventh_failure_within_the_window_is_refused(
     blocked = await login(client)  # even the right password is refused while blocked
 
     assert blocked.status_code == 429
+
+
+async def test_parallel_attempts_cannot_bypass_the_limit(client: AsyncClient, admin: None) -> None:
+    statuses: list[int] = []
+
+    async def attempt() -> None:
+        statuses.append((await login(client, password="wrong password!")).status_code)
+
+    async with anyio.create_task_group() as group:
+        for _ in range(15):
+            group.start_soon(attempt)
+
+    assert sorted(statuses) == [401] * 10 + [429] * 5
+
+
+async def test_successful_logins_do_not_count_as_failures(client: AsyncClient, admin: None) -> None:
+    for _ in range(9):
+        await login(client, password="wrong password!")
+    for _ in range(3):
+        assert (await login(client)).status_code == 204
+
+    assert (await login(client, password="wrong password!")).status_code == 401
 
 
 async def test_protected_routes_reject_missing_forged_expired_and_logged_out_sessions(

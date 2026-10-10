@@ -29,6 +29,11 @@ class LoginRateLimiter:
     def record_failure(self, key: str, now: float | None = None) -> None:
         self._failures[key].append(time.monotonic() if now is None else now)
 
+    def forgive(self, key: str) -> None:
+        """Cancel the most recent recorded attempt (it turned out to be a successful login)."""
+        if self._failures.get(key):
+            self._failures[key].pop()
+
     def reset(self) -> None:
         self._failures.clear()
 

@@ -47,6 +47,9 @@ async def login(
     if login_limiter.is_blocked(ip):
         logger.warning("Admin login blocked (too many failures) from ip=%s", ip)
         raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, detail="Too many attempts")
+    # Count the attempt before any await: parallel requests would otherwise all pass the check
+    # above before the first failure is recorded. A successful login forgives it below.
+    login_limiter.record_failure(ip)
 
     credentials = await repository.get_credentials(body.username)
     # argon2 is CPU-heavy: run it in a thread so other requests are not blocked meanwhile.
@@ -57,10 +60,10 @@ async def login(
         valid = await anyio.to_thread.run_sync(verify_password, credentials[1], body.password)
 
     if not valid:
-        login_limiter.record_failure(ip)
         logger.warning("Admin login failed for username=%r from ip=%s", body.username, ip)
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
+    login_limiter.forgive(ip)
     user = credentials[0]
     now = datetime.now(UTC)
     token, token_hash = new_session_token()
