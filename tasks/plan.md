@@ -31,9 +31,9 @@ First slice from database to screen: a single `home_content` row with translated
 - [x] Task 5: Home page fetching and rendering the content
 
 ### Checkpoint B: complete
-- [ ] Human check in the browser: both languages, links, CV, backend stopped → error message
-- [ ] All 7 spec success criteria verified
-- [ ] Code review (`/review`), then merge into `develop` after approval
+- [x] Human check in the browser: both languages, links, CV, backend stopped → error message
+- [x] All 7 spec success criteria verified
+- [x] Code review (`/review`), then merge into `develop` after approval
 
 ## Risks and Mitigations
 

@@ -11,7 +11,11 @@ export function HomePage() {
     <section className={styles.hero}>
       <title>{t('site.name')}</title>
       <h1 className={styles.name}>{t('site.name')}</h1>
-      {state.status === 'loading' && <p className={styles.status}>{t('home.loading')}</p>}
+      {state.status === 'loading' && (
+        <p className={styles.status} role="status">
+          {t('home.loading')}
+        </p>
+      )}
       {state.status === 'error' && (
         <p className={styles.status} role="alert">
           {t('home.error')}
