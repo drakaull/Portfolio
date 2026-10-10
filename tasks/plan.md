@@ -1,55 +1,46 @@
-# Implementation Plan: Feature 1 — Site shell
+# Implementation Plan: Feature 2 — Backend foundation
 
-Spec: [SPEC.md](../SPEC.md) · Task list: [todo.md](todo.md) · Branch: `feature/site-shell`
+Spec: [02-backend-foundation.md](../specs/02-backend-foundation.md) · Task list: [todo.md](todo.md) · Branch: `feature/backend-foundation`
 
 ## Overview
 
-Turn the empty React app into the portfolio's frame: one URL per section with the language in the path, a fixed navbar, a FR/EN switch and a light/dark theme. Pages stay empty (translated title only); content comes in later features.
+Connect FastAPI to PostgreSQL asynchronously, add Alembic migrations and a test setup on a real test database. The only visible change is a health check that reports the database state.
 
 ## Architecture Decisions
 
-- **Language lives in the URL only** (`/:lang/...`). No React context or global store: `useTranslation()` reads `lang` from the route params, so a shared link always opens in the right language.
-- **`en.ts` is the source of truth for translation keys**; `fr.ts` is typed against it, so a missing French string fails the TypeScript build.
-- **Theme is applied before React loads** by a few lines of inline script in `index.html` that set `<html data-theme>`. This avoids the flash of the wrong theme on reload (success criterion 5). React then only toggles the attribute and `localStorage`.
-- **All colors are CSS variables in `styles/global.css`**; components never hard-code colors, which keeps a later redesign to one file.
-- **Font bundled from npm** (`@fontsource-variable/google-sans`), served from the site's own origin.
+- **Async SQLAlchemy + asyncpg**, one `AsyncSession` per request through a `get_session` FastAPI dependency. `asyncpg` because async psycopg does not run on Windows' default event loop.
+- **Engine created once at import from settings**; tests swap it by overriding `get_session`, so no global state is patched.
+- **Alembic async template**: `migrations/env.py` reads `settings.database_url` (never `alembic.ini`), so the URL lives in `.env` only.
+- **Test isolation by rollback**: each test runs inside a connection-level transaction; the session joins it with savepoints, and everything is rolled back after the test.
+- **Naming conventions on `Base.metadata`** (pk/fk/ix/uq/ck) so constraint names are stable and migrations can drop them reliably.
 
 ## Task List
 
-### Phase 1: Foundation
-- [x] Task 1: Design tokens, self-hosted font and theme bootstrap
-- [x] Task 2: Localized routing with home and 404 pages
-- [x] Task 3: Empty section pages
+### Phase 1: Database connection
+- [x] Task 1: Async database session and health check
 
-### Checkpoint A: after Tasks 1–3
-- [x] Lint, format check, tests and build pass
-- [x] Every route from the spec renders its translated title
-- [x] Human check in the browser
+### Phase 2: Migrations
+- [x] Task 2: Alembic setup and migration round-trip test
 
-### Phase 2: Navigation
-- [x] Task 4: Fixed navbar with active link
-- [x] Task 5: Language switch
-- [x] Task 6: Theme toggle
+### Checkpoint A: after Tasks 1–2
+- [x] ruff + pytest green
+- [x] Human check: health is 200 with Docker up, 503 with the database stopped
 
-### Checkpoint B: after Tasks 4–6
-- [x] All checks pass
-- [x] Human check: switch language and theme on several pages, reload
+### Phase 3: Documentation
+- [x] Task 3: README — environment, migrations and layering rules
 
-### Phase 3: Mobile
-- [x] Task 7: Mobile menu below 768 px
-
-### Checkpoint C: complete
-- [x] All 8 success criteria of the spec verified
-- [x] Code review (`/review`), then merge `feature/site-shell` into `develop` and push, after approval
+### Checkpoint B: complete
+- [x] All 5 spec success criteria verified
+- [x] Code review (`/review`), then merge into `develop` after approval
 
 ## Risks and Mitigations
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Flash of wrong theme on reload | Med | Inline script in `index.html` runs before the first paint (Task 1) |
-| French dictionary drifts from English | Low | `fr.ts` typed as `typeof en`; build fails on a missing key |
-| Fixed navbar hides the top of the page or anchor targets | Low | `<main>` gets top padding equal to the navbar height token |
-| Font package changes or disappears | Low | Version pinned in `package-lock.json`; system fallback stack declared |
+| Tests accidentally run against the dev database | High | Test URL derived from settings with the database name forced to `portfolio_test`; a guard asserts the name before any test runs |
+| Event-loop mismatch between pytest and the async engine | Med | AnyIO plugin + `httpx.AsyncClient`/`ASGITransport` (no sync `TestClient`); engine created inside the test event loop |
+| Windows event loop incompatibility | Med | `asyncpg` driver (works with ProactorEventLoop) |
+| Health check leaks connection details | Low | Fixed response body; exception never serialized; test asserts the body |
 
 ## Open Questions
 
