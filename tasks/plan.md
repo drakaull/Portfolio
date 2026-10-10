@@ -23,11 +23,11 @@ Connect FastAPI to PostgreSQL asynchronously, add Alembic migrations and a test 
 - [x] Task 2: Alembic setup and migration round-trip test
 
 ### Checkpoint A: after Tasks 1–2
-- [ ] ruff + pytest green
-- [ ] Human check: health is 200 with Docker up, 503 with the database stopped
+- [x] ruff + pytest green
+- [x] Human check: health is 200 with Docker up, 503 with the database stopped
 
 ### Phase 3: Documentation
-- [ ] Task 3: README — environment, migrations and layering rules
+- [x] Task 3: README — environment, migrations and layering rules
 
 ### Checkpoint B: complete
 - [ ] All 5 spec success criteria verified
