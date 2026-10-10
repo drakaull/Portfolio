@@ -177,5 +177,16 @@ async def test_signed_in_admin_can_read_me_then_log_out(client: AsyncClient, adm
     assert (await client.get("/api/admin/me")).status_code == 401
 
 
+async def test_signing_in_again_ends_the_previous_session(
+    client: AsyncClient, admin: None, session: AsyncSession
+) -> None:
+    first_token = (await login(client)).cookies["admin_session"]
+    await login(client)  # the client sends the first cookie along
+
+    replay = {"Cookie": f"admin_session={first_token}"}
+    assert (await client.get("/api/admin/me", headers=replay)).status_code == 401
+    assert len(list(await session.scalars(select(AdminSessionModel)))) == 1
+
+
 async def test_logout_without_session_is_harmless(client: AsyncClient) -> None:
     assert (await client.post("/api/admin/logout")).status_code == 204

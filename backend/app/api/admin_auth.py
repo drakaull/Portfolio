@@ -46,6 +46,7 @@ async def login(
     request: Request,
     response: Response,
     repository: Annotated[AdminRepository, Depends(get_admin_repository)],
+    previous_token: Annotated[str | None, Cookie(alias=ADMIN_COOKIE)] = None,
 ) -> None:
     ip = _client_ip(request)
     if login_limiter.is_blocked(ip):
@@ -71,6 +72,8 @@ async def login(
     now = datetime.now(UTC)
     token, token_hash = new_session_token()
     await repository.delete_expired_sessions(now)
+    if previous_token:  # signing in again replaces the previous session instead of adding one
+        await repository.delete_session(hash_token(previous_token))
     await repository.create_session(user, token_hash, now + SESSION_LIFETIME)
     await repository.commit()
     response.set_cookie(
