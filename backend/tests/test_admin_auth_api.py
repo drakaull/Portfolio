@@ -7,6 +7,7 @@ from httpx import AsyncClient
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api import admin_auth
 from app.infra.models import AdminSessionModel
 from app.infra.rate_limit import login_limiter
 from app.infra.repositories.admin import AdminRepository
@@ -46,6 +47,23 @@ async def test_wrong_password_and_unknown_user_get_the_same_answer(
     assert wrong_password.status_code == unknown_user.status_code == 401
     assert wrong_password.json() == unknown_user.json() == {"detail": "Invalid credentials"}
     assert "set-cookie" not in wrong_password.headers
+
+
+async def test_unknown_username_still_costs_a_full_password_check(
+    client: AsyncClient, admin: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Without this dummy check, a fast 401 would reveal that the username does not exist.
+    burned: list[str] = []
+
+    async def spy(password: str) -> None:
+        burned.append(password)
+
+    monkeypatch.setattr(admin_auth, "burn_password_check_in_thread", spy)
+
+    await login(client, username="nobody", password="guess-1")
+    await login(client, password="guess-2")  # known username: real check, no dummy
+
+    assert burned == ["guess-1"]
 
 
 async def test_failures_are_logged_without_the_password(
