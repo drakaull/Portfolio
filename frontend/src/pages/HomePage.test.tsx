@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { describe, expect, test, vi } from 'vitest'
 import { App } from '../App.tsx'
@@ -33,6 +33,30 @@ function mockApi(content: Record<string, Partial<HomeContent>> = CONTENT, status
   return fetchMock
 }
 
+/** Fake backend whose answers the test releases one by one; aborted requests reject like fetch. */
+function controlledApi() {
+  const pending: Record<string, () => void> = {}
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(
+      (url: string, init: RequestInit) =>
+        new Promise<Response>((resolve, reject) => {
+          const lang = new URL(url, 'http://test').searchParams.get('lang') ?? ''
+          pending[lang] = () => resolve(new Response(JSON.stringify(CONTENT[lang])))
+          init.signal?.addEventListener('abort', () =>
+            reject(new DOMException('Aborted', 'AbortError')),
+          )
+        }),
+    ),
+  )
+  return {
+    answer: (lang: string) =>
+      act(async () => {
+        pending[lang]()
+      }),
+  }
+}
+
 function renderAt(path: string) {
   render(
     <MemoryRouter initialEntries={[path]}>
@@ -64,6 +88,31 @@ describe('home page', () => {
     fireEvent.click(screen.getByRole('link', { name: 'English' }))
 
     expect(await screen.findByText('Fullstack developer')).toBeDefined()
+  })
+
+  test('does not show the previous language while the new one loads', async () => {
+    const api = controlledApi()
+    renderAt('/fr')
+    await api.answer('fr')
+    await screen.findByText('Développeur fullstack')
+
+    fireEvent.click(screen.getByRole('link', { name: 'English' }))
+
+    expect(screen.getByText('Loading…')).toBeDefined()
+    expect(screen.queryByText('Développeur fullstack')).toBeNull()
+  })
+
+  test('ignores a late answer for the previous language', async () => {
+    const api = controlledApi()
+    renderAt('/fr')
+    fireEvent.click(screen.getByRole('link', { name: 'English' }))
+    await api.answer('en')
+    await screen.findByText('Fullstack developer')
+
+    await api.answer('fr') // the French request was cancelled; a real fetch would reject it
+
+    expect(await screen.findByText('Fullstack developer')).toBeDefined()
+    expect(screen.queryByText('Développeur fullstack')).toBeNull()
   })
 
   test('shows HTML written in the introduction as text, never as markup', async () => {
