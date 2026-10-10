@@ -13,6 +13,7 @@ from app.infra.rate_limit import login_limiter
 from app.infra.repositories.admin import AdminRepository
 from app.infra.security import hash_password, hash_token
 from app.main import app
+from tests.conftest import assert_committed
 
 pytestmark = pytest.mark.anyio
 
@@ -155,6 +156,7 @@ async def test_login_sets_a_hardened_cookie_and_stores_only_its_hash(
     client: AsyncClient, admin: None, session: AsyncSession
 ) -> None:
     response = await login(client)
+    assert_committed(session)
 
     assert response.status_code == 204
     cookie = response.headers["set-cookie"].lower()
@@ -165,7 +167,9 @@ async def test_login_sets_a_hardened_cookie_and_stores_only_its_hash(
     assert stored == [hash_token(token)]
 
 
-async def test_signed_in_admin_can_read_me_then_log_out(client: AsyncClient, admin: None) -> None:
+async def test_signed_in_admin_can_read_me_then_log_out(
+    client: AsyncClient, admin: None, session: AsyncSession
+) -> None:
     await login(client)
 
     me = await client.get("/api/admin/me")
@@ -173,6 +177,7 @@ async def test_signed_in_admin_can_read_me_then_log_out(client: AsyncClient, adm
     assert me.json() == {"username": "leonard"}
 
     logout = await client.post("/api/admin/logout")
+    assert_committed(session)
     assert logout.status_code == 204
     assert (await client.get("/api/admin/me")).status_code == 401
 

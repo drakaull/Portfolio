@@ -11,6 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engin
 
 from app.api.dependencies import get_session
 from app.infra.config import settings
+from app.infra.repositories.admin import AdminRepository
+from app.infra.security import hash_password
 from app.main import app
 
 TEST_DATABASE = "portfolio_test"
@@ -86,3 +88,26 @@ async def client(session: AsyncSession) -> AsyncIterator[AsyncClient]:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="https://test") as http:
         yield http
     app.dependency_overrides.clear()
+
+
+ADMIN_PASSWORD = "correct horse battery"
+
+
+@pytest.fixture
+async def admin_client(client: AsyncClient, session: AsyncSession) -> AsyncClient:
+    """HTTP client already signed in as the admin."""
+    await AdminRepository(session).save_user("leonard", hash_password(ADMIN_PASSWORD))
+    response = await client.post(
+        "/api/admin/login", json={"username": "leonard", "password": ADMIN_PASSWORD}
+    )
+    assert response.status_code == 204
+    return client
+
+
+def assert_committed(session: AsyncSession) -> None:
+    """Fail if the code under test left its database work uncommitted.
+
+    Tests run inside a rolled-back transaction, so a forgotten commit is otherwise invisible here
+    while in production the change would silently be lost when the request ends.
+    """
+    assert not session.in_transaction(), "the database work was not committed"

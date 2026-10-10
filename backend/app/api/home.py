@@ -52,4 +52,6 @@ async def get_cv() -> FileResponse:
         media_type="application/pdf",
         filename="Leonard_Fontaine_CV.pdf",
         content_disposition_type="inline",
+        # Served from the site's own origin: forbid scripts and type sniffing on this response.
+        headers={"Content-Security-Policy": "sandbox", "X-Content-Type-Options": "nosniff"},
     )

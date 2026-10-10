@@ -1,81 +1,91 @@
-# Tasks: Feature 4 — Admin authentication
+# Tasks: Feature 5 — Edit the home page from the admin
 
 Each task: implement → checks green (backend: `uv run ruff check . && uv run ruff format --check . && uv run pytest`; frontend: `npm run lint && npm run format:check && npm test && npm run build`) → one commit.
 
-## Task 1: Auth domain rules and security helpers
+## Task 1: GET / PUT /api/admin/home
 
-**Description:** `AdminUser` entity, password policy and session lifetime in the domain; argon2 hashing/verification and token generation/hashing in infra. Adds `argon2-cffi`.
+**Description:** Domain length limits, `HomeContentRepository.save()`, admin schemas and the two protected routes.
 
 **Acceptance criteria:**
-- [ ] Passwords under 12 characters rejected by the policy
-- [ ] `hash_password` / `verify_password` round-trip; wrong password → False; hash never equals the password
-- [ ] `new_session_token()` returns a token and its SHA-256; same token → same hash
+- [ ] `GET` returns both languages, URLs and `has_cv`
+- [ ] `PUT` saves and returns the content; `/api/home` reflects it
+- [ ] 422 for: empty English, too long, `http://` or `javascript:` URL, unknown language key, extra field
+- [ ] 401 without session (existing route-walking test now covers these routes)
 
-**Verification:** unit tests
+**Verification:** API tests
 **Dependencies:** None
-**Files:** `pyproject.toml`, `uv.lock`, `app/domain/auth.py`, `app/infra/security.py`, `tests/test_security.py`
-**Scope:** S
+**Files:** `app/domain/home.py`, `app/infra/repositories/home.py`, `app/api/admin_home.py`, `app/main.py`, `tests/test_admin_home_api.py`
+**Scope:** M
 
-## Task 2: Admin users and sessions tables, migration and repository
+## Task 2: PUT / DELETE /api/admin/cv
 
-**Description:** ORM models, migration, and `AdminRepository`: find user by username, create or update a user (revoking its sessions on password change), create session, find the user of a valid (non-expired) session, delete one session, delete expired sessions.
+**Description:** Multipart upload with 5 MB cap, PDF type and signature checks, atomic write; removal.
 
 **Acceptance criteria:**
-- [ ] Username unique; session cascade-deleted with its user
-- [ ] Expired session → no user; deleted session → no user
-- [ ] Password change revokes all sessions of that user
+- [ ] Valid PDF → 204, served by `/api/cv`
+- [ ] Wrong type or fake PDF → 415; over 5 MB → 413; in both cases the previous CV is kept and no temp file remains
+- [ ] `DELETE` → 204, `/api/cv` → 404
 
-**Verification:** repository tests; migration round-trip
+**Verification:** API tests with a temporary storage folder
 **Dependencies:** Task 1
-**Files:** `app/infra/models.py`, `app/infra/repositories/admin.py`, `migrations/versions/<date>-create_admin_tables.py`, `tests/test_admin_repository.py`
-**Scope:** M
-
-## Task 3: create-admin command
-
-**Description:** `uv run python -m app.cli create-admin --username leonard`, password asked twice with hidden input.
-
-**Acceptance criteria:**
-- [ ] Creates the user, or updates the password of an existing one (revoking sessions)
-- [ ] Refuses mismatched passwords and passwords under 12 characters, with a clear message and non-zero exit code
-
-**Verification:** tests calling the command with a patched password prompt
-**Dependencies:** Task 2
-**Files:** `app/cli.py`, `tests/test_cli.py`
+**Files:** `app/infra/storage.py`, `app/api/admin_home.py`, `tests/test_admin_cv_api.py`
 **Scope:** S
-
-## Task 4: Login, logout, me endpoints with rate limiting
-
-**Description:** `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/me`, `require_admin` dependency, in-memory limiter, login audit logs.
-
-**Acceptance criteria:**
-- [ ] Login success → 204 + cookie with `HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/api/admin`, `Max-Age=28800`
-- [ ] Wrong password and unknown user → identical 401 body; 11th failure in 15 min → 429
-- [ ] `me` → 200 with a valid session; 401 without cookie, with forged, expired or logged-out session
-- [ ] Logs contain username, IP and outcome, never the password or token
-- [ ] Every `/api/admin/*` route except login/logout requires a session (route-listing test)
-
-**Verification:** API tests (abuse cases first)
-**Dependencies:** Task 3
-**Files:** `app/api/admin_auth.py`, `app/api/dependencies.py`, `app/infra/rate_limit.py`, `app/main.py`, `tests/test_admin_auth_api.py`
-**Scope:** M
 
 ## Checkpoint A
-- [ ] Backend checks green · human check with the CLI and `/docs`
+- [ ] Backend checks green · human check through `/docs`
 
-## Task 5: Bilingual admin login page and protected admin area
+## Task 3: Switch to the data router (refactor)
 
-**Description:** `/:lang/admin/login` form, `/:lang/admin` protected page (connected user + logout), `/admin` redirect, admin layout with language switch and theme toggle, `noindex`.
+**Description:** `createBrowserRouter` with the existing routes; tests use a shared `renderApp(path)` built on `createMemoryRouter`.
 
 **Acceptance criteria:**
-- [ ] Successful login redirects to `/:lang/admin`; errors shown for 401 and 429
-- [ ] `/:lang/admin` redirects to the login page when `/api/admin/me` returns 401
-- [ ] Logout calls the API and returns to the login page
-- [ ] Texts translated FR/EN; password field `autocomplete="current-password"`
+- [ ] No behaviour change; all existing frontend tests pass unchanged in intent
+- [ ] Route list defined once, used by production and tests
 
-**Verification:** tests with mocked `fetch`; build
-**Dependencies:** Task 4
-**Files:** `src/App.tsx`, `src/api/admin.ts`, `src/components/AdminLayout/*`, `src/pages/admin/AdminLoginPage.tsx`, `src/pages/admin/AdminHomePage.tsx`, `src/pages/admin/*.test.tsx`, `src/i18n/*.ts`
+**Verification:** full frontend test suite + build
+**Dependencies:** None (can start after Checkpoint A)
+**Files:** `src/main.tsx`, `src/App.tsx` → `src/routes.tsx`, `src/test/renderApp.tsx`, `src/App.test.tsx`, `src/pages/HomePage.test.tsx`, `src/pages/admin/AdminPages.test.tsx`
 **Scope:** M
+
+## Task 4: Guarded admin layout and dashboard
+
+**Description:** Session check moved into `AdminLayout` (login page excluded); dashboard lists editable sections with sign-out.
+
+**Acceptance criteria:**
+- [ ] Any admin page except login redirects to login without a session
+- [ ] Dashboard shows the user, sign-out and a "Home page" link to `/:lang/admin/home`
+
+**Verification:** tests
+**Dependencies:** Task 3
+**Files:** `src/components/AdminLayout/AdminLayout.tsx`, `src/pages/admin/AdminHomePage.tsx` (dashboard), `src/pages/admin/AdminPages.test.tsx`, `src/i18n/*.ts`
+**Scope:** S
+
+## Task 5: Home editor (texts, links, preview, save, unsaved changes)
+
+**Description:** `/:lang/admin/home` form with FR/EN tabs, Markdown preview, URL fields, save with server errors, 401 handling, `useBlocker` + `beforeunload`.
+
+**Acceptance criteria:**
+- [ ] Loads current content; preview updates while typing and escapes HTML
+- [ ] Save sends the full JSON, shows "Saved"; 422 errors shown next to fields; 401 keeps the text and explains how to sign in
+- [ ] Leaving with unsaved changes asks for confirmation; no prompt after saving
+
+**Verification:** tests with mocked `fetch`
+**Dependencies:** Task 4
+**Files:** `src/api/adminHome.ts`, `src/pages/admin/HomeEditorPage.tsx`, `src/pages/admin/HomeEditorPage.module.css`, `src/pages/admin/HomeEditorPage.test.tsx`, `src/components/MarkdownText/MarkdownText.tsx`, `src/pages/HomePage.tsx`, `src/i18n/*.ts`, `src/routes.tsx`
+**Scope:** M (largest task)
+
+## Task 6: CV upload and removal in the editor
+
+**Description:** CV block: current state with link, upload/replace (PDF only), remove with confirmation.
+
+**Acceptance criteria:**
+- [ ] Upload sends multipart to `PUT /api/admin/cv`; 413/415 shown as translated messages
+- [ ] Remove asks for confirmation, then calls `DELETE /api/admin/cv`
+
+**Verification:** tests
+**Dependencies:** Task 5
+**Files:** `src/api/adminHome.ts`, `src/pages/admin/CvField.tsx`, `src/pages/admin/HomeEditorPage.test.tsx`, `src/i18n/*.ts`
+**Scope:** S
 
 ## Checkpoint B
 - [ ] Human browser check · security-auditor review · `/review` · merge into `develop` after approval

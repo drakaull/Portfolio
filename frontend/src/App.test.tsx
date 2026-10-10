@@ -1,15 +1,6 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
-import { MemoryRouter } from 'react-router'
+import { fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import { App } from './App.tsx'
-
-function renderAt(path: string) {
-  render(
-    <MemoryRouter initialEntries={[path]}>
-      <App />
-    </MemoryRouter>,
-  )
-}
+import { renderApp } from './test/renderApp.tsx'
 
 const heading = () => screen.getByRole('heading', { level: 1 })
 
@@ -20,13 +11,13 @@ afterEach(() => {
 describe('root redirect', () => {
   test('goes to French when the browser language is French', () => {
     vi.spyOn(navigator, 'language', 'get').mockReturnValue('fr-BE')
-    renderAt('/')
+    renderApp('/')
     expect(screen.getByRole('link', { name: 'Parcours' })).toBeDefined()
   })
 
   test('goes to English for any other browser language', () => {
     vi.spyOn(navigator, 'language', 'get').mockReturnValue('de-DE')
-    renderAt('/')
+    renderApp('/')
     expect(screen.getByRole('link', { name: 'Experience' })).toBeDefined()
   })
 })
@@ -36,7 +27,7 @@ describe('home page', () => {
     ['/en', 'en'],
     ['/fr', 'fr'],
   ])('%s renders the name as title and sets <html lang>', (path, lang) => {
-    renderAt(path)
+    renderApp(path)
     expect(heading().textContent).toBe('Léonard Fontaine')
     expect(document.documentElement.lang).toBe(lang)
   })
@@ -53,19 +44,19 @@ describe('section pages', () => {
     ['/en/contact', 'Contact'],
     ['/fr/contact', 'Contact'],
   ])('%s renders its translated title', (path, title) => {
-    renderAt(path)
+    renderApp(path)
     expect(heading().textContent).toBe(title)
   })
 
   test('sets the document title', () => {
-    renderAt('/fr/skills')
+    renderApp('/fr/skills')
     expect(document.title).toBe('Compétences · Léonard Fontaine')
   })
 })
 
 describe('navbar', () => {
   test('links to home and every section in the current language', () => {
-    renderAt('/fr')
+    renderApp('/fr')
     const nav = screen.getByRole('navigation', { name: 'Principale' })
     const hrefs = within(nav)
       .getAllByRole('link')
@@ -82,13 +73,13 @@ describe('navbar', () => {
   })
 
   test('marks the current section link with aria-current', () => {
-    renderAt('/en/projects')
+    renderApp('/en/projects')
     expect(screen.getByRole('link', { name: 'Projects' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('link', { name: 'Skills' }).getAttribute('aria-current')).toBeNull()
   })
 
   test('offers a skip link to the main content', () => {
-    renderAt('/en')
+    renderApp('/en')
     expect(screen.getByRole('link', { name: 'Skip to content' }).getAttribute('href')).toBe('#main')
   })
 })
@@ -97,7 +88,7 @@ describe('mobile menu', () => {
   const menuButton = () => screen.getByRole('button', { name: 'Menu' })
 
   test('opens and closes with the menu button', () => {
-    renderAt('/en')
+    renderApp('/en')
     expect(menuButton().getAttribute('aria-expanded')).toBe('false')
     fireEvent.click(menuButton())
     expect(menuButton().getAttribute('aria-expanded')).toBe('true')
@@ -106,7 +97,7 @@ describe('mobile menu', () => {
   })
 
   test('closes on Escape and gives focus back to the button', () => {
-    renderAt('/en')
+    renderApp('/en')
     fireEvent.click(menuButton())
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(menuButton().getAttribute('aria-expanded')).toBe('false')
@@ -114,7 +105,7 @@ describe('mobile menu', () => {
   })
 
   test('closes after choosing a section', () => {
-    renderAt('/en')
+    renderApp('/en')
     fireEvent.click(menuButton())
     fireEvent.click(screen.getByRole('link', { name: 'Skills' }))
     expect(heading().textContent).toBe('Skills')
@@ -124,14 +115,14 @@ describe('mobile menu', () => {
 
 describe('language switch', () => {
   test('switches to English and keeps the current section', () => {
-    renderAt('/fr/skills')
+    renderApp('/fr/skills')
     fireEvent.click(screen.getByRole('link', { name: 'English' }))
     expect(heading().textContent).toBe('Skills')
     expect(document.documentElement.lang).toBe('en')
   })
 
   test('switches to French from the home page', () => {
-    renderAt('/en')
+    renderApp('/en')
     fireEvent.click(screen.getByRole('link', { name: 'Français' }))
     expect(screen.getByRole('link', { name: 'Parcours' })).toBeDefined()
   })
@@ -144,7 +135,7 @@ describe('not found page', () => {
     ['/en/nope', 'Page not found'],
     ['/fr/nope', 'Page introuvable'],
   ])('%s shows the 404 page', (path, title) => {
-    renderAt(path)
+    renderApp(path)
     expect(heading().textContent).toBe(title)
   })
 })
