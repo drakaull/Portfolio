@@ -128,6 +128,19 @@ describe('language switch', () => {
   })
 })
 
+describe('path eyebrows', () => {
+  test.each([
+    ['/fr', '~/portfolio — Belgique'],
+    ['/en', '~/portfolio — Belgium'],
+    ['/fr/skills', '~/portfolio/competences'],
+    ['/en/experience', '~/portfolio/experience'],
+    ['/fr/nope', '~/portfolio/404'],
+  ])('%s shows %s', (path, eyebrow) => {
+    renderApp(path)
+    expect(screen.getByText(eyebrow)).toBeDefined()
+  })
+})
+
 describe('not found page', () => {
   test.each([
     ['/de', 'Page not found'],

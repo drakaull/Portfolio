@@ -27,7 +27,7 @@ Direction A ("Papier quadrillé") applied site-wide: refined tokens, graph-paper
 - [ ] Human check in the browser: background, navbar, footer, favicon, both themes
 
 ### Phase 2: Pages
-- [ ] Task 4: Home, section pages and 404
+- [x] Task 4: Home, section pages and 404
 - [ ] Task 5: Admin restyle and route transition
 
 ### Checkpoint B: complete

@@ -1,14 +1,15 @@
-import { Link } from 'react-router'
+import { PageHeader } from '../components/PageHeader/PageHeader.tsx'
+import { TextLink } from '../components/TextLink/TextLink.tsx'
 import { useTranslation } from '../i18n/useTranslation.ts'
 
 export function NotFoundPage() {
   const { t, lang } = useTranslation()
 
   return (
-    <>
-      <title>{`${t('notFound.title')} · ${t('site.name')}`}</title>
-      <h1>{t('notFound.title')}</h1>
-      <Link to={`/${lang}`}>{t('notFound.back')}</Link>
-    </>
+    <PageHeader eyebrow="~/portfolio/404" title={t('notFound.title')}>
+      <p>
+        <TextLink to={`/${lang}`}>{t('notFound.back')}</TextLink>
+      </p>
+    </PageHeader>
   )
 }

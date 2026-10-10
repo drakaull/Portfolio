@@ -1,35 +1,44 @@
 .hero {
   display: grid;
-  gap: 1.25rem;
-  max-width: 42rem;
-  padding-block: clamp(2rem, 8vh, 5rem);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: var(--space-6);
+  padding-block: clamp(var(--space-6), 9vh, var(--space-8));
+}
+
+.intro {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
 }
 
 .name {
   margin: 0;
-  font-size: clamp(2.5rem, 7vw, 4rem);
+  font-family: var(--font-display);
+  font-size: var(--text-display);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
   text-wrap: balance;
 }
 
 .headline {
   margin: 0;
   color: var(--color-accent);
-  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-size: var(--text-xl);
   font-weight: 500;
 }
 
-.intro {
+.text {
+  max-width: 46ch;
   color: var(--color-text-muted);
   font-size: 1.0625rem;
 }
 
-.intro > :first-child {
+.text > :first-child {
   margin-top: 0;
 }
 
-.intro > :last-child {
+.text > :last-child {
   margin-bottom: 0;
 }
 
@@ -38,47 +47,18 @@
   color: var(--color-text-muted);
 }
 
-.links {
+.actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin: 0.5rem 0 0;
-  padding: 0;
-  list-style: none;
+  align-items: center;
+  gap: var(--space-4) var(--space-5);
+  margin-top: var(--space-2);
+  /* Same text size for the CV button and the links next to it. */
+  font-size: var(--text-sm);
 }
 
-.primary,
-.secondary {
-  display: inline-block;
-  padding: 0.6rem 1.1rem;
-  border: 1px solid var(--color-accent);
-  border-radius: 0.375rem;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.primary {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-}
-
-.secondary {
-  color: var(--color-accent);
-}
-
-.secondary:hover {
-  background: var(--color-surface);
-}
-
-.primary:hover {
-  filter: brightness(1.1);
-}
-
-.visuallyHidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+@media (max-width: 767px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
 }
