@@ -6,7 +6,7 @@ from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from app.api.dependencies import ADMIN_COOKIE, get_admin_repository, require_admin
-from app.domain.auth import SESSION_LIFETIME, AdminUser
+from app.domain.auth import MAX_PASSWORD_LENGTH, SESSION_LIFETIME, AdminUser
 from app.infra.rate_limit import login_limiter
 from app.infra.repositories.admin import AdminRepository
 from app.infra.security import (
@@ -29,7 +29,7 @@ protected_router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depe
 class LoginIn(BaseModel):
     username: str = Field(min_length=1, max_length=50)
     # Capped so a huge password cannot make argon2 burn CPU.
-    password: str = Field(min_length=1, max_length=128)
+    password: str = Field(min_length=1, max_length=MAX_PASSWORD_LENGTH)
 
 
 class AdminOut(BaseModel):

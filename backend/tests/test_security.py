@@ -15,6 +15,12 @@ def test_password_policy_rejects_short_passwords() -> None:
     check_password_policy("12-chars-xxx")
 
 
+def test_password_policy_rejects_passwords_the_login_form_would_refuse() -> None:
+    check_password_policy("x" * 128)
+    with pytest.raises(WeakPasswordError):
+        check_password_policy("x" * 129)
+
+
 def test_password_hash_round_trip() -> None:
     password_hash = hash_password("correct horse battery")
 
