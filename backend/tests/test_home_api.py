@@ -71,5 +71,7 @@ async def test_cv_is_served_inline_when_present(client: AsyncClient, storage_dir
     assert response.headers["content-disposition"].startswith("inline")
     assert "Leonard_Fontaine_CV.pdf" in response.headers["content-disposition"]
     assert response.content == b"%PDF-1.7 fake"
+    assert response.headers["content-security-policy"] == "sandbox"
+    assert response.headers["x-content-type-options"] == "nosniff"
     home = await client.get("/api/home", params={"lang": "en"})
     assert home.json()["cv_url"] == "/api/cv"
