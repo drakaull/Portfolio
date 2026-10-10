@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router'
 import { useTranslation } from '../../i18n/useTranslation.ts'
 import { LanguageSwitch } from '../LanguageSwitch/LanguageSwitch.tsx'
+import { ThemeToggle } from '../ThemeToggle/ThemeToggle.tsx'
 import styles from './Navbar.module.css'
 
 const SECTIONS = ['experience', 'skills', 'projects', 'contact'] as const
@@ -23,7 +24,10 @@ export function Navbar() {
           </li>
         ))}
       </ul>
-      <LanguageSwitch />
+      <div className={styles.controls}>
+        <LanguageSwitch />
+        <ThemeToggle />
+      </div>
     </nav>
   )
 }

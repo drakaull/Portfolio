@@ -23,6 +23,12 @@
   list-style: none;
 }
 
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .link {
   color: var(--color-text-muted);
   text-decoration: none;

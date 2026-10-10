@@ -4,6 +4,7 @@ export const fr: Record<TranslationKey, string> = {
   'site.name': 'Léonard Fontaine',
   'nav.label': 'Principale',
   'nav.skip': 'Aller au contenu',
+  'theme.dark': 'Mode sombre',
   'home.title': 'Accueil',
   'experience.title': 'Parcours',
   'skills.title': 'Compétences',

@@ -29,7 +29,7 @@ Turn the empty React app into the portfolio's frame: one URL per section with th
 ### Phase 2: Navigation
 - [x] Task 4: Fixed navbar with active link
 - [x] Task 5: Language switch
-- [ ] Task 6: Theme toggle
+- [x] Task 6: Theme toggle
 
 ### Checkpoint B: after Tasks 4–6
 - [ ] All checks pass
