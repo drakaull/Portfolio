@@ -39,8 +39,8 @@ Turn the empty React app into the portfolio's frame: one URL per section with th
 - [x] Task 7: Mobile menu below 768 px
 
 ### Checkpoint C: complete
-- [ ] All 8 success criteria of the spec verified
-- [ ] Code review (`/review`), then merge `feature/site-shell` into `develop` and push, after approval
+- [x] All 8 success criteria of the spec verified
+- [x] Code review (`/review`), then merge `feature/site-shell` into `develop` and push, after approval
 
 ## Risks and Mitigations
 

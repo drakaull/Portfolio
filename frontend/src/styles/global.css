@@ -13,6 +13,8 @@
   --gutter: 1.5rem;
 
   color-scheme: light;
+  /* Keep in-page anchor targets clear of the fixed navbar. */
+  scroll-padding-top: var(--navbar-height);
 }
 
 :root[data-theme='dark'] {
