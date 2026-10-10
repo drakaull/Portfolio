@@ -1,8 +1,10 @@
+from collections.abc import AsyncIterator
 from pathlib import Path
 
 import pytest
 from httpx import AsyncClient
 
+from app.api.body_limit import MAX_BODY_BYTES
 from app.infra.storage import CV_MAX_BYTES
 
 pytestmark = pytest.mark.anyio
@@ -49,3 +51,38 @@ async def test_cv_can_be_removed(admin_client: AsyncClient) -> None:
     assert (await admin_client.delete("/api/admin/cv")).status_code == 204
     assert (await admin_client.get("/api/cv")).status_code == 404
     assert (await admin_client.delete("/api/admin/cv")).status_code == 204  # already gone
+
+
+async def test_a_cv_of_exactly_5_mb_is_accepted(admin_client: AsyncClient) -> None:
+    content = b"%PDF-" + b"x" * (CV_MAX_BYTES - 5)
+
+    assert (await upload(admin_client, content)).status_code == 204
+
+
+@pytest.mark.parametrize("declare_length", [True, False], ids=["content-length", "chunked"])
+async def test_anonymous_oversized_bodies_are_cut_off_before_parsing(
+    client: AsyncClient, storage_dir: Path, declare_length: bool
+) -> None:
+    size = MAX_BODY_BYTES + 1
+
+    # A well-formed multipart start, then an endless file part: what an attacker would send.
+    part_start = (
+        b'--x\r\nContent-Disposition: form-data; name="file"; filename="cv.pdf"\r\n'
+        b"Content-Type: application/pdf\r\n\r\n%PDF-"
+    )
+
+    async def chunks() -> AsyncIterator[bytes]:
+        yield part_start
+        for _ in range(size // 65536 + 1):
+            yield b"x" * 65536
+
+    headers = {"Content-Type": "multipart/form-data; boundary=x"}
+    if declare_length:
+        response = await client.put(
+            "/api/admin/cv", content=part_start + b"x" * size, headers=headers
+        )
+    else:  # no Content-Length: the limit must hold while bytes arrive
+        response = await client.put("/api/admin/cv", content=chunks(), headers=headers)
+
+    assert response.status_code == 413
+    assert list(storage_dir.iterdir()) == []
