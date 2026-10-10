@@ -7,6 +7,7 @@ from app import cli
 from app.domain.auth import AdminAlreadyExistsError
 from app.infra.repositories.admin import AdminRepository
 from app.infra.security import verify_password
+from tests.conftest import assert_committed
 
 
 def answer_prompts(monkeypatch: pytest.MonkeyPatch, *answers: str) -> None:
@@ -40,6 +41,7 @@ def test_create_admin_refuses_invalid_input(
 @pytest.mark.anyio
 async def test_create_admin_stores_an_argon2_hash(session: AsyncSession) -> None:
     await cli.create_admin(session, "leonard", "long-enough-pw")
+    assert_committed(session)
 
     user, password_hash = await AdminRepository(session).get_credentials("leonard")
     assert password_hash != "long-enough-pw"

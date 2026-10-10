@@ -102,3 +102,12 @@ async def admin_client(client: AsyncClient, session: AsyncSession) -> AsyncClien
     )
     assert response.status_code == 204
     return client
+
+
+def assert_committed(session: AsyncSession) -> None:
+    """Fail if the code under test left its database work uncommitted.
+
+    Tests run inside a rolled-back transaction, so a forgotten commit is otherwise invisible here
+    while in production the change would silently be lost when the request ends.
+    """
+    assert not session.in_transaction(), "the database work was not committed"

@@ -1,5 +1,8 @@
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from tests.conftest import assert_committed
 
 pytestmark = pytest.mark.anyio
 
@@ -28,8 +31,11 @@ async def test_admin_reads_both_languages(admin_client: AsyncClient) -> None:
     }
 
 
-async def test_saved_content_is_public_immediately(admin_client: AsyncClient) -> None:
+async def test_saved_content_is_public_immediately(
+    admin_client: AsyncClient, session: AsyncSession
+) -> None:
     saved = await admin_client.put("/api/admin/home", json=VALID)
+    assert_committed(session)
 
     assert saved.status_code == 200
     assert saved.json() == {**VALID, "has_cv": False}
