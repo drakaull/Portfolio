@@ -1,0 +1,53 @@
+:root {
+  --color-bg: #faf6ee;
+  --color-surface: #f2ecdf;
+  --color-text: #1f1d1a;
+  --color-text-muted: #5e5850;
+  --color-border: #e3daca;
+  --color-accent: #a4462a;
+  --color-on-accent: #faf6ee;
+
+  --font-sans: 'Google Sans Variable', 'Segoe UI', system-ui, sans-serif;
+  --navbar-height: 4rem;
+  --content-width: 64rem;
+  --gutter: 1.5rem;
+
+  color-scheme: light;
+  /* Keep in-page anchor targets clear of the fixed navbar. */
+  scroll-padding-top: var(--navbar-height);
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #1a1917;
+  --color-surface: #24221f;
+  --color-text: #ede8df;
+  --color-text-muted: #a39c91;
+  --color-border: #36332e;
+  --color-accent: #e8a084;
+  --color-on-accent: #1a1917;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

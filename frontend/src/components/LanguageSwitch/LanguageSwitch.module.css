@@ -1,0 +1,14 @@
+.switch {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.switch:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
