@@ -11,6 +11,7 @@ export function AdminHomePage() {
   const { t, lang } = useTranslation()
   const navigate = useNavigate()
   const [state, setState] = useState<State>({ status: 'loading' })
+  const [logoutFailed, setLogoutFailed] = useState(false)
 
   useEffect(() => {
     fetchCurrentAdmin()
@@ -19,7 +20,13 @@ export function AdminHomePage() {
   }, [])
 
   async function handleLogout() {
-    await logout()
+    try {
+      await logout()
+    } catch {
+      // The session may still be alive: say so instead of pretending the user is signed out.
+      setLogoutFailed(true)
+      return
+    }
     navigate(`/${lang}/admin/login`, { replace: true })
   }
 
@@ -45,6 +52,11 @@ export function AdminHomePage() {
           <button type="button" className={styles.button} onClick={handleLogout}>
             {t('admin.logout')}
           </button>
+          {logoutFailed && (
+            <p className={styles.error} role="alert">
+              {t('admin.logoutError')}
+            </p>
+          )}
         </>
       )}
     </section>

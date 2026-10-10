@@ -67,6 +67,19 @@ describe('admin area', () => {
     expect(fetchMock).toHaveBeenCalledWith('/api/admin/logout', { method: 'POST' })
   })
 
+  test('says so when signing out fails, instead of leaving', async () => {
+    mockApi({
+      'GET /api/admin/me': signedIn,
+      'POST /api/admin/logout': () => new Response(null, { status: 503 }),
+    })
+    renderAt('/en/admin')
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
+
+    expect((await screen.findByRole('alert')).textContent).toContain('you are still signed in')
+    expect(screen.getByText('leonard')).toBeDefined()
+  })
+
   test('is hidden from search engines', async () => {
     mockApi({ 'GET /api/admin/me': signedOut })
     renderAt('/en/admin/login')

@@ -27,6 +27,8 @@ export async function fetchCurrentAdmin(): Promise<string | null> {
   return username
 }
 
+/** Throws when the session could not be ended (network or server error). */
 export async function logout(): Promise<void> {
-  await fetch('/api/admin/logout', { method: 'POST' })
+  const response = await fetch('/api/admin/logout', { method: 'POST' })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
 }
