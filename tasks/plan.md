@@ -30,8 +30,8 @@ Connect FastAPI to PostgreSQL asynchronously, add Alembic migrations and a test 
 - [x] Task 3: README — environment, migrations and layering rules
 
 ### Checkpoint B: complete
-- [ ] All 5 spec success criteria verified
-- [ ] Code review (`/review`), then merge into `develop` after approval
+- [x] All 5 spec success criteria verified
+- [x] Code review (`/review`), then merge into `develop` after approval
 
 ## Risks and Mitigations
 

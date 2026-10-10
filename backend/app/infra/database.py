@@ -20,5 +20,6 @@ class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=NAMING_CONVENTION)
 
 
-engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+# asyncpg waits 60 s by default to connect; fail fast when the database is unreachable.
+engine = create_async_engine(settings.database_url, pool_pre_ping=True, connect_args={"timeout": 5})
 SessionFactory = async_sessionmaker(engine, expire_on_commit=False)
