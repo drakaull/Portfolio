@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 import { renderApp } from '../test/renderApp.tsx'
 import type { HomeContent } from '../api/useHomeContent.ts'
@@ -118,11 +118,14 @@ describe('home page', () => {
     mockApi()
     renderApp('/en')
 
-    const linkedin = await screen.findByRole('link', { name: /LinkedIn/ })
+    // The footer repeats LinkedIn and GitHub: look inside the page content only.
+    await screen.findByText('Fullstack developer')
+    const main = within(screen.getByRole('main'))
+    const linkedin = main.getByRole('link', { name: /LinkedIn/ })
     expect(linkedin.getAttribute('href')).toBe('https://www.linkedin.com/in/someone')
     expect(linkedin.getAttribute('target')).toBe('_blank')
     expect(linkedin.getAttribute('rel')).toBe('noopener noreferrer')
-    expect(screen.getByRole('link', { name: /View my CV/ }).getAttribute('href')).toBe('/api/cv')
+    expect(main.getByRole('link', { name: /View my CV/ }).getAttribute('href')).toBe('/api/cv')
   })
 
   test('hides the CV link when there is no CV', async () => {
@@ -140,5 +143,20 @@ describe('home page', () => {
     expect((await screen.findByRole('alert')).textContent).toBe(
       "Ce contenu n'a pas pu être chargé. Réessayez plus tard.",
     )
+  })
+})
+
+describe('footer', () => {
+  test('shows the social links on every public page with a single API request', async () => {
+    const fetchMock = mockApi()
+    renderApp('/fr')
+    await screen.findByText('Développeur fullstack')
+
+    const footer = within(screen.getByRole('contentinfo'))
+    expect(footer.getByRole('link', { name: /GitHub/ }).getAttribute('href')).toBe(
+      'https://github.com/someone',
+    )
+    expect(footer.getByText(/© \d{4} Léonard Fontaine · Belgique/)).toBeDefined()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 })

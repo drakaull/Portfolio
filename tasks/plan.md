@@ -20,10 +20,10 @@ Direction A ("Papier quadrillé") applied site-wide: refined tokens, graph-paper
 ### Phase 1: Foundation
 - [x] Task 1: Tokens, fonts, graph-paper background, global motion rules
 - [x] Task 2: Building blocks (Eyebrow, Button, TextLink, Badge, Reveal)
-- [ ] Task 3: Navbar, footer and favicon
+- [x] Task 3: Navbar, footer and favicon
 
 ### Checkpoint A: after Tasks 1–3
-- [ ] All frontend checks green; Playwright screenshots reviewed
+- [x] All frontend checks green; Playwright screenshots reviewed
 - [ ] Human check in the browser: background, navbar, footer, favicon, both themes
 
 ### Phase 2: Pages

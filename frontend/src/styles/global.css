@@ -90,6 +90,12 @@ a {
   color: var(--color-accent);
 }
 
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
 /* Readable by screen readers, invisible on screen. */
 .visually-hidden {
   position: absolute;

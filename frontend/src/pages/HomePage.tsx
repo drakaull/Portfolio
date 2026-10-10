@@ -1,11 +1,12 @@
-import { useHomeContent, type HomeContent } from '../api/useHomeContent.ts'
+import { useSharedHomeContent } from '../api/homeContentContext.ts'
+import type { HomeContent } from '../api/useHomeContent.ts'
 import { MarkdownText } from '../components/MarkdownText/MarkdownText.tsx'
 import { useTranslation } from '../i18n/useTranslation.ts'
 import styles from './HomePage.module.css'
 
 export function HomePage() {
-  const { t, lang } = useTranslation()
-  const state = useHomeContent(lang)
+  const { t } = useTranslation()
+  const state = useSharedHomeContent()
 
   return (
     <section className={styles.hero}>
