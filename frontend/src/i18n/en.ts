@@ -25,6 +25,8 @@ export const en = {
   'admin.login.blocked': 'Too many attempts. Try again in 15 minutes.',
   'admin.connectedAs': 'Signed in as',
   'admin.logout': 'Sign out',
+  'admin.sections': 'Sections',
+  'admin.sections.home': 'Home page',
   'admin.logoutError':
     'Sign-out failed: you are still signed in. Check your connection and try again.',
   'notFound.title': 'Page not found',

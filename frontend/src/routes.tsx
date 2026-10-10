@@ -2,7 +2,8 @@ import { createRoutesFromElements, Outlet, Route } from 'react-router'
 import { AdminLayout } from './components/AdminLayout/AdminLayout.tsx'
 import { Layout } from './components/Layout/Layout.tsx'
 import { BrowserLanguageRedirect, LocalizedRoutes } from './components/Routing/Routing.tsx'
-import { AdminHomePage } from './pages/admin/AdminHomePage.tsx'
+import { RequireAdmin } from './components/RequireAdmin/RequireAdmin.tsx'
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage.tsx'
 import { AdminLoginPage } from './pages/admin/AdminLoginPage.tsx'
 import { ContactPage } from './pages/ContactPage.tsx'
 import { ExperiencePage } from './pages/ExperiencePage.tsx'
@@ -32,8 +33,10 @@ export const routes = createRoutesFromElements(
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       <Route path="admin" element={<AdminLayout />}>
-        <Route index element={<AdminHomePage />} />
         <Route path="login" element={<AdminLoginPage />} />
+        <Route element={<RequireAdmin />}>
+          <Route index element={<AdminDashboardPage />} />
+        </Route>
       </Route>
     </Route>
   </>,

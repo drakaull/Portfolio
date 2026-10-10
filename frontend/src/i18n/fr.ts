@@ -26,6 +26,8 @@ export const fr: Record<TranslationKey, string> = {
   'admin.login.blocked': 'Trop de tentatives. Réessayez dans 15 minutes.',
   'admin.connectedAs': 'Connecté en tant que',
   'admin.logout': 'Se déconnecter',
+  'admin.sections': 'Sections',
+  'admin.sections.home': "Page d'accueil",
   'admin.logoutError':
     'La déconnexion a échoué : vous êtes toujours connecté. Vérifiez votre connexion et réessayez.',
   'notFound.title': 'Page introuvable',

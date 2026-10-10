@@ -27,7 +27,7 @@ Protected API to read/save the home content and upload/remove the CV, then an ad
 
 ### Phase 2: Frontend
 - [x] Task 3: Switch to the data router (refactor, no behaviour change)
-- [ ] Task 4: Guarded admin layout and dashboard
+- [x] Task 4: Guarded admin layout and dashboard
 - [ ] Task 5: Home editor (texts, links, preview, save, unsaved changes)
 - [ ] Task 6: CV upload and removal in the editor
 

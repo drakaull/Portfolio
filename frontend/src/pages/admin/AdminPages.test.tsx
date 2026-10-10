@@ -71,6 +71,14 @@ describe('admin area', () => {
     expect(screen.getByText('leonard')).toBeDefined()
   })
 
+  test('dashboard links to the editable sections', async () => {
+    mockApi({ 'GET /api/admin/me': signedIn })
+    renderApp('/fr/admin')
+
+    const link = await screen.findByRole('link', { name: "Page d'accueil" })
+    expect(link.getAttribute('href')).toBe('/fr/admin/home')
+  })
+
   test('is hidden from search engines', async () => {
     mockApi({ 'GET /api/admin/me': signedOut })
     renderApp('/en/admin/login')
