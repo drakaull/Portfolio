@@ -1,22 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
+import { mockApi, noContent, signedIn, signedOut } from '../../test/mockApi.ts'
 import { renderApp } from '../../test/renderApp.tsx'
-
-type Handler = (init?: RequestInit) => Response
-
-/** Fake backend: one handler per "METHOD /path"; `me` answers 200 only after a successful login. */
-function mockApi(handlers: Record<string, Handler>) {
-  const fetchMock = vi.fn((url: string, init?: RequestInit) => {
-    const handler = handlers[`${init?.method ?? 'GET'} ${url}`]
-    return Promise.resolve(handler ? handler(init) : new Response(null, { status: 404 }))
-  })
-  vi.stubGlobal('fetch', fetchMock)
-  return fetchMock
-}
-
-const signedIn = () => Response.json({ username: 'leonard' })
-const signedOut = () => new Response(null, { status: 401 })
-const noContent = () => new Response(null, { status: 204 })
 
 async function submitLogin(username = 'leonard', password = 'correct horse battery') {
   fireEvent.change(await screen.findByLabelText('Username'), { target: { value: username } })

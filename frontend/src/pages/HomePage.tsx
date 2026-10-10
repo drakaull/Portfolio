@@ -1,5 +1,5 @@
-import Markdown from 'react-markdown'
 import { useHomeContent, type HomeContent } from '../api/useHomeContent.ts'
+import { MarkdownText } from '../components/MarkdownText/MarkdownText.tsx'
 import { useTranslation } from '../i18n/useTranslation.ts'
 import styles from './HomePage.module.css'
 
@@ -32,9 +32,8 @@ function HomeDetails({ content }: { content: HomeContent }) {
   return (
     <>
       <p className={styles.headline}>{content.headline}</p>
-      {/* react-markdown escapes raw HTML, so injected tags are shown as text, never executed. */}
       <div className={styles.intro}>
-        <Markdown>{content.intro}</Markdown>
+        <MarkdownText>{content.intro}</MarkdownText>
       </div>
       <ul className={styles.links}>
         {content.cv_url && (
