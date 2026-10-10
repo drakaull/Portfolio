@@ -18,7 +18,7 @@ Direction A ("Papier quadrillé") applied site-wide: refined tokens, graph-paper
 ## Task List
 
 ### Phase 1: Foundation
-- [ ] Task 1: Tokens, fonts, graph-paper background, global motion rules
+- [x] Task 1: Tokens, fonts, graph-paper background, global motion rules
 - [ ] Task 2: Building blocks (Eyebrow, Button, TextLink, Badge, Reveal)
 - [ ] Task 3: Navbar, footer and favicon
 
