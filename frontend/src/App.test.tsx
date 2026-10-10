@@ -21,23 +21,23 @@ describe('root redirect', () => {
   test('goes to French when the browser language is French', () => {
     vi.spyOn(navigator, 'language', 'get').mockReturnValue('fr-BE')
     renderAt('/')
-    expect(heading().textContent).toBe('Accueil')
+    expect(screen.getByRole('link', { name: 'Parcours' })).toBeDefined()
   })
 
   test('goes to English for any other browser language', () => {
     vi.spyOn(navigator, 'language', 'get').mockReturnValue('de-DE')
     renderAt('/')
-    expect(heading().textContent).toBe('Home')
+    expect(screen.getByRole('link', { name: 'Experience' })).toBeDefined()
   })
 })
 
 describe('home page', () => {
   test.each([
-    ['/en', 'Home', 'en'],
-    ['/fr', 'Accueil', 'fr'],
-  ])('%s renders its title and sets <html lang>', (path, title, lang) => {
+    ['/en', 'en'],
+    ['/fr', 'fr'],
+  ])('%s renders the name as title and sets <html lang>', (path, lang) => {
     renderAt(path)
-    expect(heading().textContent).toBe(title)
+    expect(heading().textContent).toBe('Léonard Fontaine')
     expect(document.documentElement.lang).toBe(lang)
   })
 })
@@ -133,7 +133,7 @@ describe('language switch', () => {
   test('switches to French from the home page', () => {
     renderAt('/en')
     fireEvent.click(screen.getByRole('link', { name: 'Français' }))
-    expect(heading().textContent).toBe('Accueil')
+    expect(screen.getByRole('link', { name: 'Parcours' })).toBeDefined()
   })
 })
 

@@ -1,46 +1,49 @@
-# Implementation Plan: Feature 2 — Backend foundation
+# Implementation Plan: Feature 3 — Home page
 
-Spec: [02-backend-foundation.md](../specs/02-backend-foundation.md) · Task list: [todo.md](todo.md) · Branch: `feature/backend-foundation`
+Spec: [03-home-page.md](../specs/03-home-page.md) · Task list: [todo.md](todo.md) · Branch: `feature/home-page`
 
 ## Overview
 
-Connect FastAPI to PostgreSQL asynchronously, add Alembic migrations and a test setup on a real test database. The only visible change is a health check that reports the database state.
+First slice from database to screen: a single `home_content` row with translated JSON fields, a public `GET /api/home?lang=` endpoint, a `GET /api/cv` file endpoint, and the home page rendering the content (Markdown intro, LinkedIn / GitHub / CV links).
 
 ## Architecture Decisions
 
-- **Async SQLAlchemy + asyncpg**, one `AsyncSession` per request through a `get_session` FastAPI dependency. `asyncpg` because async psycopg does not run on Windows' default event loop.
-- **Engine created once at import from settings**; tests swap it by overriding `get_session`, so no global state is patched.
-- **Alembic async template**: `migrations/env.py` reads `settings.database_url` (never `alembic.ini`), so the URL lives in `.env` only.
-- **Test isolation by rollback**: each test runs inside a connection-level transaction; the session joins it with savepoints, and everything is rolled back after the test.
-- **Naming conventions on `Base.metadata`** (pk/fk/ix/uq/ck) so constraint names are stable and migrations can drop them reliably.
+- **Languages defined once in `domain/language.py`** (`Lang`, `DEFAULT_LANG`, `localize()`), used by the API for `?lang=` validation, so adding Dutch touches one backend file.
+- **ORM model ↔ domain entity conversion lives in the repository**, the only place that knows both.
+- **Repository injected through a FastAPI dependency** (`get_home_repository`), built on `get_session`; tests keep overriding only `get_session`.
+- **Placeholder row inserted by the migration**, so a fresh database already serves a valid home page; real text comes from the admin (feature 5).
+- **CV file path from a `storage_dir` setting** (default `backend/storage`), never exposed in responses; `cv_url` is computed from file existence.
+- **Frontend fetch with a small hook** (`useHomeContent`), aborting the previous request when the language changes so a slow answer cannot overwrite a newer one.
 
 ## Task List
 
-### Phase 1: Database connection
-- [x] Task 1: Async database session and health check
+### Phase 1: Backend
+- [x] Task 1: Language helpers and HomeContent entity
+- [x] Task 2: home_content table, migration and repository
+- [x] Task 3: GET /api/home endpoint
+- [x] Task 4: CV storage and GET /api/cv
 
-### Phase 2: Migrations
-- [x] Task 2: Alembic setup and migration round-trip test
+### Checkpoint A: after Tasks 1–4
+- [x] ruff + pytest green, migration round-trip green
+- [ ] Human check: `/api/home?lang=fr`, `/api/home?lang=xx` (422), `/api/cv` with and without a PDF
 
-### Checkpoint A: after Tasks 1–2
-- [x] ruff + pytest green
-- [x] Human check: health is 200 with Docker up, 503 with the database stopped
-
-### Phase 3: Documentation
-- [x] Task 3: README — environment, migrations and layering rules
+### Phase 2: Frontend
+- [x] Task 5: Home page fetching and rendering the content
 
 ### Checkpoint B: complete
-- [x] All 5 spec success criteria verified
+- [x] Human check in the browser: both languages, links, CV, backend stopped → error message
+- [x] All 7 spec success criteria verified
 - [x] Code review (`/review`), then merge into `develop` after approval
 
 ## Risks and Mitigations
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Tests accidentally run against the dev database | High | Test URL derived from settings with the database name forced to `portfolio_test`; a guard asserts the name before any test runs |
-| Event-loop mismatch between pytest and the async engine | Med | AnyIO plugin + `httpx.AsyncClient`/`ASGITransport` (no sync `TestClient`); engine created inside the test event loop |
-| Windows event loop incompatibility | Med | `asyncpg` driver (works with ProactorEventLoop) |
-| Health check leaks connection details | Low | Fixed response body; exception never serialized; test asserts the body |
+| Markdown renders injected HTML/script | High | `react-markdown` without `rehype-raw`; test with a `<script>` in the intro |
+| Path traversal or file path leak via the CV endpoint | Med | Fixed file name, no user input in the path; responses never contain paths |
+| Out-of-order responses when switching language fast | Low | `AbortController` in the hook |
+| JSON rows missing a language | Low | Check constraints in the database + English fallback in `localize()` |
+| CV accidentally committed | Med | `backend/storage/` in `.gitignore` before the first file is placed |
 
 ## Open Questions
 

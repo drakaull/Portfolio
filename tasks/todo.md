@@ -1,57 +1,91 @@
-# Tasks: Feature 2 — Backend foundation
+# Tasks: Feature 3 — Home page
 
-Each task: implement → `uv run ruff check . && uv run ruff format --check . && uv run pytest` (from `backend/`) → one commit.
+Each task: implement → checks green (backend: `uv run ruff check . && uv run ruff format --check . && uv run pytest`; frontend: `npm run lint && npm run format:check && npm test && npm run build`) → one commit.
 
-## Task 1: Async database session and health check
+## Task 1: Language helpers and HomeContent entity
 
-**Description:** Add SQLAlchemy (asyncio) and asyncpg, a `database_url` setting, the async engine/session factory and declarative `Base`, a `get_session` dependency, and make `/api/health` check the database. Add the test setup that creates and targets `portfolio_test`.
+**Description:** Pure domain code: supported languages, English fallback, and the `HomeContent` dataclass.
 
 **Acceptance criteria:**
-- [ ] `GET /api/health` → 200 `{"status": "ok", "database": "ok"}` when PostgreSQL answers
-- [ ] → 503 `{"status": "degraded", "database": "unreachable"}` when it does not, with no error detail
-- [ ] Tests run against `portfolio_test` only (guarded)
+- [ ] `localize({"en": "A", "fr": "B"}, "fr")` → `"B"`; missing or empty `fr` → `"A"`
+- [ ] `domain/` imports nothing from FastAPI, SQLAlchemy, `api/` or `infra/`
 
 **Verification:**
-- [ ] Tests: health up (real test DB), health down (session dependency overridden to fail)
-- [ ] Manual: `curl localhost:8000/api/health` with Docker up
+- [ ] Unit tests for `localize`
 
 **Dependencies:** None
-**Files:** `pyproject.toml`, `uv.lock`, `.env.example`, `app/infra/config.py`, `app/infra/database.py`, `app/api/dependencies.py`, `app/api/health.py`, `tests/conftest.py`, `tests/test_health.py`
-**Scope:** M (several small files)
+**Files:** `app/domain/language.py`, `app/domain/home.py`, `tests/test_language.py`
+**Scope:** S
 
-## Task 2: Alembic setup and migration round-trip test
+## Task 2: home_content table, migration and repository
 
-**Description:** Initialise Alembic with the async template in `backend/migrations`, wire `env.py` to the settings URL and `Base.metadata`, run migrations at the start of the test session, and add a round-trip test.
+**Description:** ORM model, Alembic migration (table, single-row and language check constraints, placeholder row), and `HomeContentRepository.get()` returning a domain entity.
 
 **Acceptance criteria:**
-- [ ] `uv run alembic upgrade head` and `uv run alembic downgrade base` succeed on the dev database
-- [ ] Test session applies `upgrade head` to `portfolio_test` before tests
-- [ ] Round-trip test (`upgrade head` → `downgrade base` → `upgrade head`) passes
+- [ ] Fresh database after `upgrade head` contains the placeholder row
+- [ ] Database rejects a second row and a row whose `headline`/`intro` lacks `en` or `fr`
+- [ ] Repository returns a `HomeContent` (not the ORM object), or `None` without a row
+- [ ] Isolation: data written in one test is gone in the next
 
 **Verification:**
-- [ ] Tests pass; manual run of the two Alembic commands
+- [ ] Tests: repository read, constraints, isolation; migration round-trip still green
 
 **Dependencies:** Task 1
-**Files:** `alembic.ini`, `migrations/env.py`, `migrations/script.py.mako`, `tests/conftest.py`, `tests/test_migrations.py`
+**Files:** `app/infra/models.py`, `app/infra/repositories/home.py`, `migrations/env.py` (import models), `migrations/versions/<date>-create_home_content.py`, `tests/test_home_repository.py`
+**Scope:** M
+
+## Task 3: GET /api/home endpoint
+
+**Description:** Public endpoint returning the localized home content.
+
+**Acceptance criteria:**
+- [ ] `?lang=en|fr` → 200 with `headline`, `intro`, `linkedin_url`, `github_url`, `cv_url`
+- [ ] Missing/invalid `lang` → 422; no row → 404
+- [ ] Missing translation falls back to English
+
+**Verification:**
+- [ ] Tests for each case above
+
+**Dependencies:** Task 2
+**Files:** `app/api/home.py`, `app/api/dependencies.py`, `app/main.py`, `tests/test_home_api.py`
+**Scope:** S
+
+## Task 4: CV storage and GET /api/cv
+
+**Description:** `storage_dir` setting, git-ignored `backend/storage/`, `/api/cv` serving `cv.pdf` inline, and `cv_url` filled when the file exists.
+
+**Acceptance criteria:**
+- [ ] With `storage/cv.pdf`: `/api/cv` → 200 `application/pdf`, inline, file name `Leonard_Fontaine_CV.pdf`; `cv_url` = `/api/cv`
+- [ ] Without it: `/api/cv` → 404; `cv_url` = `null`
+- [ ] `backend/storage/` ignored by git
+
+**Verification:**
+- [ ] Tests with a temporary storage directory
+- [ ] `git check-ignore backend/storage/cv.pdf`
+
+**Dependencies:** Task 3
+**Files:** `.gitignore`, `app/infra/config.py`, `app/api/home.py`, `backend/.env.example`, `tests/test_home_api.py`
 **Scope:** S
 
 ## Checkpoint A
-- [ ] ruff + pytest green · human check of health with the database up and stopped
+- [ ] Backend checks green · human check of `/api/home` and `/api/cv`
 
-## Task 3: README — environment, migrations and layering rules
+## Task 5: Home page fetching and rendering the content
 
-**Description:** Document `.env` setup, migration commands, and the api/domain/infra import rules.
+**Description:** `useHomeContent(lang)` hook and `HomePage` rendering name, headline, Markdown intro and links, with loading and error states. Adds `react-markdown`.
 
 **Acceptance criteria:**
-- [ ] A new developer can go from clone to a working health check by following the README
-- [ ] Layering rules match the spec
+- [ ] Content from the API shown in the URL language; switching language refetches
+- [ ] `<script>` in the intro shown as text; external links have `target="_blank"` and `rel="noopener noreferrer"`
+- [ ] CV link hidden when `cv_url` is null; translated error message when the API fails
 
 **Verification:**
-- [ ] Manual read-through
+- [ ] Tests with mocked `fetch`: both languages, loading, error, script-as-text, links, CV hidden
+- [ ] Build passes; note `react-markdown` bundle impact
 
-**Dependencies:** Task 2
-**Files:** `README.md`
-**Scope:** XS
+**Dependencies:** Task 4 (API contract)
+**Files:** `frontend/package.json`, `frontend/src/api/useHomeContent.ts`, `frontend/src/pages/HomePage.tsx`, `frontend/src/pages/HomePage.module.css`, `frontend/src/pages/HomePage.test.tsx`, `frontend/src/i18n/*.ts`, `frontend/src/App.test.tsx` (home title expectations)
+**Scope:** M
 
 ## Checkpoint B
-- [ ] All 5 spec success criteria verified · `/review` · merge into `develop` after approval
+- [ ] Human browser check · 7 spec success criteria · `/review` · merge into `develop` after approval
