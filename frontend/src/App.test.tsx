@@ -93,6 +93,35 @@ describe('navbar', () => {
   })
 })
 
+describe('mobile menu', () => {
+  const menuButton = () => screen.getByRole('button', { name: 'Menu' })
+
+  test('opens and closes with the menu button', () => {
+    renderAt('/en')
+    expect(menuButton().getAttribute('aria-expanded')).toBe('false')
+    fireEvent.click(menuButton())
+    expect(menuButton().getAttribute('aria-expanded')).toBe('true')
+    fireEvent.click(menuButton())
+    expect(menuButton().getAttribute('aria-expanded')).toBe('false')
+  })
+
+  test('closes on Escape and gives focus back to the button', () => {
+    renderAt('/en')
+    fireEvent.click(menuButton())
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(menuButton().getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(menuButton())
+  })
+
+  test('closes after choosing a section', () => {
+    renderAt('/en')
+    fireEvent.click(menuButton())
+    fireEvent.click(screen.getByRole('link', { name: 'Skills' }))
+    expect(heading().textContent).toBe('Skills')
+    expect(menuButton().getAttribute('aria-expanded')).toBe('false')
+  })
+})
+
 describe('language switch', () => {
   test('switches to English and keeps the current section', () => {
     renderAt('/fr/skills')

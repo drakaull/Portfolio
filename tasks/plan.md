@@ -32,11 +32,11 @@ Turn the empty React app into the portfolio's frame: one URL per section with th
 - [x] Task 6: Theme toggle
 
 ### Checkpoint B: after Tasks 4–6
-- [ ] All checks pass
-- [ ] Human check: switch language and theme on several pages, reload
+- [x] All checks pass
+- [x] Human check: switch language and theme on several pages, reload
 
 ### Phase 3: Mobile
-- [ ] Task 7: Mobile menu below 768 px
+- [x] Task 7: Mobile menu below 768 px
 
 ### Checkpoint C: complete
 - [ ] All 8 success criteria of the spec verified

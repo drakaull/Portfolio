@@ -3,6 +3,7 @@ export const en = {
   'site.name': 'Léonard Fontaine',
   'nav.label': 'Main',
   'nav.skip': 'Skip to content',
+  'nav.menu': 'Menu',
   'theme.dark': 'Dark mode',
   'home.title': 'Home',
   'experience.title': 'Experience',
