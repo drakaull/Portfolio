@@ -60,6 +60,9 @@ class AdminRepository:
             delete(AdminSessionModel).where(AdminSessionModel.token_hash == token_hash)
         )
 
+    async def commit(self) -> None:
+        await self._session.commit()
+
     async def delete_expired_sessions(self, now: datetime) -> None:
         await self._session.execute(
             delete(AdminSessionModel).where(AdminSessionModel.expires_at <= now)

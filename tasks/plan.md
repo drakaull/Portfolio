@@ -21,10 +21,10 @@ Single-admin authentication: account created by CLI, argon2 password, server-sid
 - [x] Task 1: Auth domain rules and security helpers
 - [x] Task 2: Admin users and sessions tables, migration and repository
 - [x] Task 3: `create-admin` command
-- [ ] Task 4: Login, logout, me endpoints with rate limiting
+- [x] Task 4: Login, logout, me endpoints with rate limiting
 
 ### Checkpoint A: after Tasks 1–4
-- [ ] ruff + pytest green, migration round-trip green
+- [x] ruff + pytest green, migration round-trip green
 - [ ] Human check: create the account with the CLI, sign in through `/docs`, `/api/admin/me` → 200, logout → 401
 
 ### Phase 2: Frontend
