@@ -32,8 +32,8 @@ Protected API to read/save the home content and upload/remove the CV, then an ad
 - [x] Task 6: CV upload and removal in the editor
 
 ### Checkpoint B: complete
-- [ ] Human browser check of the 6 spec success criteria
-- [ ] Security review (security-auditor) + code review (`/review`)
+- [x] Human browser check of the 6 spec success criteria
+- [x] Security review (security-auditor) + code review (`/review`)
 - [ ] Merge into `develop` after approval
 
 ## Risks and Mitigations
