@@ -18,7 +18,7 @@ Protected API to read/save the home content and upload/remove the CV, then an ad
 ## Task List
 
 ### Phase 1: Backend
-- [ ] Task 1: GET / PUT /api/admin/home
+- [x] Task 1: GET / PUT /api/admin/home
 - [ ] Task 2: PUT / DELETE /api/admin/cv
 
 ### Checkpoint A: after Tasks 1–2

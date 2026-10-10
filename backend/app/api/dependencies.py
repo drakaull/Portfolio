@@ -2,7 +2,7 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import Cookie, Depends, HTTPException, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.auth import AdminUser
@@ -41,3 +41,8 @@ async def require_admin(
     if not user:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     return user
+
+
+def admin_router() -> APIRouter:
+    """Router for admin routes: every route added to it requires a valid admin session."""
+    return APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])

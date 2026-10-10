@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel, Field
 
-from app.api.dependencies import ADMIN_COOKIE, get_admin_repository, require_admin
+from app.api.dependencies import ADMIN_COOKIE, admin_router, get_admin_repository, require_admin
 from app.domain.auth import MAX_PASSWORD_LENGTH, SESSION_LIFETIME, AdminUser
 from app.infra.rate_limit import login_limiter
 from app.infra.repositories.admin import AdminRepository
@@ -22,8 +22,7 @@ logger = logging.getLogger(__name__)
 COOKIE_PATH = "/api/admin"
 
 public_router = APIRouter(prefix="/admin", tags=["admin"])
-# Every route added to this router requires a valid admin session.
-protected_router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
+protected_router = admin_router()
 
 
 class LoginIn(BaseModel):

@@ -18,3 +18,15 @@ class HomeContentRepository:
             linkedin_url=row.linkedin_url,
             github_url=row.github_url,
         )
+
+    async def save(self, content: HomeContent) -> None:
+        row = await self._session.get(HomeContentModel, 1) or HomeContentModel(id=1)
+        row.headline = dict(content.headline)
+        row.intro = dict(content.intro)
+        row.linkedin_url = content.linkedin_url
+        row.github_url = content.github_url
+        self._session.add(row)
+        await self._session.flush()
+
+    async def commit(self) -> None:
+        await self._session.commit()
