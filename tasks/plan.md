@@ -22,12 +22,12 @@ Turn the empty React app into the portfolio's frame: one URL per section with th
 - [x] Task 3: Empty section pages
 
 ### Checkpoint A: after Tasks 1–3
-- [ ] Lint, format check, tests and build pass
-- [ ] Every route from the spec renders its translated title
-- [ ] Human check in the browser
+- [x] Lint, format check, tests and build pass
+- [x] Every route from the spec renders its translated title
+- [x] Human check in the browser
 
 ### Phase 2: Navigation
-- [ ] Task 4: Fixed navbar with active link
+- [x] Task 4: Fixed navbar with active link
 - [ ] Task 5: Language switch
 - [ ] Task 6: Theme toggle
 

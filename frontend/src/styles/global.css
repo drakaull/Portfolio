@@ -9,6 +9,8 @@
 
   --font-sans: 'Google Sans Variable', 'Segoe UI', system-ui, sans-serif;
   --navbar-height: 4rem;
+  --content-width: 64rem;
+  --gutter: 1.5rem;
 
   color-scheme: light;
 }

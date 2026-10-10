@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Navigate, Outlet, Route, Routes, useParams } from 'react-router'
+import { Layout } from './components/Layout/Layout.tsx'
 import { DEFAULT_LANG, isLang } from './i18n/useTranslation.ts'
 import { ContactPage } from './pages/ContactPage.tsx'
 import { ExperiencePage } from './pages/ExperiencePage.tsx'
@@ -21,7 +22,7 @@ function LocalizedRoutes() {
     document.documentElement.lang = validLang
   }, [validLang])
 
-  return isLang(lang) ? <Outlet /> : <NotFoundPage />
+  return <Layout>{isLang(lang) ? <Outlet /> : <NotFoundPage />}</Layout>
 }
 
 export function App() {

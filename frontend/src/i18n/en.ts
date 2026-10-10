@@ -1,6 +1,8 @@
 // Source of truth for translation keys: fr.ts must define every key below.
 export const en = {
   'site.name': 'Léonard Fontaine',
+  'nav.label': 'Main',
+  'nav.skip': 'Skip to content',
   'home.title': 'Home',
   'experience.title': 'Experience',
   'skills.title': 'Skills',

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { App } from './App.tsx'
@@ -60,6 +60,28 @@ describe('section pages', () => {
   test('sets the document title', () => {
     renderAt('/fr/skills')
     expect(document.title).toBe('Compétences · Léonard Fontaine')
+  })
+})
+
+describe('navbar', () => {
+  test('links to home and every section in the current language', () => {
+    renderAt('/fr')
+    const nav = screen.getByRole('navigation', { name: 'Principale' })
+    const hrefs = within(nav)
+      .getAllByRole('link')
+      .map((link) => link.getAttribute('href'))
+    expect(hrefs).toEqual(['/fr', '/fr/experience', '/fr/skills', '/fr/projects', '/fr/contact'])
+  })
+
+  test('marks the current section link with aria-current', () => {
+    renderAt('/en/projects')
+    expect(screen.getByRole('link', { name: 'Projects' }).getAttribute('aria-current')).toBe('page')
+    expect(screen.getByRole('link', { name: 'Skills' }).getAttribute('aria-current')).toBeNull()
+  })
+
+  test('offers a skip link to the main content', () => {
+    renderAt('/en')
+    expect(screen.getByRole('link', { name: 'Skip to content' }).getAttribute('href')).toBe('#main')
   })
 })
 
