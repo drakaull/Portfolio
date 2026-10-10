@@ -19,10 +19,10 @@ Protected API to read/save the home content and upload/remove the CV, then an ad
 
 ### Phase 1: Backend
 - [x] Task 1: GET / PUT /api/admin/home
-- [ ] Task 2: PUT / DELETE /api/admin/cv
+- [x] Task 2: PUT / DELETE /api/admin/cv
 
 ### Checkpoint A: after Tasks 1–2
-- [ ] ruff + pytest green
+- [x] ruff + pytest green
 - [ ] Human check through `/docs`: edit the headline, see it on `/api/home`; upload a PDF, try a renamed non-PDF
 
 ### Phase 2: Frontend

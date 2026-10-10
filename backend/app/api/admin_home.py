@@ -1,12 +1,12 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.dependencies import admin_router, get_home_repository
 from app.domain.home import HEADLINE_MAX_LENGTH, INTRO_MAX_LENGTH, URL_MAX_LENGTH, HomeContent
 from app.infra.repositories.home import HomeContentRepository
-from app.infra.storage import cv_file
+from app.infra.storage import CvTooLargeError, NotAPdfError, cv_file, delete_cv, save_cv
 
 router = admin_router()
 
@@ -76,3 +76,24 @@ async def save_home_content(body: HomeContentIn, repository: Repository) -> Admi
     await repository.save(content)
     await repository.commit()
     return AdminHomeContentOut.from_domain(content)
+
+
+@router.put("/cv", status_code=status.HTTP_204_NO_CONTENT)
+async def upload_cv(file: UploadFile) -> None:
+    if file.content_type != "application/pdf":
+        raise HTTPException(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="The CV must be a PDF")
+    try:
+        await save_cv(file.read)
+    except NotAPdfError as error:
+        raise HTTPException(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="The CV must be a PDF"
+        ) from error
+    except CvTooLargeError as error:
+        raise HTTPException(
+            status.HTTP_413_CONTENT_TOO_LARGE, detail="The CV must be 5 MB or less"
+        ) from error
+
+
+@router.delete("/cv", status_code=status.HTTP_204_NO_CONTENT)
+async def remove_cv() -> None:
+    delete_cv()

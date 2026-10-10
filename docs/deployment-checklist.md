@@ -8,6 +8,7 @@ Items collected during code and security reviews. **Required** items must be don
 - [ ] **Single backend process**, or move the login rate limiter to the database (`shortcut:` in `app/infra/rate_limit.py`).
 - [ ] **HTTPS everywhere**; the admin cookie is `Secure` and is refused over plain HTTP outside `localhost`.
 - [ ] **Security headers** on every response: `Content-Security-Policy` (allow the inline theme script in `frontend/index.html` by hash), `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` (or CSP `frame-ancestors 'none'`), `Referrer-Policy`.
+- [ ] **Request body size limit at the reverse proxy** (e.g. nginx `client_max_body_size 6m`). Starlette receives a whole multipart upload before the 5 MB CV check runs, so without a proxy limit a huge upload still fills the disk temporarily.
 - [ ] **Persistent volume for `backend/storage/`** (CV, later images); it is git-ignored and would be lost on redeploy.
 - [ ] **`DEBUG=false`** (default) and a production `DATABASE_URL` in the server environment, never in git.
 - [ ] **Run `alembic upgrade head`** on each deploy, before starting the new backend.
