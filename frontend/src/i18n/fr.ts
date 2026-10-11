@@ -49,6 +49,10 @@ export const fr: Record<TranslationKey, string> = {
   'admin.logout': 'Se déconnecter',
   'admin.sections': 'Sections',
   'admin.sections.home': "Page d'accueil",
+  'admin.sections.experiences': 'Parcours',
+  'admin.experiences.title': 'Modifier le parcours',
+  'admin.experiences.new': 'Nouvelle expérience',
+  'admin.experiences.empty': 'Aucune expérience pour le moment.',
   'admin.logoutError':
     'La déconnexion a échoué : vous êtes toujours connecté. Vérifiez votre connexion et réessayez.',
   'admin.home.title': "Modifier la page d'accueil",

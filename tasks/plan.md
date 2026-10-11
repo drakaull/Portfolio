@@ -25,7 +25,7 @@ Admin pages to list, create, edit and delete timeline entries, with the home edi
 
 ### Phase 2: Frontend
 - [x] Task 3: Extract the translation block from the home editor (no visible change, existing tests green)
-- [ ] Task 4: Experience list page + dashboard link
+- [x] Task 4: Experience list page + dashboard link
 - [ ] Task 5: Experience form (create / edit / delete, slug proposal, technologies, translation)
 
 ### Checkpoint B: after Tasks 3–5

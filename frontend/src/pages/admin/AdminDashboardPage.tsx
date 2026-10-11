@@ -36,6 +36,9 @@ export function AdminDashboardPage() {
           <li>
             <Link to={`/${lang}/admin/home`}>{t('admin.sections.home')}</Link>
           </li>
+          <li>
+            <Link to={`/${lang}/admin/experiences`}>{t('admin.sections.experiences')}</Link>
+          </li>
         </ul>
       </nav>
       <Button onClick={handleLogout}>{t('admin.logout')}</Button>

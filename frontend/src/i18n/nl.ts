@@ -50,6 +50,10 @@ export const nl: Record<TranslationKey, string> = {
   'admin.logout': 'Uitloggen',
   'admin.sections': 'Secties',
   'admin.sections.home': 'Startpagina',
+  'admin.sections.experiences': 'Ervaring',
+  'admin.experiences.title': 'Tijdlijn bewerken',
+  'admin.experiences.new': 'Nieuwe ervaring',
+  'admin.experiences.empty': 'Nog geen ervaring.',
   'admin.logoutError':
     'Uitloggen is mislukt: je bent nog steeds ingelogd. Controleer je verbinding en probeer het opnieuw.',
   'admin.home.title': 'De startpagina bewerken',

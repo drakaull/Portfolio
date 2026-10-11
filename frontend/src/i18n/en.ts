@@ -48,6 +48,10 @@ export const en = {
   'admin.logout': 'Sign out',
   'admin.sections': 'Sections',
   'admin.sections.home': 'Home page',
+  'admin.sections.experiences': 'Experience',
+  'admin.experiences.title': 'Edit the timeline',
+  'admin.experiences.new': 'New experience',
+  'admin.experiences.empty': 'No experience yet.',
   'admin.logoutError':
     'Sign-out failed: you are still signed in. Check your connection and try again.',
   'admin.home.title': 'Edit the home page',

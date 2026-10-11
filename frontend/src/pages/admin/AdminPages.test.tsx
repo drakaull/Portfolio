@@ -62,6 +62,9 @@ describe('admin area', () => {
 
     const link = await screen.findByRole('link', { name: "Page d'accueil" })
     expect(link.getAttribute('href')).toBe('/fr/admin/home')
+    expect(screen.getByRole('link', { name: 'Parcours' }).getAttribute('href')).toBe(
+      '/fr/admin/experiences',
+    )
   })
 
   test('is hidden from search engines', async () => {
