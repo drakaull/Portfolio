@@ -3,6 +3,7 @@ import type { TranslationKey } from './en.ts'
 export const fr: Record<TranslationKey, string> = {
   'site.name': 'Léonard Fontaine',
   'nav.label': 'Principale',
+  'nav.home': 'Accueil',
   'nav.skip': 'Aller au contenu',
   'nav.menu': 'Menu',
   'link.newTab': "s'ouvre dans un nouvel onglet",

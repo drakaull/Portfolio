@@ -61,8 +61,9 @@ describe('navbar', () => {
     const hrefs = within(nav)
       .getAllByRole('link')
       .map((link) => link.getAttribute('href'))
-    // Last link is the language switch.
+    // Brand, then the "Accueil" link, the sections, and last the language switch.
     expect(hrefs).toEqual([
+      '/fr',
       '/fr',
       '/fr/experience',
       '/fr/skills',
@@ -72,10 +73,16 @@ describe('navbar', () => {
     ])
   })
 
+  test('marks the home link as current on the home page only', () => {
+    renderApp('/fr')
+    expect(screen.getByRole('link', { name: 'Accueil' }).getAttribute('aria-current')).toBe('page')
+  })
+
   test('marks the current section link with aria-current', () => {
     renderApp('/en/projects')
     expect(screen.getByRole('link', { name: 'Projects' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('link', { name: 'Skills' }).getAttribute('aria-current')).toBeNull()
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('aria-current')).toBeNull()
   })
 
   test('offers a skip link to the main content', () => {

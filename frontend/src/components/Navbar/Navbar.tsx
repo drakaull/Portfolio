@@ -43,6 +43,12 @@ export function Navbar() {
         {t('nav.menu')}
       </button>
       <ul id="nav-links" className={`${styles.links} ${menuOpen ? styles.open : ''}`}>
+        <li>
+          {/* `end`: active on the home page only, not on every page under /<lang>. */}
+          <NavLink to={`/${lang}`} end className={styles.link} onClick={() => setMenuOpen(false)}>
+            {t('nav.home')}
+          </NavLink>
+        </li>
         {SECTIONS.map((section) => (
           <li key={section}>
             {/* NavLink sets aria-current="page" on the active link; the CSS styles that attribute. */}
