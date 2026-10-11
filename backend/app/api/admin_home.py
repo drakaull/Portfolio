@@ -23,15 +23,18 @@ class _StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
 
-# One field per supported language; French (the source) is required, English may be left empty.
+# One field per supported language; French (the source) is required, the others may be left
+# empty (or omitted) and are then translated on save.
 class HeadlineIn(_StrictModel):
     fr: str = Field(min_length=1, max_length=HEADLINE_MAX_LENGTH)
-    en: str = Field(max_length=HEADLINE_MAX_LENGTH)
+    en: str = Field(default="", max_length=HEADLINE_MAX_LENGTH)
+    nl: str = Field(default="", max_length=HEADLINE_MAX_LENGTH)
 
 
 class IntroIn(_StrictModel):
     fr: str = Field(min_length=1, max_length=INTRO_MAX_LENGTH)
-    en: str = Field(max_length=INTRO_MAX_LENGTH)
+    en: str = Field(default="", max_length=INTRO_MAX_LENGTH)
+    nl: str = Field(default="", max_length=INTRO_MAX_LENGTH)
 
 
 class HomeContentIn(_StrictModel):

@@ -17,7 +17,7 @@ Dutch (`nl`) added end to end — backend language list, DeepL target, admin sch
 ## Task List
 
 ### Phase 1: Backend
-- [ ] Task 1: Dutch in the backend (language list, DeepL target, admin schemas)
+- [x] Task 1: Dutch in the backend (language list, DeepL target, admin schemas)
 - [ ] Task 2: `translate-missing` command
 
 ### Checkpoint A: after Tasks 1–2

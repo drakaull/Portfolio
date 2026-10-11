@@ -138,3 +138,11 @@ async def test_live_deepl_translation() -> None:
         [("Je suis **développeur**.", "markdown")], "en"
     )
     assert "**" in result and "developer" in result.lower()
+
+
+async def test_dutch_target_uses_the_deepl_code_nl() -> None:
+    transport, requests = fake_deepl()
+
+    await Translator("key:fx", transport).translate([("Bonjour", "plain")], "nl")
+
+    assert json.loads(requests[0].content)["target_lang"] == "NL"

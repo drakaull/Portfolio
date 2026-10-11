@@ -11,7 +11,7 @@ from app.domain.language import SOURCE_LANG, Lang
 TextFormat = Literal["markdown", "plain"]
 
 # DeepL language codes; British English for a European audience.
-_DEEPL_LANGS: dict[Lang, str] = {"fr": "FR", "en": "EN-GB"}
+_DEEPL_LANGS: dict[Lang, str] = {"fr": "FR", "en": "EN-GB", "nl": "NL"}
 _TIMEOUT_SECONDS = 10
 # Raw HTML typed in Markdown is escaped, never passed through (same rule as the public renderer).
 _markdown = MarkdownIt("commonmark", {"html": False})
