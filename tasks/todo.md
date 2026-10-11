@@ -1,61 +1,62 @@
-# Tasks: Feature 8 — Experience (public)
+# Tasks: Feature 9 — Language switcher and Dutch
 
 Each task: implement → checks green (backend: `uv run ruff check . && uv run ruff format --check . && uv run pytest`; frontend: `npm run lint && npm run format:check && npm test && npm run build`, plus Playwright screenshots) → one commit.
 
-## Task 1: Experience entity, table, seed migration and repository
+## Task 1: Dutch in the backend
 
 **Acceptance criteria:**
-- [ ] Constraints: unique slug, slug format `^[a-z0-9-]+$`, kind values, years 1950–2100, end ≥ start
-- [ ] Migration inserts the 7 seed entries from the spec; downgrade removes the table
-- [ ] Repository: `list()` most recent first (same-year tie by insertion order), `get(slug)` or `None`, returns domain entities
+- [ ] `Lang = "en" | "fr" | "nl"`; `lang=nl` accepted with French fallback
+- [ ] DeepL target `NL`; translate endpoint accepts `target=nl`
+- [ ] Admin home schemas accept an optional `nl`; save fills empty `en` and `nl`
 
-**Verification:** repository and constraint tests; migration round trip
-**Files:** `app/domain/experience.py`, `app/infra/models.py`, `app/infra/repositories/experience.py`, `migrations/versions/<date>-create_experiences.py`, `tests/test_experience_repository.py`
-**Scope:** M
-
-## Task 2: Public list and detail endpoints
-
-**Acceptance criteria:**
-- [ ] `GET /api/experiences?lang=` returns localized items (French fallback), most recent first
-- [ ] `GET /api/experiences/{slug}?lang=` returns the detail with description; 404 unknown slug; 422 bad lang
-
-**Verification:** API tests
-**Files:** `app/api/experiences.py`, `app/api/dependencies.py`, `app/main.py`, `tests/test_experiences_api.py`
+**Verification:** updated API tests
+**Files:** `app/domain/language.py`, `app/infra/translation.py`, `app/api/admin_home.py`, tests
 **Scope:** S
+
+## Task 2: translate-missing command
+
+**Acceptance criteria:**
+- [ ] `uv run python -m app.cli translate-missing` fills empty non-French fields of the home content and every experience
+- [ ] Never overwrites existing text; prints a summary; exits with a clear message when DeepL is unavailable
+
+**Verification:** tests with the fake translator
+**Files:** `app/cli.py`, `app/infra/repositories/experience.py` (save), `tests/test_cli.py`
+**Scope:** M
 
 ## Checkpoint A
-- [ ] Backend green · human check in `/docs` or the browser
+- [ ] Backend green · human runs the command and checks `lang=nl`
 
-## Task 3: Timeline page with carousel
+## Task 3: Dutch interface
 
 **Acceptance criteria:**
-- [ ] Cards in order with badge, years, title, organization, summary, technologies; card links to `/:lang/experience/<slug>`
-- [ ] Horizontal scroll snap; previous/next buttons scroll one card and hide at the ends
-- [ ] Loading, error and empty states
+- [ ] `nl.ts` with every key (DeepL from English), eyebrows as decided
+- [ ] `/nl/...` routes; `/` redirects Dutch browsers to `/nl`
+- [ ] Existing tests still pass; Dutch route tests added
 
-**Verification:** tests (mocked fetch; scroll behaviour through `scrollBy` spy and scroll events) + screenshots
-**Files:** `src/api/useExperiences.ts`, `src/components/ExperienceCard/*`, `src/components/Timeline/*`, `src/pages/ExperiencePage.tsx`, `src/i18n/*.ts`, `src/lib/years.ts`
+**Files:** `src/i18n/nl.ts`, `src/i18n/useTranslation.ts`, `src/components/Routing/Routing.tsx`, tests
 **Scope:** M
 
-## Task 4: Experience detail page
+## Task 4: Flags and language switcher
 
 **Acceptance criteria:**
-- [ ] Eyebrow `~/portfolio/parcours/<slug>`, title, badge, organization, years, Markdown description, technologies, back link
-- [ ] Unknown slug → 404 page
+- [ ] Inline SVG flags: UK; France/Belgium and Netherlands/Belgium split by a diagonal
+- [ ] Button shows current flag + code; list of 3 languages linking to the same page; Escape/outside click close; focus returns to the button
+- [ ] Used in the public navbar and the admin header
 
-**Verification:** tests + screenshots
-**Files:** `src/api/useExperience.ts`, `src/pages/ExperienceDetailPage.tsx` (+ CSS, test), `src/routes.tsx`, `src/i18n/*.ts`
-**Scope:** S
-
-## Task 5: "Recent path" column on the home page
-
-**Acceptance criteria:**
-- [ ] Latest 3 entries as compact cards linking to their detail pages; hidden when empty or on error
-- [ ] Layout matches the visual direction preview; stacks under the intro at 390 px
-
-**Verification:** tests + screenshots
-**Files:** `src/pages/HomePage.tsx`, `src/pages/HomePage.module.css`, `src/pages/HomePage.test.tsx`, `src/i18n/*.ts`
-**Scope:** S
+**Files:** `src/components/Flag/*`, `src/components/LanguageSwitch/*`, tests
+**Scope:** M
 
 ## Checkpoint B
+- [ ] Screenshots reviewed · human approves flags and Dutch texts
+
+## Task 5: NL tab in the home editor
+
+**Acceptance criteria:**
+- [ ] Tabs FR · EN · NL; each non-French tab has its own "Translate from French" (with confirmation before replacing)
+- [ ] Save notices cover both generated languages
+
+**Files:** `src/api/adminHome.ts`, `src/pages/admin/HomeEditorPage.tsx`, tests, `src/i18n/*.ts`
+**Scope:** M
+
+## Checkpoint C
 - [ ] Human browser check · `/review` · merge into `develop` after approval
