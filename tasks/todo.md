@@ -1,77 +1,63 @@
-# Tasks: Feature 6 — Visual direction
+# Tasks: Feature 7 — Automatic translation
 
-Each task: implement → `npm run lint && npm run format:check && npm test && npm run build` (from `frontend/`) → Playwright screenshots (light/dark, 1280/390 px) reviewed → one commit.
+Each task: implement → checks green (backend: `uv run ruff check . && uv run ruff format --check . && uv run pytest`; frontend: `npm run lint && npm run format:check && npm test && npm run build`, plus Playwright screenshots) → one commit.
 
-## Task 1: Tokens, fonts, graph-paper background, global motion rules
+## Task 1: French as source language
 
-**Description:** Add the two font packages, the token groups from the spec, the graph-paper background, `scroll-behavior: smooth` and the global reduced-motion rule.
+**Description:** `SOURCE_LANG = "fr"` in the domain; `localize()` falls back to French; admin save requires French and accepts empty English.
 
 **Acceptance criteria:**
-- [ ] `--font-display`, `--font-mono`, type/space/radius/motion scales and `--color-grid` defined for both themes
-- [ ] Background shows a faint grid in both themes; text contrast unchanged (AA)
-- [ ] Reduced motion disables all animations and transitions
+- [ ] Empty or missing English → public `/api/home?lang=en` shows French
+- [ ] `PUT /api/admin/home`: empty French → 422; empty English accepted
 
-**Verification:** test asserting the reduced-motion rule; build (fonts bundled, no Google URL); screenshots
+**Verification:** updated domain and API tests
 **Dependencies:** None
-**Files:** `frontend/package.json`, `src/main.tsx`, `src/styles/global.css`, `src/styles/global.test.ts`
+**Files:** `app/domain/language.py`, `app/api/admin_home.py`, `tests/test_language.py`, `tests/test_home_api.py`, `tests/test_admin_home_api.py`
 **Scope:** S
 
-## Task 2: Building blocks
+## Task 2: Translation service
 
-**Description:** `Eyebrow`, `Button`, `TextLink` (internal and external), `Badge`, `Reveal` with CSS Modules and tests.
+**Description:** `infra/translation.py`: Markdown ↔ HTML conversion and DeepL client (EN-GB, `tag_handling=html`, 10 s timeout); `DEEPL_API_KEY` optional setting. Adds `markdown-it-py` and `markdownify`.
 
 **Acceptance criteria:**
-- [ ] Each block renders semantic HTML and forwards its props (`href`, `onClick`, `type`, `disabled`…)
-- [ ] External `TextLink` opens in a new tab with `rel="noopener noreferrer"` and a hidden "opens in a new tab" text
-- [ ] `Reveal` staggers its children and leaves them visible at rest
+- [ ] Round trip without translation returns the original Markdown (paragraphs, bold, italic, links, lists, headings, inline code)
+- [ ] Request shape: `Authorization: DeepL-Auth-Key …`, `source_lang=FR`, `target_lang=EN-GB`, `tag_handling=html`, free endpoint for `:fx` keys
+- [ ] No key, 403, 456, 5xx, timeout → `TranslationUnavailable`
 
-**Verification:** component tests
+**Verification:** unit tests with `httpx.MockTransport`
 **Dependencies:** Task 1
-**Files:** `src/components/{Eyebrow,Button,TextLink,Badge,Reveal}/*`
+**Files:** `pyproject.toml`, `uv.lock`, `app/infra/config.py`, `app/infra/translation.py`, `.env.example`, `tests/test_translation.py`
 **Scope:** M
 
-## Task 3: Navbar, footer and favicon
+## Task 3: Translate endpoint and auto-fill on save
 
-**Description:** Brand in Bricolage, sliding underline on section links, minimal footer (© year + name, LinkedIn, GitHub), SVG favicon "LF".
+**Description:** `POST /api/admin/translate`; `PUT /api/admin/home` fills empty English fields and returns `auto_translated` / `translation_failed`.
 
 **Acceptance criteria:**
-- [ ] Existing navbar behaviour and tests unchanged (active link, mobile menu, language and theme switches)
-- [ ] Footer on every public page, links from the home content API (fallback: hidden if not loaded)
-- [ ] Favicon shown in the browser tab
+- [ ] Translate: 200 with translations; 503 when unavailable; 422 over limits; 401 without session
+- [ ] Save: empty English filled; written English untouched; DeepL failure → saved with `translation_failed: true`
+- [ ] Deployment checklist: `DEEPL_API_KEY` in the server environment
 
-**Verification:** tests + screenshots
+**Verification:** API tests with the translation service replaced by a fake
 **Dependencies:** Task 2
-**Files:** `src/components/Navbar/*`, `src/components/Footer/*`, `src/components/Layout/*`, `public/favicon.svg`, `index.html`, `src/i18n/*.ts`
+**Files:** `app/api/admin_translate.py`, `app/api/admin_home.py`, `app/api/dependencies.py`, `app/main.py`, `tests/test_admin_translate_api.py`, `tests/test_admin_home_api.py`, `docs/deployment-checklist.md`
 **Scope:** M
 
 ## Checkpoint A
-- [ ] Checks green · screenshots reviewed · human browser check
+- [ ] Backend green · human: DeepL key + `/docs` checks
 
-## Task 4: Home, section pages and 404
+## Task 4: Editor — French first, translate button, notices
 
-**Description:** Home hero with eyebrow, Bricolage name, `Button` + `TextLink`s and `Reveal`; path eyebrows on section pages; 404 restyled.
+**Description:** FR tab first and default; "Translate from French" button in the EN tab with confirmation when English exists; review notice; save notices (auto-translated / failed); new English hint.
 
 **Acceptance criteria:**
-- [ ] Home matches the spec in both languages and themes; right column empty
-- [ ] Each section page shows its localized path eyebrow
-- [ ] Existing home tests (content, errors, stale responses, links) still pass
+- [ ] Button fills English headline and intro; confirmation before replacing existing English
+- [ ] Notices after save match `auto_translated` / `translation_failed`
+- [ ] 503 on the button shows "translation unavailable"
 
-**Verification:** tests + screenshots
+**Verification:** tests with mocked `fetch`; screenshots
 **Dependencies:** Task 3
-**Files:** `src/pages/HomePage.tsx`, `src/pages/HomePage.module.css`, `src/pages/*Page.tsx`, `src/pages/NotFoundPage.tsx`, `src/i18n/*.ts`, `src/App.test.tsx`
-**Scope:** M
-
-## Task 5: Admin restyle and route transition
-
-**Description:** Admin uses the new blocks and tokens; header border full width; public page content fades in on navigation.
-
-**Acceptance criteria:**
-- [ ] Admin pages consistent with the public site; all admin tests unchanged
-- [ ] Route change fades the content in (not the navbar); nothing moves with reduced motion
-
-**Verification:** tests + screenshots of login, dashboard and editor
-**Dependencies:** Task 4
-**Files:** `src/components/AdminLayout/*`, `src/pages/admin/*.module.css`, `src/pages/admin/*.tsx` (buttons), `src/components/Layout/*`
+**Files:** `src/api/adminHome.ts`, `src/pages/admin/HomeEditorPage.tsx`, `src/pages/admin/HomeEditorPage.test.tsx`, `src/i18n/*.ts`
 **Scope:** M
 
 ## Checkpoint B
