@@ -24,8 +24,6 @@ export const en = {
   'experience.kind.student_job': 'Student job',
   'experience.kind.internship': 'Internship',
   'experience.kind.education': 'Education',
-  'experience.previous': 'Previous',
-  'experience.next': 'Next',
   'experience.loading': 'Loading the timeline…',
   'experience.error': 'The timeline could not be loaded. Please try again later.',
   'experience.empty': 'The timeline is coming soon.',

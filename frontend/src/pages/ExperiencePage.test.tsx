@@ -1,4 +1,4 @@
-import { fireEvent, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import type { Experience } from '../api/experiences.ts'
 import { ENTRIES } from '../test/fixtures.ts'
@@ -35,35 +35,24 @@ describe('experience timeline', () => {
       '/fr/experience/helha-computer-science',
     ])
     expect(within(cards[0]).getByText('Job étudiant')).toBeDefined()
-    expect(within(cards[0]).getByText('2026')).toBeDefined()
     // At most 4 technologies on a card.
     expect(within(cards[0]).getByText('Amazon S3 · Python · NoSQL · Docker')).toBeDefined()
-    expect(within(cards[1]).getByText("2023 – Aujourd'hui")).toBeDefined()
     expect(within(cards[1]).getByText('Formation')).toBeDefined()
   })
 
-  test('shows previous/next buttons only when there is more to scroll', async () => {
+  test('shows the years beside each card, most recent at the top', async () => {
     mockTimeline()
     renderApp('/fr/experience')
-    const track = await screen.findByRole('list', { name: 'Frise du parcours' })
-    const scrollBy = vi.fn()
-    // jsdom has no layout: give the track a scrollable width.
-    Object.defineProperties(track, {
-      scrollWidth: { value: 1000, configurable: true },
-      clientWidth: { value: 400, configurable: true },
-      scrollLeft: { value: 0, writable: true, configurable: true },
-      scrollBy: { value: scrollBy, configurable: true },
-    })
 
-    fireEvent.scroll(track)
-    expect(screen.queryByRole('button', { name: /Précédent/ })).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: /Suivant/ }))
-    expect(scrollBy).toHaveBeenCalledWith(expect.objectContaining({ left: 320 }))
-
-    track.scrollLeft = 600 // the end: 1000 - 400
-    fireEvent.scroll(track)
-    expect(screen.queryByRole('button', { name: /Suivant/ })).toBeNull()
-    expect(screen.getByRole('button', { name: /Précédent/ })).toBeDefined()
+    const timeline = await screen.findByRole('list', { name: 'Frise du parcours' })
+    const items = within(timeline).getAllByRole('listitem')
+    expect(items.map((item) => item.firstElementChild?.textContent)).toEqual([
+      '2026',
+      "2023 – Aujourd'hui",
+    ])
+    // The years are not repeated inside the card links.
+    const card = within(items[0]).getByRole('link')
+    expect(within(card).queryByText('2026')).toBeNull()
   })
 
   test('says when the timeline is empty', async () => {

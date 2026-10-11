@@ -27,6 +27,11 @@
   gap: var(--space-2);
 }
 
+/* The badge stays on the right, with or without the years before it. */
+.meta > :last-child {
+  margin-left: auto;
+}
+
 .years {
   color: var(--color-text-muted);
   font-family: var(--font-mono);

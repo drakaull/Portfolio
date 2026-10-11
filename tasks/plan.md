@@ -10,7 +10,7 @@ Spec: [08-experience-public.md](../specs/08-experience-public.md) · Task list: 
 
 - **Same layering as the home content**: domain `Experience` dataclass, ORM model, repository converting between them, public routes localizing with `localize()`.
 - **Ordering in SQL** (`start_year desc, end_year desc nulls first, id desc`), so every consumer (timeline, home, later admin) gets the same order.
-- **Carousel = CSS scroll snap on a scrollable list**: native touch/trackpad/keyboard behaviour; the previous/next buttons call `scrollBy` by one card width; their visibility follows the scroll position. No wheel interception.
+- **Vertical timeline** (replaces the first carousel version, Task 6): a semantic ordered list in CSS grid — years column, line, card — collapsing to years-above-card on narrow screens. The carousel code stays in git history (commit f834e2f) for the personal projects section.
 - **One fetch hook per resource** (`useExperiences(lang)`, `useExperience(slug, lang)`), following `useHomeContent` (abort on language change, stale-result guard).
 - **Home column reuses the list endpoint** (first 3 items) — no extra endpoint.
 - **Year formatting in one helper** (`formatYears(start, end, t)`) shared by cards, detail page and home.
@@ -29,6 +29,7 @@ Spec: [08-experience-public.md](../specs/08-experience-public.md) · Task list: 
 - [x] Task 3: Timeline page with carousel
 - [x] Task 4: Experience detail page
 - [x] Task 5: "Recent path" column on the home page
+- [x] Task 6: Replace the carousel with a vertical timeline (years on the left) — decided at Checkpoint B
 
 ### Checkpoint B: complete
 - [ ] Human browser check of the 5 spec success criteria

@@ -25,8 +25,6 @@ export const fr: Record<TranslationKey, string> = {
   'experience.kind.student_job': 'Job étudiant',
   'experience.kind.internship': 'Stage',
   'experience.kind.education': 'Formation',
-  'experience.previous': 'Précédent',
-  'experience.next': 'Suivant',
   'experience.loading': 'Chargement du parcours…',
   'experience.error': "Le parcours n'a pas pu être chargé. Réessayez plus tard.",
   'experience.empty': 'Le parcours arrive bientôt.',
