@@ -1,53 +1,49 @@
-# Implementation Plan: Feature 9 — Language switcher and Dutch
+# Implementation Plan: Feature 10 — Experience editor
 
-Spec: [09-languages.md](../specs/09-languages.md) · Task list: [todo.md](todo.md) · Branch: `feature/languages`
+Spec: [10-experience-editor.md](../specs/10-experience-editor.md) · Task list: [todo.md](todo.md) · Branch: `feature/experience-editor`
 
 ## Overview
 
-Dutch (`nl`) added end to end — backend language list, DeepL target, admin schemas, CLI to translate existing content, interface dictionary, routes — and a new language switcher showing the current language with diagonal-split flags.
+Admin pages to list, create, edit and delete timeline entries, with the home editor's translation behaviour (FR · EN · NL tabs, DeepL per tab, fill on save).
 
 ## Architecture Decisions
 
-- **One language list per side**: backend `Lang` (domain) drives validation, fallback, auto-fill on save and the CLI; frontend dictionaries drive routes, the switcher and the editor tabs. Adding a language stays a two-place change.
-- **`nl.ts` typed against `en.ts`**: a missing Dutch key fails the build.
-- **Flags as inline SVG components** with a `clipPath` triangle for the diagonal split; no image files, no dependency, crisp at any size.
-- **Switcher = disclosure button + list of links** (not an ARIA menu): simplest accessible pattern; each link keeps the current page and carries `lang`/`hreflang`.
-- **CLI `translate-missing` reuses the save logic's rule** (fill only empty fields from French) through the existing `Translator`; it never overwrites.
+- **Backend `api/admin_experiences.py`** on `admin_router()` (session required); Pydantic input models mirror the spec's validation table; the domain declares the translated experience fields once (shared with `translate-missing`).
+- **Repository** gains `create`, `update` (everything but the slug) and `delete`; the unique slug is checked in the repository and reported as a domain error → 409.
+- **Shared frontend component** extracted from `HomeEditorPage`: the translation block (tabs, translate button, confirmation, messages). The home editor is refactored onto it first, with its tests unchanged — proof the extraction is safe.
+- **Slug proposal** computed in the frontend from the French title + organisation (accents removed, lowercase, `-`); the server only validates it.
+- **Technologies** kept as the comma-separated text in the form, converted to a list when sending.
 
 ## Task List
 
 ### Phase 1: Backend
-- [x] Task 1: Dutch in the backend (language list, DeepL target, admin schemas)
-- [x] Task 2: `translate-missing` command
+- [ ] Task 1: Domain + repository (translated fields in the domain, create / update / delete, duplicate-slug error)
+- [ ] Task 2: Admin API routes (list, get, create, update, delete; validation; auto-translation on save)
 
 ### Checkpoint A: after Tasks 1–2
-- [x] ruff + pytest green
-- [x] Human: run `uv run python -m app.cli translate-missing`; `/api/home?lang=nl` and `/api/experiences?lang=nl` answer in Dutch
+- [ ] ruff + pytest green; every new route refused without a session (route-walking test)
 
-### Phase 2: Interface
-- [x] Task 3: Dutch interface (dictionary via DeepL, `/nl` routes, browser redirect, eyebrows)
-- [x] Task 4: Flags and language switcher
+### Phase 2: Frontend
+- [ ] Task 3: Extract the translation block from the home editor (no visible change, existing tests green)
+- [ ] Task 4: Experience list page + dashboard link
+- [ ] Task 5: Experience form (create / edit / delete, slug proposal, technologies, translation)
 
-### Checkpoint B: after Tasks 3–4
-- [x] Frontend green; screenshots of the switcher (closed/open, both themes, 390 px) and `/nl`
-- [x] Human: flags look right; Dutch interface texts reviewed
-
-### Phase 3: Editor
-- [x] Task 5: NL tab in the home editor
+### Checkpoint B: after Tasks 3–5
+- [ ] Frontend green; screenshots of list and form (both themes, desktop and 390 px)
+- [ ] Human: create, edit and delete an entry in the browser; texts reviewed
 
 ### Checkpoint C: complete
-- [x] Human browser check of the 5 spec success criteria
-- [x] Code review (`/review`)
-- [x] Merge into `develop` after approval
+- [ ] Code review (`/review`)
+- [ ] Merge into `develop` after approval
 
 ## Risks and Mitigations
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Machine-translated Dutch UI sounds odd | Med | Léonard reviews at Checkpoint B; texts are short UI labels |
-| Flags unrecognisable at 20 px | Med | Screenshots at real size, both themes; design tweak before merge |
-| Admin save now calls DeepL twice (EN + NL) | Low | One request per target language; still well under the free quota |
-| Existing tests assume two languages | Low | Update fixtures; type check catches missing keys |
+| Extracting the translation block breaks the home editor | Med | Separate task, existing home editor tests must stay green unchanged |
+| Two slugs proposed identical (same title + organisation) | Low | Server answers 409; the form shows "address already used" next to the field |
+| Deleting the wrong entry | Med | Confirmation naming the entry; delete only on the edit page |
+| Form grows large on mobile | Low | Same single-column layout as the home editor (overflow fix already in place) |
 
 ## Open Questions
 

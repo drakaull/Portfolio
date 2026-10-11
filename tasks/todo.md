@@ -1,62 +1,63 @@
-# Tasks: Feature 9 — Language switcher and Dutch
+# Todo: Feature 10 — Experience editor
 
-Each task: implement → checks green (backend: `uv run ruff check . && uv run ruff format --check . && uv run pytest`; frontend: `npm run lint && npm run format:check && npm test && npm run build`, plus Playwright screenshots) → one commit.
+Plan: [plan.md](plan.md)
 
-## Task 1: Dutch in the backend
+## Task 1: Domain + repository
 
 **Acceptance criteria:**
-- [ ] `Lang = "en" | "fr" | "nl"`; `lang=nl` accepted with French fallback
-- [ ] DeepL target `NL`; translate endpoint accepts `target=nl`
-- [ ] Admin home schemas accept an optional `nl`; save fills empty `en` and `nl`
+- [ ] `TRANSLATED_FIELDS` for experiences in the domain, used by `translate-missing`
+- [ ] Repository `create`, `update` (slug unchanged), `delete`; duplicate slug raises a domain error
+- [ ] Tests on the real test database
 
-**Verification:** updated API tests
-**Files:** `app/domain/language.py`, `app/infra/translation.py`, `app/api/admin_home.py`, tests
+**Files:** `backend/app/domain/experience.py`, `backend/app/infra/repositories/experience.py`, `backend/app/cli.py`, tests
 **Scope:** S
 
-## Task 2: translate-missing command
+## Task 2: Admin API routes
 
 **Acceptance criteria:**
-- [ ] `uv run python -m app.cli translate-missing` fills empty non-French fields of the home content and every experience
-- [ ] Never overwrites existing text; prints a summary; exits with a clear message when DeepL is unavailable
+- [ ] `GET/POST /api/admin/experiences`, `GET/PUT/DELETE /api/admin/experiences/{slug}`
+- [ ] Validation per the spec table (422 with the field), 409 duplicate slug, 404 unknown slug
+- [ ] Empty translations filled on save; written ones kept; DeepL failure still saves; response reports languages
+- [ ] Public API reflects changes immediately
 
-**Verification:** tests with the fake translator
-**Files:** `app/cli.py`, `app/infra/repositories/experience.py` (save), `tests/test_cli.py`
+**Files:** `backend/app/api/admin_experiences.py`, `backend/app/main.py`, tests
 **Scope:** M
 
 ## Checkpoint A
-- [ ] Backend green · human runs the command and checks `lang=nl`
+- [ ] ruff + pytest green
 
-## Task 3: Dutch interface
+## Task 3: Shared translation block
 
 **Acceptance criteria:**
-- [ ] `nl.ts` with every key (DeepL from English), eyebrows as decided
-- [ ] `/nl/...` routes; `/` redirects Dutch browsers to `/nl`
-- [ ] Existing tests still pass; Dutch route tests added
+- [ ] Translation tabs + translate button + confirmation + messages in one component
+- [ ] Home editor uses it; its tests pass unchanged
 
-**Files:** `src/i18n/nl.ts`, `src/i18n/useTranslation.ts`, `src/components/Routing/Routing.tsx`, tests
+**Files:** `frontend/src/components/TranslatedTexts/*` (name to confirm in code), `frontend/src/pages/admin/HomeEditorPage.tsx`
 **Scope:** M
 
-## Task 4: Flags and language switcher
+## Task 4: Experience list page
 
 **Acceptance criteria:**
-- [ ] Inline SVG flags: UK; France/Belgium and Netherlands/Belgium split by a diagonal
-- [ ] Button shows current flag + code; list of 3 languages linking to the same page; Escape/outside click close; focus returns to the button
-- [ ] Used in the public navbar and the admin header
+- [ ] `/:lang/admin/experiences` lists entries in public order (years, title, organisation, kind, Edit link)
+- [ ] "New experience" button; dashboard link
+- [ ] Interface texts in en/fr/nl
 
-**Files:** `src/components/Flag/*`, `src/components/LanguageSwitch/*`, tests
+**Files:** `frontend/src/api/adminExperiences.ts`, `frontend/src/pages/admin/ExperienceListPage.tsx`, `frontend/src/routes.tsx`, dashboard, i18n, tests
+**Scope:** S
+
+## Task 5: Experience form
+
+**Acceptance criteria:**
+- [ ] Create (`/new`) with slug proposed from French title + organisation, editable until saved
+- [ ] Edit (`/:slug`) with read-only slug; delete with confirmation, then back to the list
+- [ ] Fields and validation messages per the spec; technologies comma-separated
+- [ ] Translation tabs via the shared block; unsaved-changes guard
+
+**Files:** `frontend/src/pages/admin/ExperienceEditorPage.tsx`, CSS, i18n, tests
 **Scope:** M
 
 ## Checkpoint B
-- [ ] Screenshots reviewed · human approves flags and Dutch texts
-
-## Task 5: NL tab in the home editor
-
-**Acceptance criteria:**
-- [ ] Tabs FR · EN · NL; each non-French tab has its own "Translate from French" (with confirmation before replacing)
-- [ ] Save notices cover both generated languages
-
-**Files:** `src/api/adminHome.ts`, `src/pages/admin/HomeEditorPage.tsx`, tests, `src/i18n/*.ts`
-**Scope:** M
+- [ ] Screenshots reviewed · human checks create / edit / delete
 
 ## Checkpoint C
-- [ ] Human browser check · `/review` · merge into `develop` after approval
+- [ ] `/review` · merge approval
