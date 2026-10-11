@@ -8,7 +8,7 @@ pytestmark = pytest.mark.anyio
 
 VALID = {
     "headline": {"en": "Fullstack developer", "fr": "Développeur fullstack"},
-    "intro": {"en": "I build **web apps**.", "fr": ""},
+    "intro": {"en": "", "fr": "Je crée des **applications web**."},
     "linkedin_url": "https://www.linkedin.com/in/someone",
     "github_url": "https://github.com/someone",
 }
@@ -39,9 +39,9 @@ async def test_saved_content_is_public_immediately(
 
     assert saved.status_code == 200
     assert saved.json() == {**VALID, "has_cv": False}
-    public = (await admin_client.get("/api/home", params={"lang": "fr"})).json()
-    assert public["headline"] == "Développeur fullstack"
-    assert public["intro"] == "I build **web apps**."  # empty French falls back to English
+    public = (await admin_client.get("/api/home", params={"lang": "en"})).json()
+    assert public["headline"] == "Fullstack developer"
+    assert public["intro"] == "Je crée des **applications web**."  # empty English shows French
     assert public["github_url"] == "https://github.com/someone"
 
 
@@ -56,10 +56,10 @@ async def test_surrounding_spaces_are_trimmed(admin_client: AsyncClient) -> None
 @pytest.mark.parametrize(
     ("body", "field"),
     [
-        (with_changes(headline={"en": "", "fr": "x"}), "en"),
-        (with_changes(headline={"en": "   ", "fr": "x"}), "en"),
+        (with_changes(headline={"en": "x", "fr": ""}), "fr"),
+        (with_changes(headline={"en": "x", "fr": "   "}), "fr"),
         (with_changes(headline={"en": "x" * 121, "fr": "x"}), "en"),
-        (with_changes(intro={"en": "x" * 5001, "fr": ""}), "en"),
+        (with_changes(intro={"en": "", "fr": "x" * 5001}), "fr"),
         (with_changes(headline={"en": "x", "fr": "x", "nl": "x"}), "nl"),
         (with_changes(linkedin_url="http://www.linkedin.com/in/someone"), "linkedin_url"),
         (with_changes(github_url="javascript:alert(1)"), "github_url"),
