@@ -23,7 +23,7 @@ Spec: [08-experience-public.md](../specs/08-experience-public.md) · Task list: 
 
 ### Checkpoint A: after Tasks 1–2
 - [x] ruff + pytest green; migration round trip green
-- [ ] Human: `/api/experiences?lang=fr` lists the 7 entries in the right order; a detail URL works
+- [x] Human: `/api/experiences?lang=fr` lists the 7 entries in the right order; a detail URL works
 
 ### Phase 2: Frontend
 - [x] Task 3: Timeline page with carousel
@@ -32,9 +32,9 @@ Spec: [08-experience-public.md](../specs/08-experience-public.md) · Task list: 
 - [x] Task 6: Replace the carousel with a vertical timeline (years on the left) — decided at Checkpoint B
 
 ### Checkpoint B: complete
-- [ ] Human browser check of the 5 spec success criteria
-- [ ] Code review (`/review`)
-- [ ] Merge into `develop` after approval
+- [x] Human browser check of the 5 spec success criteria
+- [x] Code review (`/review`)
+- [x] Merge into `develop` after approval
 
 ## Risks and Mitigations
 
