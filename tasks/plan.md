@@ -18,7 +18,7 @@ Spec: [08-experience-public.md](../specs/08-experience-public.md) · Task list: 
 ## Task List
 
 ### Phase 1: Backend
-- [ ] Task 1: Experience entity, table, seed migration and repository
+- [x] Task 1: Experience entity, table, seed migration and repository
 - [ ] Task 2: Public list and detail endpoints
 
 ### Checkpoint A: after Tasks 1–2
