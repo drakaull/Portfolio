@@ -1,4 +1,4 @@
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterator
 from pathlib import Path
 
 import anyio
@@ -9,10 +9,11 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy import make_url, text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 
-from app.api.dependencies import get_session
+from app.api.dependencies import get_session, get_translator
 from app.infra.config import settings
 from app.infra.repositories.admin import AdminRepository
 from app.infra.security import hash_password
+from app.infra.translation import TranslationUnavailable
 from app.main import app
 
 TEST_DATABASE = "portfolio_test"
@@ -34,6 +35,12 @@ def storage_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Empty storage folder per test, so a real CV in backend/storage never affects tests."""
     monkeypatch.setattr(settings, "storage_dir", tmp_path)
     return tmp_path
+
+
+@pytest.fixture(autouse=True)
+def no_deepl_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The real key in .env must never be used by tests (network calls, quota)."""
+    monkeypatch.setattr(settings, "deepl_api_key", None)
 
 
 async def _create_test_database() -> None:
@@ -111,3 +118,25 @@ def assert_committed(session: AsyncSession) -> None:
     while in production the change would silently be lost when the request ends.
     """
     assert not session.in_transaction(), "the database work was not committed"
+
+
+class FakeTranslator:
+    """Stands in for DeepL: prefixes each text with the target language, or fails on demand."""
+
+    def __init__(self) -> None:
+        self.fail = False
+        self.calls: list[tuple[list[tuple[str, str]], str]] = []
+
+    async def translate(self, items: list[tuple[str, str]], target: str) -> list[str]:
+        self.calls.append((list(items), target))
+        if self.fail:
+            raise TranslationUnavailable("fake failure")
+        return [f"[{target}] {text}" for text, _ in items]
+
+
+@pytest.fixture
+def fake_translator() -> Iterator[FakeTranslator]:
+    translator = FakeTranslator()
+    app.dependency_overrides[get_translator] = lambda: translator
+    yield translator
+    app.dependency_overrides.pop(get_translator, None)
