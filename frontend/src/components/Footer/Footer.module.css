@@ -1,0 +1,30 @@
+.footer {
+  border-top: 1px solid var(--color-border);
+}
+
+.inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding: var(--space-6) var(--gutter) var(--space-7);
+}
+
+.signature {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.links {
+  display: flex;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}

@@ -1,91 +1,78 @@
-# Tasks: Feature 5 — Edit the home page from the admin
+# Tasks: Feature 6 — Visual direction
 
-Each task: implement → checks green (backend: `uv run ruff check . && uv run ruff format --check . && uv run pytest`; frontend: `npm run lint && npm run format:check && npm test && npm run build`) → one commit.
+Each task: implement → `npm run lint && npm run format:check && npm test && npm run build` (from `frontend/`) → Playwright screenshots (light/dark, 1280/390 px) reviewed → one commit.
 
-## Task 1: GET / PUT /api/admin/home
+## Task 1: Tokens, fonts, graph-paper background, global motion rules
 
-**Description:** Domain length limits, `HomeContentRepository.save()`, admin schemas and the two protected routes.
+**Description:** Add the two font packages, the token groups from the spec, the graph-paper background, `scroll-behavior: smooth` and the global reduced-motion rule.
 
 **Acceptance criteria:**
-- [ ] `GET` returns both languages, URLs and `has_cv`
-- [ ] `PUT` saves and returns the content; `/api/home` reflects it
-- [ ] 422 for: empty English, too long, `http://` or `javascript:` URL, unknown language key, extra field
-- [ ] 401 without session (existing route-walking test now covers these routes)
+- [ ] `--font-display`, `--font-mono`, type/space/radius/motion scales and `--color-grid` defined for both themes
+- [ ] Background shows a faint grid in both themes; text contrast unchanged (AA)
+- [ ] Reduced motion disables all animations and transitions
 
-**Verification:** API tests
+**Verification:** test asserting the reduced-motion rule; build (fonts bundled, no Google URL); screenshots
 **Dependencies:** None
-**Files:** `app/domain/home.py`, `app/infra/repositories/home.py`, `app/api/admin_home.py`, `app/main.py`, `tests/test_admin_home_api.py`
+**Files:** `frontend/package.json`, `src/main.tsx`, `src/styles/global.css`, `src/styles/global.test.ts`
+**Scope:** S
+
+## Task 2: Building blocks
+
+**Description:** `Eyebrow`, `Button`, `TextLink` (internal and external), `Badge`, `Reveal` with CSS Modules and tests.
+
+**Acceptance criteria:**
+- [ ] Each block renders semantic HTML and forwards its props (`href`, `onClick`, `type`, `disabled`…)
+- [ ] External `TextLink` opens in a new tab with `rel="noopener noreferrer"` and a hidden "opens in a new tab" text
+- [ ] `Reveal` staggers its children and leaves them visible at rest
+
+**Verification:** component tests
+**Dependencies:** Task 1
+**Files:** `src/components/{Eyebrow,Button,TextLink,Badge,Reveal}/*`
 **Scope:** M
 
-## Task 2: PUT / DELETE /api/admin/cv
+## Task 3: Navbar, footer and favicon
 
-**Description:** Multipart upload with 5 MB cap, PDF type and signature checks, atomic write; removal.
+**Description:** Brand in Bricolage, sliding underline on section links, minimal footer (© year + name, LinkedIn, GitHub), SVG favicon "LF".
 
 **Acceptance criteria:**
-- [ ] Valid PDF → 204, served by `/api/cv`
-- [ ] Wrong type or fake PDF → 415; over 5 MB → 413; in both cases the previous CV is kept and no temp file remains
-- [ ] `DELETE` → 204, `/api/cv` → 404
+- [ ] Existing navbar behaviour and tests unchanged (active link, mobile menu, language and theme switches)
+- [ ] Footer on every public page, links from the home content API (fallback: hidden if not loaded)
+- [ ] Favicon shown in the browser tab
 
-**Verification:** API tests with a temporary storage folder
-**Dependencies:** Task 1
-**Files:** `app/infra/storage.py`, `app/api/admin_home.py`, `tests/test_admin_cv_api.py`
-**Scope:** S
+**Verification:** tests + screenshots
+**Dependencies:** Task 2
+**Files:** `src/components/Navbar/*`, `src/components/Footer/*`, `src/components/Layout/*`, `public/favicon.svg`, `index.html`, `src/i18n/*.ts`
+**Scope:** M
 
 ## Checkpoint A
-- [ ] Backend checks green · human check through `/docs`
+- [ ] Checks green · screenshots reviewed · human browser check
 
-## Task 3: Switch to the data router (refactor)
+## Task 4: Home, section pages and 404
 
-**Description:** `createBrowserRouter` with the existing routes; tests use a shared `renderApp(path)` built on `createMemoryRouter`.
+**Description:** Home hero with eyebrow, Bricolage name, `Button` + `TextLink`s and `Reveal`; path eyebrows on section pages; 404 restyled.
 
 **Acceptance criteria:**
-- [ ] No behaviour change; all existing frontend tests pass unchanged in intent
-- [ ] Route list defined once, used by production and tests
+- [ ] Home matches the spec in both languages and themes; right column empty
+- [ ] Each section page shows its localized path eyebrow
+- [ ] Existing home tests (content, errors, stale responses, links) still pass
 
-**Verification:** full frontend test suite + build
-**Dependencies:** None (can start after Checkpoint A)
-**Files:** `src/main.tsx`, `src/App.tsx` → `src/routes.tsx`, `src/test/renderApp.tsx`, `src/App.test.tsx`, `src/pages/HomePage.test.tsx`, `src/pages/admin/AdminPages.test.tsx`
+**Verification:** tests + screenshots
+**Dependencies:** Task 3
+**Files:** `src/pages/HomePage.tsx`, `src/pages/HomePage.module.css`, `src/pages/*Page.tsx`, `src/pages/NotFoundPage.tsx`, `src/i18n/*.ts`, `src/App.test.tsx`
 **Scope:** M
 
-## Task 4: Guarded admin layout and dashboard
+## Task 5: Admin restyle and route transition
 
-**Description:** Session check moved into `AdminLayout` (login page excluded); dashboard lists editable sections with sign-out.
-
-**Acceptance criteria:**
-- [ ] Any admin page except login redirects to login without a session
-- [ ] Dashboard shows the user, sign-out and a "Home page" link to `/:lang/admin/home`
-
-**Verification:** tests
-**Dependencies:** Task 3
-**Files:** `src/components/AdminLayout/AdminLayout.tsx`, `src/pages/admin/AdminHomePage.tsx` (dashboard), `src/pages/admin/AdminPages.test.tsx`, `src/i18n/*.ts`
-**Scope:** S
-
-## Task 5: Home editor (texts, links, preview, save, unsaved changes)
-
-**Description:** `/:lang/admin/home` form with FR/EN tabs, Markdown preview, URL fields, save with server errors, 401 handling, `useBlocker` + `beforeunload`.
+**Description:** Admin uses the new blocks and tokens; header border full width; public page content fades in on navigation.
 
 **Acceptance criteria:**
-- [ ] Loads current content; preview updates while typing and escapes HTML
-- [ ] Save sends the full JSON, shows "Saved"; 422 errors shown next to fields; 401 keeps the text and explains how to sign in
-- [ ] Leaving with unsaved changes asks for confirmation; no prompt after saving
+- [ ] Admin pages consistent with the public site; all admin tests unchanged
+- [ ] Route change fades the content in (not the navbar); nothing moves with reduced motion
 
-**Verification:** tests with mocked `fetch`
+**Verification:** tests + screenshots of login, dashboard and editor
 **Dependencies:** Task 4
-**Files:** `src/api/adminHome.ts`, `src/pages/admin/HomeEditorPage.tsx`, `src/pages/admin/HomeEditorPage.module.css`, `src/pages/admin/HomeEditorPage.test.tsx`, `src/components/MarkdownText/MarkdownText.tsx`, `src/pages/HomePage.tsx`, `src/i18n/*.ts`, `src/routes.tsx`
-**Scope:** M (largest task)
-
-## Task 6: CV upload and removal in the editor
-
-**Description:** CV block: current state with link, upload/replace (PDF only), remove with confirmation.
-
-**Acceptance criteria:**
-- [ ] Upload sends multipart to `PUT /api/admin/cv`; 413/415 shown as translated messages
-- [ ] Remove asks for confirmation, then calls `DELETE /api/admin/cv`
-
-**Verification:** tests
-**Dependencies:** Task 5
-**Files:** `src/api/adminHome.ts`, `src/pages/admin/CvField.tsx`, `src/pages/admin/HomeEditorPage.test.tsx`, `src/i18n/*.ts`
-**Scope:** S
+**Files:** `src/components/AdminLayout/*`, `src/pages/admin/*.module.css`, `src/pages/admin/*.tsx` (buttons), `src/components/Layout/*`
+**Scope:** M
 
 ## Checkpoint B
-- [ ] Human browser check · security-auditor review · `/review` · merge into `develop` after approval
+- [ ] Human browser check · `/review` · merge into `develop` after approval

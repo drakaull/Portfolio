@@ -1,6 +1,7 @@
-import { Link, Outlet } from 'react-router'
+import { Outlet } from 'react-router'
 import { useTranslation } from '../../i18n/useTranslation.ts'
 import { LanguageSwitch } from '../LanguageSwitch/LanguageSwitch.tsx'
+import { TextLink } from '../TextLink/TextLink.tsx'
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle.tsx'
 import styles from './AdminLayout.module.css'
 
@@ -12,12 +13,12 @@ export function AdminLayout() {
       {/* Admin pages must never appear in search results. */}
       <meta name="robots" content="noindex" />
       <header className={styles.header}>
-        <span className={styles.brand}>{t('admin.title')}</span>
-        <Link to={`/${lang}`} className={styles.back}>
-          {t('admin.backToSite')}
-        </Link>
-        <LanguageSwitch />
-        <ThemeToggle />
+        <div className={styles.headerInner}>
+          <span className={styles.brand}>{t('admin.title')}</span>
+          <TextLink to={`/${lang}`}>{t('admin.backToSite')}</TextLink>
+          <LanguageSwitch />
+          <ThemeToggle />
+        </div>
       </header>
       <main className={styles.main}>
         <Outlet />

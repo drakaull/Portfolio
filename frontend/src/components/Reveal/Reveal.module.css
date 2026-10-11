@@ -1,0 +1,31 @@
+/* Ends on the visible state: if animations are off or fail, content is simply shown. */
+.reveal > * {
+  animation: rise var(--duration-slow) var(--ease-out) both;
+}
+
+.reveal > :nth-child(2) {
+  animation-delay: 80ms;
+}
+
+.reveal > :nth-child(3) {
+  animation-delay: 160ms;
+}
+
+.reveal > :nth-child(4) {
+  animation-delay: 240ms;
+}
+
+.reveal > :nth-child(5) {
+  animation-delay: 320ms;
+}
+
+.reveal > :nth-child(n + 6) {
+  animation-delay: 400ms;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
