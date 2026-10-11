@@ -1,12 +1,17 @@
-from typing import Annotated
+import logging
+from typing import Annotated, get_args
 
 from fastapi import Depends, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.api.dependencies import admin_router, get_home_repository
+from app.api.dependencies import admin_router, get_home_repository, get_translator
 from app.domain.home import HEADLINE_MAX_LENGTH, INTRO_MAX_LENGTH, URL_MAX_LENGTH, HomeContent
+from app.domain.language import SOURCE_LANG, Lang
 from app.infra.repositories.home import HomeContentRepository
 from app.infra.storage import CvTooLargeError, NotAPdfError, cv_file, delete_cv, save_cv
+from app.infra.translation import TextFormat, TranslationUnavailable, Translator
+
+logger = logging.getLogger(__name__)
 
 router = admin_router()
 
@@ -18,15 +23,15 @@ class _StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
 
-# One field per supported language; English is required, French falls back to English when empty.
+# One field per supported language; French (the source) is required, English may be left empty.
 class HeadlineIn(_StrictModel):
-    en: str = Field(min_length=1, max_length=HEADLINE_MAX_LENGTH)
-    fr: str = Field(max_length=HEADLINE_MAX_LENGTH)
+    fr: str = Field(min_length=1, max_length=HEADLINE_MAX_LENGTH)
+    en: str = Field(max_length=HEADLINE_MAX_LENGTH)
 
 
 class IntroIn(_StrictModel):
-    en: str = Field(min_length=1, max_length=INTRO_MAX_LENGTH)
-    fr: str = Field(max_length=INTRO_MAX_LENGTH)
+    fr: str = Field(min_length=1, max_length=INTRO_MAX_LENGTH)
+    en: str = Field(max_length=INTRO_MAX_LENGTH)
 
 
 class HomeContentIn(_StrictModel):
@@ -54,7 +59,14 @@ class AdminHomeContentOut(BaseModel):
         )
 
 
+class AdminHomeSaveOut(AdminHomeContentOut):
+    auto_translated: list[str]  # fields whose empty translations were generated on this save
+    translation_failed: bool
+
+
 Repository = Annotated[HomeContentRepository, Depends(get_home_repository)]
+
+_TRANSLATED_FIELDS: dict[str, TextFormat] = {"headline": "plain", "intro": "markdown"}
 
 
 @router.get("/home")
@@ -66,16 +78,45 @@ async def get_home_content(repository: Repository) -> AdminHomeContentOut:
 
 
 @router.put("/home")
-async def save_home_content(body: HomeContentIn, repository: Repository) -> AdminHomeContentOut:
+async def save_home_content(
+    body: HomeContentIn,
+    repository: Repository,
+    translator: Annotated[Translator, Depends(get_translator)],
+) -> AdminHomeSaveOut:
+    texts = {field: getattr(body, field).model_dump() for field in _TRANSLATED_FIELDS}
+    auto_translated: set[str] = set()
+    translation_failed = False
+
+    # Fill only empty translations: text the admin wrote in another language is never replaced.
+    for target in (lang for lang in get_args(Lang) if lang != SOURCE_LANG):
+        empty = [field for field in _TRANSLATED_FIELDS if not texts[field][target]]
+        if not empty:
+            continue
+        items = [(texts[field][SOURCE_LANG], _TRANSLATED_FIELDS[field]) for field in empty]
+        try:
+            translations = await translator.translate(items, target)
+        except TranslationUnavailable as error:
+            # Saving must not fail because of DeepL: the public site shows French meanwhile.
+            logger.warning("Automatic translation to %s failed: %s", target, error)
+            translation_failed = True
+            continue
+        for field, translation in zip(empty, translations, strict=True):
+            texts[field][target] = translation
+            auto_translated.add(field)
+
     content = HomeContent(
-        headline=body.headline.model_dump(),
-        intro=body.intro.model_dump(),
+        headline=texts["headline"],
+        intro=texts["intro"],
         linkedin_url=body.linkedin_url,
         github_url=body.github_url,
     )
     await repository.save(content)
     await repository.commit()
-    return AdminHomeContentOut.from_domain(content)
+    return AdminHomeSaveOut(
+        **AdminHomeContentOut.from_domain(content).model_dump(),
+        auto_translated=sorted(auto_translated),
+        translation_failed=translation_failed,
+    )
 
 
 @router.put("/cv", status_code=status.HTTP_204_NO_CONTENT)

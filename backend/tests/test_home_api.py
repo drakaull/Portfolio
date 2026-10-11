@@ -32,12 +32,12 @@ async def test_home_returns_content_in_requested_language(
     }
 
 
-async def test_home_falls_back_to_english(client: AsyncClient, session: AsyncSession) -> None:
-    await session.execute(update(HomeContentModel).values(headline={"en": "Developer", "fr": ""}))
+async def test_home_falls_back_to_french(client: AsyncClient, session: AsyncSession) -> None:
+    await session.execute(update(HomeContentModel).values(headline={"en": "", "fr": "Développeur"}))
 
-    response = await client.get("/api/home", params={"lang": "fr"})
+    response = await client.get("/api/home", params={"lang": "en"})
 
-    assert response.json()["headline"] == "Developer"
+    assert response.json()["headline"] == "Développeur"
 
 
 @pytest.mark.parametrize("params", [{}, {"lang": "de"}, {"lang": "FR"}])

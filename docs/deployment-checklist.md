@@ -11,6 +11,7 @@ Items collected during code and security reviews. **Required** items must be don
 - [ ] **Request body size limit at the reverse proxy** (e.g. nginx `client_max_body_size 6m`, at least on `/api/`). FastAPI reads a request body before checking the admin session, so **anonymous** clients can send large bodies. The app's `BodySizeLimitMiddleware` already cuts bodies at 6 MB; the proxy limit stops them before they reach the app at all.
 - [ ] **Persistent volume for `backend/storage/`** (CV, later images); it is git-ignored and would be lost on redeploy.
 - [ ] **`DEBUG=false`** (default) and a production `DATABASE_URL` in the server environment, never in git.
+- [ ] **`DEEPL_API_KEY`** in the server environment (never in git) for automatic translation; without it, saving still works and the English site shows the French text.
 - [ ] **Run `alembic upgrade head`** on each deploy, before starting the new backend.
 - [ ] **Create the admin** on the server: `uv run python -m app.cli create-admin --username leonard`.
 - [ ] **Dependency audit**: `npm audit` (frontend) and a Python audit (e.g. `uvx pip-audit`) with no unresolved critical/high finding.

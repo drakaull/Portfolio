@@ -6,10 +6,12 @@ from fastapi import APIRouter, Cookie, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.auth import AdminUser
+from app.infra.config import settings
 from app.infra.database import SessionFactory
 from app.infra.repositories.admin import AdminRepository
 from app.infra.repositories.home import HomeContentRepository
 from app.infra.security import hash_token
+from app.infra.translation import Translator
 
 ADMIN_COOKIE = "admin_session"
 
@@ -46,3 +48,7 @@ async def require_admin(
 def admin_router() -> APIRouter:
     """Router for admin routes: every route added to it requires a valid admin session."""
     return APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
+
+
+def get_translator() -> Translator:
+    return Translator(settings.deepl_api_key)

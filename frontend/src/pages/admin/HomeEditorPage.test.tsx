@@ -6,17 +6,25 @@ import { renderApp } from '../../test/renderApp.tsx'
 
 const CONTENT: AdminHomeContent = {
   headline: { en: 'Fullstack developer', fr: 'Développeur fullstack' },
-  intro: { en: 'I build **web apps**.', fr: '' },
+  intro: { en: '', fr: 'Je crée des **applications web**.' },
   linkedin_url: 'https://www.linkedin.com/in/someone',
   github_url: 'https://github.com/someone',
   has_cv: false,
 }
 
-function mockEditorApi(save: (body: unknown) => Response = (body) => Response.json(body)) {
+const savedAsSent = (body: unknown) =>
+  Response.json({ ...(body as object), auto_translated: [], translation_failed: false })
+
+function mockEditorApi(
+  save: (body: unknown) => Response = savedAsSent,
+  translate: (body: { items: { text: string }[] }) => Response = ({ items }) =>
+    Response.json({ translations: items.map((item) => `[en] ${item.text}`) }),
+) {
   return mockApi({
     'GET /api/admin/me': signedIn,
     'GET /api/admin/home': () => Response.json(CONTENT),
     'PUT /api/admin/home': (init) => save({ ...JSON.parse(String(init?.body)), has_cv: false }),
+    'POST /api/admin/translate': (init) => translate(JSON.parse(String(init?.body))),
     'GET /api/home?lang=en': () => new Promise(() => {}),
   })
 }
@@ -32,14 +40,15 @@ describe('home editor', () => {
     expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeDefined()
   })
 
-  test('loads the current content, in the UI language first', async () => {
+  test('loads the current content, French first', async () => {
     mockEditorApi()
     renderApp('/en/admin/home')
 
-    expect(((await headline()) as HTMLInputElement).value).toBe('Fullstack developer')
-    fireEvent.click(screen.getByRole('tab', { name: 'FR' }))
     expect(((await headline()) as HTMLInputElement).value).toBe('Développeur fullstack')
-    expect(screen.getByText(/Leave a French field empty/)).toBeDefined()
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['FR', 'EN'])
+    fireEvent.click(screen.getByRole('tab', { name: 'EN' }))
+    expect(((await headline()) as HTMLInputElement).value).toBe('Fullstack developer')
+    expect(screen.getByText(/its translation is generated when you save/)).toBeDefined()
   })
 
   test('previews the Markdown while typing, without running HTML', async () => {
@@ -57,14 +66,14 @@ describe('home editor', () => {
   test('saves the whole form and confirms', async () => {
     const fetchMock = mockEditorApi()
     renderApp('/en/admin/home')
-    fireEvent.change(await headline(), { target: { value: 'Software engineer' } })
+    fireEvent.change(await headline(), { target: { value: 'Ingénieur logiciel' } })
 
     fireEvent.click(saveButton())
 
     expect(await screen.findByText('Saved.')).toBeDefined()
     const [, init] = fetchMock.mock.calls.find(([, init]) => init?.method === 'PUT')!
     expect(JSON.parse(String(init?.body))).toEqual({
-      headline: { en: 'Software engineer', fr: 'Développeur fullstack' },
+      headline: { en: 'Fullstack developer', fr: 'Ingénieur logiciel' },
       intro: CONTENT.intro,
       linkedin_url: CONTENT.linkedin_url,
       github_url: CONTENT.github_url,
@@ -214,5 +223,81 @@ describe('CV', () => {
 
     expect(await screen.findByText('CV removed.')).toBeDefined()
     expect(screen.getByText(/No CV online/)).toBeDefined()
+  })
+})
+
+describe('automatic translation', () => {
+  const openEnglishTab = async () => {
+    await headline()
+    fireEvent.click(screen.getByRole('tab', { name: 'EN' }))
+  }
+
+  test('fills the English fields from French and asks for a review', async () => {
+    mockEditorApi()
+    renderApp('/en/admin/home')
+    await openEnglishTab()
+    fireEvent.change(await headline(), { target: { value: '' } }) // no English left to replace
+
+    fireEvent.click(screen.getByRole('button', { name: 'Translate from French' }))
+
+    expect(await screen.findByText(/please review it before saving/)).toBeDefined()
+    expect(((await headline()) as HTMLInputElement).value).toBe('[en] Développeur fullstack')
+    const intro = screen.getByLabelText('Introduction (Markdown)') as HTMLTextAreaElement
+    expect(intro.value).toBe('[en] Je crée des **applications web**.')
+  })
+
+  test('asks before replacing English text that already exists', async () => {
+    const fetchMock = mockEditorApi()
+    renderApp('/en/admin/home')
+    await openEnglishTab()
+    const translateCalls = () =>
+      fetchMock.mock.calls.filter(([url]) => url === '/api/admin/translate').length
+
+    fireEvent.click(screen.getByRole('button', { name: 'Translate from French' }))
+    expect(screen.getByRole('alertdialog')).toBeDefined()
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(translateCalls()).toBe(0)
+    expect(((await headline()) as HTMLInputElement).value).toBe('Fullstack developer')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Translate from French' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Replace' }))
+
+    expect(await screen.findByDisplayValue('[en] Développeur fullstack')).toBeDefined()
+    expect(translateCalls()).toBe(1)
+  })
+
+  test('explains when translation is unavailable', async () => {
+    mockEditorApi(savedAsSent, () => new Response(null, { status: 503 }))
+    renderApp('/en/admin/home')
+    await openEnglishTab()
+    fireEvent.change(await headline(), { target: { value: '' } })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Translate from French' }))
+
+    expect((await screen.findByRole('alert')).textContent).toContain('Translation is unavailable')
+  })
+
+  test('tells which English fields were generated on save', async () => {
+    mockEditorApi((body) =>
+      Response.json({ ...(body as object), auto_translated: ['intro'], translation_failed: false }),
+    )
+    renderApp('/en/admin/home')
+    fireEvent.change(await headline(), { target: { value: 'Ingénieur logiciel' } })
+
+    fireEvent.click(saveButton())
+
+    expect(await screen.findByText(/English was generated automatically/)).toBeDefined()
+  })
+
+  test('warns when English could not be generated on save', async () => {
+    mockEditorApi((body) =>
+      Response.json({ ...(body as object), auto_translated: [], translation_failed: true }),
+    )
+    renderApp('/en/admin/home')
+    fireEvent.change(await headline(), { target: { value: 'Ingénieur logiciel' } })
+
+    fireEvent.click(saveButton())
+
+    expect((await screen.findByRole('alert')).textContent).toContain('could not be generated')
   })
 })

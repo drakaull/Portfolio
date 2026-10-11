@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     database_url: str
     # Uploaded files (CV, later images). Git-ignored; must be a persistent volume in production.
     storage_dir: Path = Path("storage")
+    # DeepL API key for automatic translation; without it, translation is reported as unavailable.
+    deepl_api_key: str | None = None
 
 
 settings = Settings()
