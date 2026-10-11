@@ -17,7 +17,7 @@ Admin pages to list, create, edit and delete timeline entries, with the home edi
 ## Task List
 
 ### Phase 1: Backend
-- [ ] Task 1: Domain + repository (translated fields in the domain, create / update / delete, duplicate-slug error)
+- [x] Task 1: Domain + repository (translated fields in the domain, create / update / delete, duplicate-slug error)
 - [ ] Task 2: Admin API routes (list, get, create, update, delete; validation; auto-translation on save)
 
 ### Checkpoint A: after Tasks 1–2

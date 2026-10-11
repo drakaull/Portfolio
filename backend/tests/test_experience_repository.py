@@ -1,9 +1,11 @@
+from dataclasses import replace
+
 import pytest
 from sqlalchemy import delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.experience import Experience
+from app.domain.experience import Experience, ExperienceSlugTakenError
 from app.infra.models import ExperienceModel
 from app.infra.repositories.experience import ExperienceRepository
 
@@ -82,3 +84,56 @@ async def test_database_rejects_invalid_entries(session: AsyncSession, changes: 
 
     with pytest.raises(IntegrityError):
         await session.flush()
+
+
+NEW = Experience(
+    slug="new-job",
+    kind="job",
+    title={"fr": "Développeur", "en": "Developer", "nl": "Ontwikkelaar"},
+    organization="Acme",
+    start_year=2027,
+    end_year=None,
+    summary={"fr": "Résumé", "en": "Summary", "nl": "Samenvatting"},
+    description={"fr": "", "en": "", "nl": ""},
+    technologies=("Python", "React"),
+)
+
+
+async def test_create_then_get(session: AsyncSession) -> None:
+    repository = ExperienceRepository(session)
+
+    await repository.create(NEW)
+
+    assert await repository.get("new-job") == NEW
+    assert (await repository.list())[0] == NEW  # ongoing 2027: first of the timeline
+
+
+async def test_create_refuses_a_taken_slug(session: AsyncSession) -> None:
+    with pytest.raises(ExperienceSlugTakenError):
+        await ExperienceRepository(session).create(replace(NEW, slug="icare-internship-2026"))
+
+
+async def test_update_replaces_everything_but_the_slug(session: AsyncSession) -> None:
+    repository = ExperienceRepository(session)
+    await repository.create(NEW)
+    changed = replace(
+        NEW, kind="internship", organization="Other", end_year=2028, technologies=("Go",)
+    )
+
+    await repository.update(changed)
+
+    assert await repository.get("new-job") == changed
+
+
+async def test_update_of_an_unknown_entry_fails(session: AsyncSession) -> None:
+    with pytest.raises(LookupError):
+        await ExperienceRepository(session).update(replace(NEW, slug="unknown"))
+
+
+async def test_delete(session: AsyncSession) -> None:
+    repository = ExperienceRepository(session)
+    await repository.create(NEW)
+
+    assert await repository.delete("new-job") is True
+    assert await repository.get("new-job") is None
+    assert await repository.delete("new-job") is False

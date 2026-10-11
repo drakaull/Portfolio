@@ -20,8 +20,9 @@ from app.domain.auth import (
     WeakPasswordError,
     check_password_policy,
 )
+from app.domain.experience import TRANSLATED_FIELDS as EXPERIENCE_FIELDS
 from app.domain.home import TRANSLATED_FIELDS as HOME_FIELDS
-from app.domain.language import Lang, TextFormat
+from app.domain.language import Lang
 from app.infra.config import settings
 from app.infra.database import SessionFactory, engine
 from app.infra.repositories.admin import AdminRepository
@@ -40,13 +41,6 @@ async def create_admin(session: AsyncSession, username: str, password: str) -> A
     user = await repository.save_user(username, hash_password(password))
     await session.commit()
     return user
-
-
-_EXPERIENCE_FIELDS: dict[str, TextFormat] = {
-    "title": "plain",
-    "summary": "plain",
-    "description": "markdown",
-}
 
 
 def _describe(filled: dict[str, list[str]]) -> str:
@@ -80,13 +74,11 @@ async def translate_missing(
 
     experience_repository = ExperienceRepository(session)
     for entry in await experience_repository.list():
-        texts = {field: dict(getattr(entry, field)) for field in _EXPERIENCE_FIELDS}
-        filled, entry_failed = await fill_missing(
-            texts, _EXPERIENCE_FIELDS, translator, unavailable
-        )
+        texts = {field: dict(getattr(entry, field)) for field in EXPERIENCE_FIELDS}
+        filled, entry_failed = await fill_missing(texts, EXPERIENCE_FIELDS, translator, unavailable)
         failed |= entry_failed
         if filled:
-            await experience_repository.save_texts(replace(entry, **texts))
+            await experience_repository.update(replace(entry, **texts))
             report.append(f"experience {entry.slug}: {_describe(filled)}")
 
     await session.commit()
