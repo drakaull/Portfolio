@@ -19,10 +19,10 @@ Spec: [08-experience-public.md](../specs/08-experience-public.md) · Task list: 
 
 ### Phase 1: Backend
 - [x] Task 1: Experience entity, table, seed migration and repository
-- [ ] Task 2: Public list and detail endpoints
+- [x] Task 2: Public list and detail endpoints
 
 ### Checkpoint A: after Tasks 1–2
-- [ ] ruff + pytest green; migration round trip green
+- [x] ruff + pytest green; migration round trip green
 - [ ] Human: `/api/experiences?lang=fr` lists the 7 entries in the right order; a detail URL works
 
 ### Phase 2: Frontend

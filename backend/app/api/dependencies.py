@@ -9,6 +9,7 @@ from app.domain.auth import AdminUser
 from app.infra.config import settings
 from app.infra.database import SessionFactory
 from app.infra.repositories.admin import AdminRepository
+from app.infra.repositories.experience import ExperienceRepository
 from app.infra.repositories.home import HomeContentRepository
 from app.infra.security import hash_token
 from app.infra.translation import Translator
@@ -26,6 +27,12 @@ def get_home_repository(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> HomeContentRepository:
     return HomeContentRepository(session)
+
+
+def get_experience_repository(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> ExperienceRepository:
+    return ExperienceRepository(session)
 
 
 def get_admin_repository(
