@@ -3,6 +3,7 @@ import { Link, useBlocker } from 'react-router'
 import {
   fetchAdminHome,
   saveAdminHome,
+  translateFromFrench,
   type AdminHomeContent,
   type HomeContentForm,
   type HomeField,
@@ -15,7 +16,8 @@ import adminStyles from './Admin.module.css'
 import { CvField } from './CvField.tsx'
 import styles from './HomeEditorPage.module.css'
 
-const LANGS: Lang[] = ['en', 'fr']
+// French is the writing language: first tab, selected by default.
+const LANGS: Lang[] = ['fr', 'en']
 
 const FIELD_ERRORS: Record<HomeField, TranslationKey> = {
   headline: 'admin.home.invalidHeadline',
@@ -25,6 +27,16 @@ const FIELD_ERRORS: Record<HomeField, TranslationKey> = {
 }
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'expired' | 'error'
+type TranslateState =
+  'idle' | 'confirm' | 'translating' | 'done' | 'unavailable' | 'expired' | 'error'
+type SaveNotice = 'autoTranslated' | 'translationFailed' | null
+
+const TRANSLATE_MESSAGES: Partial<Record<TranslateState, TranslationKey>> = {
+  done: 'admin.home.reviewTranslation',
+  unavailable: 'admin.home.translateUnavailable',
+  expired: 'admin.home.expired',
+  error: 'admin.error',
+}
 
 function toForm({ headline, intro, linkedin_url, github_url }: AdminHomeContent): HomeContentForm {
   return { headline, intro, linkedin_url, github_url }
@@ -38,10 +50,12 @@ export function HomeEditorPage() {
   const [saved, setSaved] = useState<HomeContentForm | null>(null)
   const [form, setForm] = useState<HomeContentForm | null>(null)
   const [loadFailed, setLoadFailed] = useState(false)
-  const [textLang, setTextLang] = useState<Lang>(lang)
+  const [textLang, setTextLang] = useState<Lang>('fr')
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [invalid, setInvalid] = useState<HomeField[]>([])
   const [hasCv, setHasCv] = useState(false)
+  const [translateState, setTranslateState] = useState<TranslateState>('idle')
+  const [saveNotice, setSaveNotice] = useState<SaveNotice>(null)
 
   useEffect(() => {
     fetchAdminHome()
@@ -94,11 +108,19 @@ export function HomeEditorPage() {
     setSaveState('saving')
     const result = await saveAdminHome(form)
     if (result.status === 'saved') {
-      // The server trims spaces: show exactly what was stored.
+      // The server trims spaces and fills empty English fields: show exactly what was stored.
       setSaved(toForm(result.content))
       setForm(toForm(result.content))
       setInvalid([])
       setSaveState('saved')
+      setTranslateState('idle')
+      setSaveNotice(
+        result.content.translation_failed
+          ? 'translationFailed'
+          : result.content.auto_translated.length > 0
+            ? 'autoTranslated'
+            : null,
+      )
     } else if (result.status === 'invalid') {
       setInvalid(result.fields)
       setSaveState('idle')
@@ -106,6 +128,46 @@ export function HomeEditorPage() {
       setSaveState(result.status)
     }
   }
+
+  function requestTranslation() {
+    if (!form) return
+    // Replacing English the admin may have written needs an explicit confirmation.
+    const hasEnglish = form.headline.en.trim() !== '' || form.intro.en.trim() !== ''
+    if (hasEnglish && translateState !== 'confirm') {
+      setTranslateState('confirm')
+      return
+    }
+    void runTranslation()
+  }
+
+  async function runTranslation() {
+    if (!form) return
+    setTranslateState('translating')
+    const result = await translateFromFrench(
+      [
+        { text: form.headline.fr, format: 'plain' },
+        { text: form.intro.fr, format: 'markdown' },
+      ],
+      'en',
+    )
+    if (result.status !== 'ok') {
+      setTranslateState(result.status)
+      return
+    }
+    const [headline, intro] = result.translations
+    setForm(
+      (current) =>
+        current && {
+          ...current,
+          headline: { ...current.headline, en: headline },
+          intro: { ...current.intro, en: intro },
+        },
+    )
+    setSaveState('idle')
+    setTranslateState('done')
+  }
+
+  const translateMessage = TRANSLATE_MESSAGES[translateState]
 
   const fieldError = (field: HomeField) =>
     invalid.includes(field) && (
@@ -148,7 +210,46 @@ export function HomeEditorPage() {
               </button>
             ))}
           </div>
-          {textLang === 'fr' && <p className={styles.hint}>{t('admin.home.frHint')}</p>}
+          {textLang === 'en' && (
+            <div className={styles.translate}>
+              <p className={styles.hint}>{t('admin.home.enHint')}</p>
+              <button
+                type="button"
+                className={styles.secondary}
+                onClick={requestTranslation}
+                disabled={translateState === 'translating' || form.headline.fr.trim() === ''}
+              >
+                {translateState === 'translating'
+                  ? t('admin.home.translating')
+                  : t('admin.home.translate')}
+              </button>
+              {translateState === 'confirm' && (
+                <div
+                  className={styles.confirm}
+                  role="alertdialog"
+                  aria-labelledby="replace-english-message"
+                >
+                  <p id="replace-english-message">{t('admin.home.confirmReplace')}</p>
+                  <Button onClick={() => void runTranslation()}>{t('admin.home.replace')}</Button>
+                  <button
+                    type="button"
+                    className={styles.secondary}
+                    onClick={() => setTranslateState('idle')}
+                  >
+                    {t('admin.cv.cancel')}
+                  </button>
+                </div>
+              )}
+              {translateMessage && (
+                <p
+                  role={translateState === 'done' ? 'status' : 'alert'}
+                  className={translateState === 'done' ? styles.hint : adminStyles.error}
+                >
+                  {t(translateMessage)}
+                </p>
+              )}
+            </div>
+          )}
 
           <label className={adminStyles.field}>
             {t('admin.home.headline')}
@@ -156,7 +257,7 @@ export function HomeEditorPage() {
               value={form.headline[textLang]}
               onChange={(event) => updateText('headline', event.target.value)}
               maxLength={120}
-              required={textLang === 'en'}
+              required={textLang === 'fr'}
               aria-invalid={invalid.includes('headline')}
               aria-describedby={describedBy('headline')}
             />
@@ -171,7 +272,7 @@ export function HomeEditorPage() {
                 onChange={(event) => updateText('intro', event.target.value)}
                 maxLength={5000}
                 rows={12}
-                required={textLang === 'en'}
+                required={textLang === 'fr'}
                 aria-invalid={invalid.includes('intro')}
                 aria-describedby={describedBy('intro')}
               />
@@ -179,7 +280,7 @@ export function HomeEditorPage() {
             </label>
             <div className={styles.preview} aria-label={t('admin.home.preview')} role="region">
               <span className={styles.previewLabel}>{t('admin.home.preview')}</span>
-              <MarkdownText>{form.intro[textLang] || form.intro.en}</MarkdownText>
+              <MarkdownText>{form.intro[textLang] || form.intro.fr}</MarkdownText>
             </div>
           </div>
         </fieldset>
@@ -217,6 +318,16 @@ export function HomeEditorPage() {
           </Button>
           <span role="status">{saveState === 'saved' && t('admin.home.saved')}</span>
         </div>
+        {saveState === 'saved' && saveNotice === 'autoTranslated' && (
+          <p className={styles.hint} role="status">
+            {t('admin.home.autoTranslated')}
+          </p>
+        )}
+        {saveState === 'saved' && saveNotice === 'translationFailed' && (
+          <p className={adminStyles.error} role="alert">
+            {t('admin.home.translationFailed')}
+          </p>
+        )}
         {saveState === 'expired' && (
           <p className={adminStyles.error} role="alert">
             {t('admin.home.expired')}{' '}

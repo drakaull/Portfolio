@@ -12,8 +12,14 @@ export type AdminHomeContent = HomeContentForm & { has_cv: boolean }
 /** Top-level form fields the server can reject. */
 export type HomeField = keyof HomeContentForm
 
+/** What PUT returns: the stored content plus what automatic translation did on this save. */
+export type AdminHomeSaved = AdminHomeContent & {
+  auto_translated: string[]
+  translation_failed: boolean
+}
+
 export type SaveResult =
-  | { status: 'saved'; content: AdminHomeContent }
+  | { status: 'saved'; content: AdminHomeSaved }
   | { status: 'invalid'; fields: HomeField[] }
   | { status: 'expired' }
   | { status: 'error' }
@@ -33,14 +39,39 @@ export async function saveAdminHome(form: HomeContentForm): Promise<SaveResult> 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     })
-    if (response.ok)
-      return { status: 'saved', content: (await response.json()) as AdminHomeContent }
+    if (response.ok) return { status: 'saved', content: (await response.json()) as AdminHomeSaved }
     if (response.status === 401) return { status: 'expired' }
     if (response.status === 422) {
       // FastAPI reports e.g. loc = ["body", "headline", "en"]: keep the top-level field.
       const { detail } = (await response.json()) as { detail: ValidationError[] }
       return { status: 'invalid', fields: detail.map((error) => error.loc[1] as HomeField) }
     }
+    return { status: 'error' }
+  } catch {
+    return { status: 'error' }
+  }
+}
+
+export type TranslateResult =
+  { status: 'ok'; translations: string[] } | { status: 'unavailable' | 'expired' | 'error' }
+
+/** Translates French texts with DeepL through the backend (the key never reaches the browser). */
+export async function translateFromFrench(
+  items: { text: string; format: 'plain' | 'markdown' }[],
+  target: 'en',
+): Promise<TranslateResult> {
+  try {
+    const response = await fetch('/api/admin/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target, items }),
+    })
+    if (response.ok) {
+      const { translations } = (await response.json()) as { translations: string[] }
+      return { status: 'ok', translations }
+    }
+    if (response.status === 503) return { status: 'unavailable' }
+    if (response.status === 401) return { status: 'expired' }
     return { status: 'error' }
   } catch {
     return { status: 'error' }
