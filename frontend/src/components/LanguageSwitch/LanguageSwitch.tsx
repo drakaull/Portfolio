@@ -40,9 +40,11 @@ export function LanguageSwitch() {
     <div
       ref={root}
       className={styles.root}
-      // Keyboard users tabbing out of the list close it.
+      // Keyboard users tabbing out of the list close it. No relatedTarget (Safari does not focus
+      // clicked links) is left to the outside-click handler, so a click on a language still lands.
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
+        const next = event.relatedTarget
+        if (next && !event.currentTarget.contains(next)) setOpen(false)
       }}
     >
       <button

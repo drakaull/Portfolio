@@ -200,6 +200,16 @@ describe('language switch', () => {
     expect(button.getAttribute('aria-expanded')).toBe('false')
   })
 
+  test('stays open when the focus goes nowhere (Safari clicks)', () => {
+    renderApp('/en')
+    const button = switchButton('Language: English')
+    fireEvent.click(button)
+
+    fireEvent.blur(button, { relatedTarget: null })
+
+    expect(button.getAttribute('aria-expanded')).toBe('true')
+  })
+
   test('stays open while the focus moves inside it', () => {
     renderApp('/en')
     const button = switchButton('Language: English')
