@@ -1,0 +1,104 @@
+.timeline {
+  --years-width: 7.5rem;
+  --dot-size: 12px;
+
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--years-width) var(--dot-size) minmax(0, 1fr);
+  column-gap: var(--space-4);
+  padding-bottom: var(--space-5);
+}
+
+/* The line runs through every item and stops at the last dot. */
+.item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--years-width) + var(--space-4) + var(--dot-size) / 2 - 1px);
+  width: 2px;
+  background: var(--color-border);
+}
+
+.item:first-child::before {
+  top: 1.1rem;
+  background: linear-gradient(var(--color-accent), var(--color-border) 6rem);
+}
+
+.item:last-child::before {
+  bottom: auto;
+  height: 1.1rem;
+}
+
+.item:only-child::before {
+  display: none;
+}
+
+.years {
+  padding-top: 0.75rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.dot {
+  position: relative;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  margin-top: 1rem;
+  border: 2px solid var(--color-accent);
+  border-radius: 50%;
+  background: var(--color-bg);
+}
+
+.card {
+  min-width: 0;
+}
+
+/* Narrow screens: years move above the card, next to the line. */
+@media (max-width: 600px) {
+  .item {
+    grid-template-columns: var(--dot-size) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    row-gap: var(--space-2);
+  }
+
+  .item::before {
+    left: calc(var(--dot-size) / 2 - 1px);
+  }
+
+  .years {
+    grid-column: 2;
+    grid-row: 1;
+    padding-top: 0;
+    text-align: left;
+  }
+
+  .dot {
+    grid-column: 1;
+    grid-row: 1;
+    margin-top: 0.3rem;
+  }
+
+  .card {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .item:first-child::before {
+    top: 0.5rem;
+  }
+
+  .item:last-child::before {
+    height: 0.5rem;
+  }
+}

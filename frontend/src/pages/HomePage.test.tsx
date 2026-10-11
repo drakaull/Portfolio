@@ -1,7 +1,9 @@
 import { act, fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 import { renderApp } from '../test/renderApp.tsx'
+import type { Experience } from '../api/experiences.ts'
 import type { HomeContent } from '../api/useHomeContent.ts'
+import { ENTRIES } from '../test/fixtures.ts'
 
 const CONTENT: Record<string, HomeContent> = {
   en: {
@@ -21,8 +23,13 @@ const CONTENT: Record<string, HomeContent> = {
 }
 
 /** Fake backend answering /api/home?lang=xx with the given content per language. */
-function mockApi(content: Record<string, Partial<HomeContent>> = CONTENT, status = 200) {
+function mockApi(
+  content: Record<string, Partial<HomeContent>> = CONTENT,
+  status = 200,
+  experiences: Experience[] = [],
+) {
   const fetchMock = vi.fn((url: string) => {
+    if (url.startsWith('/api/experiences')) return Promise.resolve(Response.json(experiences))
     const lang = new URL(url, 'http://test').searchParams.get('lang') ?? ''
     return Promise.resolve(
       new Response(JSON.stringify({ ...CONTENT[lang], ...content[lang] }), { status }),
@@ -40,6 +47,7 @@ function controlledApi() {
     vi.fn(
       (url: string, init: RequestInit) =>
         new Promise<Response>((resolve, reject) => {
+          if (url.startsWith('/api/experiences')) return resolve(Response.json([]))
           const lang = new URL(url, 'http://test').searchParams.get('lang') ?? ''
           pending[lang] = () => resolve(new Response(JSON.stringify(CONTENT[lang])))
           init.signal?.addEventListener('abort', () =>
@@ -157,6 +165,35 @@ describe('footer', () => {
       'https://github.com/someone',
     )
     expect(footer.getByText(/© \d{4} Léonard Fontaine · Belgique/)).toBeDefined()
-    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const homeCalls = fetchMock.mock.calls.filter(([url]) => url.startsWith('/api/home'))
+    expect(homeCalls).toHaveLength(1)
+  })
+})
+
+describe('recent path', () => {
+  test('shows the latest 3 entries linking to their detail pages', async () => {
+    const four = [...ENTRIES, ...ENTRIES].map((entry, index) => ({
+      ...entry,
+      slug: `entry-${index}`,
+    }))
+    mockApi(CONTENT, 200, four)
+    renderApp('/fr')
+
+    const recent = await screen.findByRole('complementary', { name: 'Parcours récent' })
+    const links = within(recent).getAllByRole('link')
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '/fr/experience/entry-0',
+      '/fr/experience/entry-1',
+      '/fr/experience/entry-2',
+      '/fr/experience',
+    ])
+  })
+
+  test('is hidden when there is no entry', async () => {
+    mockApi(CONTENT, 200, [])
+    renderApp('/fr')
+    await screen.findByText('Développeur fullstack')
+
+    expect(screen.queryByRole('complementary', { name: 'Parcours récent' })).toBeNull()
   })
 })
