@@ -23,8 +23,9 @@ async def test_admin_reads_both_languages(admin_client: AsyncClient) -> None:
 
     assert response.status_code == 200
     assert response.json() == {
-        "headline": {"en": "Fullstack developer", "fr": "Développeur fullstack"},
-        "intro": {"en": "Introduction coming soon.", "fr": "Présentation à venir."},
+        # The seeded row has no Dutch: every language is still present, empty.
+        "headline": {"en": "Fullstack developer", "fr": "Développeur fullstack", "nl": ""},
+        "intro": {"en": "Introduction coming soon.", "fr": "Présentation à venir.", "nl": ""},
         "linkedin_url": "https://www.linkedin.com/in/l%C3%A9onard-fontaine-80902437b/",
         "github_url": "https://github.com/drakaull",
         "has_cv": False,
@@ -38,15 +39,30 @@ async def test_saved_content_is_public_immediately(
     assert_committed(session)
 
     assert saved.status_code == 200
-    # The empty English intro was generated; the English headline written by the admin was kept.
+    # Empty translations were generated from French; the English headline written was kept.
     assert saved.json() == {
         **VALID,
-        "intro": {"en": "[en] Je crée des **applications web**.", "fr": VALID["intro"]["fr"]},
+        "headline": {
+            "en": "Fullstack developer",
+            "fr": "Développeur fullstack",
+            "nl": "[nl] Développeur fullstack",
+        },
+        "intro": {
+            "en": "[en] Je crée des **applications web**.",
+            "fr": "Je crée des **applications web**.",
+            "nl": "[nl] Je crée des **applications web**.",
+        },
         "has_cv": False,
-        "auto_translated": ["intro"],
+        "auto_translated": ["en", "nl"],
         "translation_failed": False,
     }
-    assert fake_translator.calls == [([("Je crée des **applications web**.", "markdown")], "en")]
+    assert fake_translator.calls == [
+        ([("Je crée des **applications web**.", "markdown")], "en"),
+        (
+            [("Développeur fullstack", "plain"), ("Je crée des **applications web**.", "markdown")],
+            "nl",
+        ),
+    ]
     public = (await admin_client.get("/api/home", params={"lang": "en"})).json()
     assert public["headline"] == "Fullstack developer"
     assert public["intro"] == "[en] Je crée des **applications web**."
@@ -55,11 +71,15 @@ async def test_saved_content_is_public_immediately(
 async def test_written_translations_are_never_replaced(
     admin_client: AsyncClient, fake_translator: FakeTranslator
 ) -> None:
-    body = with_changes(intro={"en": "My own English.", "fr": "Mon français."})
+    body = with_changes(
+        headline={"en": "Developer", "fr": "Développeur", "nl": "Ontwikkelaar"},
+        intro={"en": "My own English.", "fr": "Mon français.", "nl": "Mijn Nederlands."},
+    )
 
     saved = (await admin_client.put("/api/admin/home", json=body)).json()
 
     assert saved["intro"]["en"] == "My own English."
+    assert saved["intro"]["nl"] == "Mijn Nederlands."
     assert saved["auto_translated"] == []
     assert fake_translator.calls == []
 
@@ -80,11 +100,17 @@ async def test_saving_works_when_translation_fails(
 
 
 async def test_surrounding_spaces_are_trimmed(admin_client: AsyncClient) -> None:
-    body = with_changes(headline={"en": "  Developer  ", "fr": " Développeur "})
+    body = with_changes(
+        headline={"en": "  Developer  ", "fr": " Développeur ", "nl": " Ontwikkelaar "}
+    )
 
     saved = await admin_client.put("/api/admin/home", json=body)
 
-    assert saved.json()["headline"] == {"en": "Developer", "fr": "Développeur"}
+    assert saved.json()["headline"] == {
+        "en": "Developer",
+        "fr": "Développeur",
+        "nl": "Ontwikkelaar",
+    }
 
 
 @pytest.mark.parametrize(
@@ -94,7 +120,7 @@ async def test_surrounding_spaces_are_trimmed(admin_client: AsyncClient) -> None
         (with_changes(headline={"en": "x", "fr": "   "}), "fr"),
         (with_changes(headline={"en": "x" * 121, "fr": "x"}), "en"),
         (with_changes(intro={"en": "", "fr": "x" * 5001}), "fr"),
-        (with_changes(headline={"en": "x", "fr": "x", "nl": "x"}), "nl"),
+        (with_changes(headline={"en": "x", "fr": "x", "de": "x"}), "de"),
         (with_changes(linkedin_url="http://www.linkedin.com/in/someone"), "linkedin_url"),
         (with_changes(github_url="javascript:alert(1)"), "github_url"),
         (with_changes(github_url="https://" + "x" * 250), "github_url"),

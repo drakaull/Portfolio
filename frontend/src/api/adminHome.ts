@@ -1,4 +1,9 @@
-export type Translated = { en: string; fr: string }
+import type { Lang } from '../i18n/useTranslation.ts'
+
+export type Translated = Record<Lang, string>
+
+/** Languages translated from French, the writing language. */
+export type TargetLang = Exclude<Lang, 'fr'>
 
 export type HomeContentForm = {
   headline: Translated
@@ -14,7 +19,7 @@ export type HomeField = keyof HomeContentForm
 
 /** What PUT returns: the stored content plus what automatic translation did on this save. */
 export type AdminHomeSaved = AdminHomeContent & {
-  auto_translated: string[]
+  auto_translated: TargetLang[] // languages generated on this save
   translation_failed: boolean
 }
 
@@ -58,7 +63,7 @@ export type TranslateResult =
 /** Translates French texts with DeepL through the backend (the key never reaches the browser). */
 export async function translateFromFrench(
   items: { text: string; format: 'plain' | 'markdown' }[],
-  target: 'en',
+  target: TargetLang,
 ): Promise<TranslateResult> {
   try {
     const response = await fetch('/api/admin/translate', {

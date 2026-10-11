@@ -1,8 +1,9 @@
 import { useParams } from 'react-router'
 import { en, type TranslationKey } from './en.ts'
 import { fr } from './fr.ts'
+import { nl } from './nl.ts'
 
-const dictionaries = { en, fr }
+const dictionaries = { en, fr, nl }
 
 export type Lang = keyof typeof dictionaries
 

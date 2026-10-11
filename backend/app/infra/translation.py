@@ -1,17 +1,18 @@
 import html
-from collections.abc import Sequence
-from typing import Literal
+import logging
+from collections.abc import Mapping, Sequence
+from typing import get_args
 
 import httpx
 from markdown_it import MarkdownIt
 from markdownify import markdownify
 
-from app.domain.language import SOURCE_LANG, Lang
+from app.domain.language import SOURCE_LANG, Lang, TextFormat
 
-TextFormat = Literal["markdown", "plain"]
+logger = logging.getLogger(__name__)
 
 # DeepL language codes; British English for a European audience.
-_DEEPL_LANGS: dict[Lang, str] = {"fr": "FR", "en": "EN-GB"}
+_DEEPL_LANGS: dict[Lang, str] = {"fr": "FR", "en": "EN-GB", "nl": "NL"}
 _TIMEOUT_SECONDS = 10
 # Raw HTML typed in Markdown is escaped, never passed through (same rule as the public renderer).
 _markdown = MarkdownIt("commonmark", {"html": False})
@@ -82,7 +83,54 @@ class Translator:
         if response.status_code != 200:
             raise TranslationUnavailable(f"DeepL answered HTTP {response.status_code}")
 
-        translations = response.json()["translations"]
-        for (index, _, fmt), translation in zip(to_send, translations, strict=True):
-            results[index] = _from_html(translation["text"], fmt)
+        try:
+            translations = response.json()["translations"]
+            for (index, _, fmt), translation in zip(to_send, translations, strict=True):
+                results[index] = _from_html(translation["text"], fmt)
+        except (ValueError, KeyError, TypeError) as error:  # not JSON, or not DeepL's shape
+            raise TranslationUnavailable("DeepL sent an unexpected answer") from error
         return results
+
+
+async def fill_missing(
+    texts: dict[str, dict[str, str]],
+    formats: Mapping[str, TextFormat],
+    translator: Translator,
+    unavailable: set[Lang] | None = None,
+) -> tuple[dict[Lang, list[str]], bool]:
+    """Translate, in place, every empty non-source text of `texts` from the source language.
+
+    `texts` maps a field name to its translations; text already written in a language is never
+    replaced. Returns, per language, the fields that received a translation, and whether any
+    language failed (the caller keeps the source text meanwhile: the public site falls back to it).
+    Languages in `unavailable` are skipped as failed, and new failures are added to it, so a caller
+    filling many items stops asking DeepL for a language once it failed.
+    """
+    if unavailable is None:
+        unavailable = set()
+    filled: dict[Lang, list[str]] = {}
+    failed = False
+    for target in (lang for lang in get_args(Lang) if lang != SOURCE_LANG):
+        if target in unavailable:
+            failed = True
+            continue
+        # A field without source text has nothing to translate: it would stay empty anyway.
+        empty = [
+            field
+            for field in formats
+            if texts[field].get(SOURCE_LANG, "").strip() and not texts[field].get(target)
+        ]
+        if not empty:
+            continue
+        items = [(texts[field][SOURCE_LANG], formats[field]) for field in empty]
+        try:
+            translations = await translator.translate(items, target)
+        except TranslationUnavailable as error:
+            logger.warning("Automatic translation to %s failed: %s", target, error)
+            unavailable.add(target)
+            failed = True
+            continue
+        for field, translation in zip(empty, translations, strict=True):
+            texts[field][target] = translation
+        filled[target] = empty
+    return filled, failed

@@ -22,6 +22,11 @@ const CONTENT: Record<string, HomeContent> = {
   },
 }
 
+function switchToEnglish() {
+  fireEvent.click(screen.getByRole('button', { name: 'Langue : Français' }))
+  fireEvent.click(screen.getByRole('link', { name: 'English' }))
+}
+
 /** Fake backend answering /api/home?lang=xx with the given content per language. */
 function mockApi(
   content: Record<string, Partial<HomeContent>> = CONTENT,
@@ -84,7 +89,7 @@ describe('home page', () => {
     renderApp('/fr')
     await screen.findByText('Développeur fullstack')
 
-    fireEvent.click(screen.getByRole('link', { name: 'English' }))
+    switchToEnglish()
 
     expect(await screen.findByText('Fullstack developer')).toBeDefined()
   })
@@ -95,7 +100,7 @@ describe('home page', () => {
     await api.answer('fr')
     await screen.findByText('Développeur fullstack')
 
-    fireEvent.click(screen.getByRole('link', { name: 'English' }))
+    switchToEnglish()
 
     expect(screen.getByText('Loading…')).toBeDefined()
     expect(screen.queryByText('Développeur fullstack')).toBeNull()
@@ -104,7 +109,7 @@ describe('home page', () => {
   test('ignores a late answer for the previous language', async () => {
     const api = controlledApi()
     renderApp('/fr')
-    fireEvent.click(screen.getByRole('link', { name: 'English' }))
+    switchToEnglish()
     await api.answer('en')
     await screen.findByText('Fullstack developer')
 

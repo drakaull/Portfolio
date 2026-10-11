@@ -6,6 +6,7 @@ export const fr: Record<TranslationKey, string> = {
   'nav.home': 'Accueil',
   'nav.skip': 'Aller au contenu',
   'nav.menu': 'Menu',
+  'language.label': 'Langue :',
   'link.newTab': "s'ouvre dans un nouvel onglet",
   'footer.place': 'Belgique',
   'theme.dark': 'Mode sombre',
@@ -59,19 +60,20 @@ export const fr: Record<TranslationKey, string> = {
   'admin.home.preview': 'Aperçu',
   'admin.home.linkedin': 'Adresse LinkedIn',
   'admin.home.github': 'Adresse GitHub',
-  'admin.home.enHint': "Laissez un champ vide : sa traduction est générée à l'enregistrement.",
+  'admin.home.translateHint':
+    "Laissez un champ vide : sa traduction est générée à l'enregistrement.",
   'admin.home.translate': 'Traduire depuis le français',
   'admin.home.translating': 'Traduction…',
   'admin.home.confirmReplace':
-    'Remplacer le texte anglais par une nouvelle traduction du français ?',
+    'Remplacer le texte de cet onglet par une nouvelle traduction du français ?',
   'admin.home.replace': 'Remplacer',
   'admin.home.reviewTranslation': "Traduction automatique — relisez-la avant d'enregistrer.",
   'admin.home.translateUnavailable':
-    'La traduction est indisponible pour le moment. Réessayez plus tard ou écrivez le texte anglais.',
+    'La traduction est indisponible pour le moment. Réessayez plus tard ou écrivez le texte vous-même.',
   'admin.home.autoTranslated':
-    "L'anglais a été généré automatiquement — relisez-le dans l'onglet EN.",
+    'Les traductions manquantes ont été générées automatiquement — relisez-les dans les onglets :',
   'admin.home.translationFailed':
-    "L'anglais n'a pas pu être généré ; le texte français s'affiche sur le site anglais en attendant.",
+    "Certaines traductions n'ont pas pu être générées ; le texte français s'affiche à leur place en attendant.",
   'admin.home.invalidHeadline': 'Le français est obligatoire ; 120 caractères maximum.',
   'admin.home.invalidIntro': 'Le français est obligatoire ; 5 000 caractères maximum.',
   'admin.home.invalidUrl': 'Saisissez une adresse complète commençant par https://',

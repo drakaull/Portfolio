@@ -15,6 +15,12 @@ describe('root redirect', () => {
     expect(screen.getByRole('link', { name: 'Parcours' })).toBeDefined()
   })
 
+  test('goes to Dutch when the browser language is Dutch', () => {
+    vi.spyOn(navigator, 'language', 'get').mockReturnValue('nl-BE')
+    renderApp('/')
+    expect(screen.getByRole('link', { name: 'Ervaring' })).toBeDefined()
+  })
+
   test('goes to English for any other browser language', () => {
     vi.spyOn(navigator, 'language', 'get').mockReturnValue('de-DE')
     renderApp('/')
@@ -61,7 +67,7 @@ describe('navbar', () => {
     const hrefs = within(nav)
       .getAllByRole('link')
       .map((link) => link.getAttribute('href'))
-    // Brand, then the "Accueil" link, the sections, and last the language switch.
+    // Brand, then the "Accueil" link and the sections (the closed language list is hidden).
     expect(hrefs).toEqual([
       '/fr',
       '/fr',
@@ -69,7 +75,6 @@ describe('navbar', () => {
       '/fr/skills',
       '/fr/projects',
       '/fr/contact',
-      '/en',
     ])
   })
 
@@ -121,17 +126,108 @@ describe('mobile menu', () => {
 })
 
 describe('language switch', () => {
-  test('switches to English and keeps the current section', () => {
+  const switchButton = (name: string) => screen.getByRole('button', { name })
+
+  test('shows the current language, closed', () => {
     renderApp('/fr/skills')
-    fireEvent.click(screen.getByRole('link', { name: 'English' }))
-    expect(heading().textContent).toBe('Skills')
-    expect(document.documentElement.lang).toBe('en')
+    const button = switchButton('Langue : Français')
+    expect(button.textContent).toBe('FR')
+    expect(button.getAttribute('aria-expanded')).toBe('false')
+    expect(screen.queryByRole('link', { name: 'English' })).toBeNull()
   })
 
-  test('switches to French from the home page', () => {
+  test('lists every language, linking to the current page', () => {
+    renderApp('/fr/skills')
+    fireEvent.click(switchButton('Langue : Français'))
+
+    const links = [
+      ['Français', 'fr'],
+      ['English', 'en'],
+      ['Nederlands', 'nl'],
+    ].map(([name, lang]) => {
+      const link = screen.getByRole('link', { name })
+      expect(link.getAttribute('href')).toBe(`/${lang}/skills`)
+      expect(link.getAttribute('hreflang')).toBe(lang)
+      expect(link.getAttribute('lang')).toBe(lang)
+      return link
+    })
+    expect(links.map((link) => link.getAttribute('aria-current'))).toEqual(['true', null, null])
+  })
+
+  test('switches language, keeps the current section and closes', () => {
+    renderApp('/fr/skills')
+    fireEvent.click(switchButton('Langue : Français'))
+    fireEvent.click(screen.getByRole('link', { name: 'English' }))
+
+    expect(heading().textContent).toBe('Skills')
+    expect(document.documentElement.lang).toBe('en')
+    expect(switchButton('Language: English').getAttribute('aria-expanded')).toBe('false')
+  })
+
+  test('switches to Dutch from the home page', () => {
     renderApp('/en')
-    fireEvent.click(screen.getByRole('link', { name: 'Français' }))
-    expect(screen.getByRole('link', { name: 'Parcours' })).toBeDefined()
+    fireEvent.click(switchButton('Language: English'))
+    fireEvent.click(screen.getByRole('link', { name: 'Nederlands' }))
+    expect(screen.getByRole('link', { name: 'Ervaring' })).toBeDefined()
+  })
+
+  test('Escape closes the list and returns focus to the button', () => {
+    renderApp('/en')
+    const button = switchButton('Language: English')
+    fireEvent.click(button)
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+
+    expect(button.getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(button)
+  })
+
+  test('keeps the query and the anchor', () => {
+    renderApp('/fr/skills?tab=1#top')
+    fireEvent.click(switchButton('Langue : Français'))
+    expect(screen.getByRole('link', { name: 'Nederlands' }).getAttribute('href')).toBe(
+      '/nl/skills?tab=1#top',
+    )
+  })
+
+  test('closes when the focus leaves it', () => {
+    renderApp('/en')
+    const button = switchButton('Language: English')
+    fireEvent.click(button)
+
+    fireEvent.blur(button, { relatedTarget: screen.getByRole('link', { name: 'Skills' }) })
+
+    expect(button.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  test('stays open when the focus goes nowhere (Safari clicks)', () => {
+    renderApp('/en')
+    const button = switchButton('Language: English')
+    fireEvent.click(button)
+
+    fireEvent.blur(button, { relatedTarget: null })
+
+    expect(button.getAttribute('aria-expanded')).toBe('true')
+  })
+
+  test('stays open while the focus moves inside it', () => {
+    renderApp('/en')
+    const button = switchButton('Language: English')
+    fireEvent.click(button)
+
+    fireEvent.blur(button, { relatedTarget: screen.getByRole('link', { name: 'Nederlands' }) })
+
+    expect(button.getAttribute('aria-expanded')).toBe('true')
+  })
+
+  test('a click outside closes the list', () => {
+    renderApp('/en')
+    const button = switchButton('Language: English')
+    fireEvent.click(button)
+
+    fireEvent.pointerDown(heading())
+
+    expect(button.getAttribute('aria-expanded')).toBe('false')
   })
 })
 
@@ -142,6 +238,8 @@ describe('path eyebrows', () => {
     ['/fr/skills', '~/portfolio/competences'],
     ['/en/experience', '~/portfolio/experience'],
     ['/fr/nope', '~/portfolio/404'],
+    ['/nl', '~/portfolio — België'],
+    ['/nl/skills', '~/portfolio/vaardigheden'],
   ])('%s shows %s', (path, eyebrow) => {
     renderApp(path)
     expect(screen.getByText(eyebrow)).toBeDefined()

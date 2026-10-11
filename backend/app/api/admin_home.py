@@ -1,17 +1,20 @@
-import logging
 from typing import Annotated, get_args
 
 from fastapi import Depends, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.dependencies import admin_router, get_home_repository, get_translator
-from app.domain.home import HEADLINE_MAX_LENGTH, INTRO_MAX_LENGTH, URL_MAX_LENGTH, HomeContent
-from app.domain.language import SOURCE_LANG, Lang
+from app.domain.home import (
+    HEADLINE_MAX_LENGTH,
+    INTRO_MAX_LENGTH,
+    TRANSLATED_FIELDS,
+    URL_MAX_LENGTH,
+    HomeContent,
+)
+from app.domain.language import Lang
 from app.infra.repositories.home import HomeContentRepository
 from app.infra.storage import CvTooLargeError, NotAPdfError, cv_file, delete_cv, save_cv
-from app.infra.translation import TextFormat, TranslationUnavailable, Translator
-
-logger = logging.getLogger(__name__)
+from app.infra.translation import Translator, fill_missing
 
 router = admin_router()
 
@@ -23,15 +26,18 @@ class _StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
 
-# One field per supported language; French (the source) is required, English may be left empty.
+# One field per supported language; French (the source) is required, the others may be left
+# empty (or omitted) and are then translated on save.
 class HeadlineIn(_StrictModel):
     fr: str = Field(min_length=1, max_length=HEADLINE_MAX_LENGTH)
-    en: str = Field(max_length=HEADLINE_MAX_LENGTH)
+    en: str = Field(default="", max_length=HEADLINE_MAX_LENGTH)
+    nl: str = Field(default="", max_length=HEADLINE_MAX_LENGTH)
 
 
 class IntroIn(_StrictModel):
     fr: str = Field(min_length=1, max_length=INTRO_MAX_LENGTH)
-    en: str = Field(max_length=INTRO_MAX_LENGTH)
+    en: str = Field(default="", max_length=INTRO_MAX_LENGTH)
+    nl: str = Field(default="", max_length=INTRO_MAX_LENGTH)
 
 
 class HomeContentIn(_StrictModel):
@@ -50,9 +56,13 @@ class AdminHomeContentOut(BaseModel):
 
     @classmethod
     def from_domain(cls, content: HomeContent) -> "AdminHomeContentOut":
+        # Rows saved before a language was added lack its key: the editor gets "" instead.
+        def every_lang(value: dict[str, str]) -> dict[str, str]:
+            return {lang: value.get(lang, "") for lang in get_args(Lang)}
+
         return cls(
-            headline=dict(content.headline),
-            intro=dict(content.intro),
+            headline=every_lang(content.headline),
+            intro=every_lang(content.intro),
             linkedin_url=content.linkedin_url,
             github_url=content.github_url,
             has_cv=cv_file() is not None,
@@ -60,13 +70,11 @@ class AdminHomeContentOut(BaseModel):
 
 
 class AdminHomeSaveOut(AdminHomeContentOut):
-    auto_translated: list[str]  # fields whose empty translations were generated on this save
+    auto_translated: list[Lang]  # languages whose empty texts were generated on this save
     translation_failed: bool
 
 
 Repository = Annotated[HomeContentRepository, Depends(get_home_repository)]
-
-_TRANSLATED_FIELDS: dict[str, TextFormat] = {"headline": "plain", "intro": "markdown"}
 
 
 @router.get("/home")
@@ -83,26 +91,9 @@ async def save_home_content(
     repository: Repository,
     translator: Annotated[Translator, Depends(get_translator)],
 ) -> AdminHomeSaveOut:
-    texts = {field: getattr(body, field).model_dump() for field in _TRANSLATED_FIELDS}
-    auto_translated: set[str] = set()
-    translation_failed = False
-
-    # Fill only empty translations: text the admin wrote in another language is never replaced.
-    for target in (lang for lang in get_args(Lang) if lang != SOURCE_LANG):
-        empty = [field for field in _TRANSLATED_FIELDS if not texts[field][target]]
-        if not empty:
-            continue
-        items = [(texts[field][SOURCE_LANG], _TRANSLATED_FIELDS[field]) for field in empty]
-        try:
-            translations = await translator.translate(items, target)
-        except TranslationUnavailable as error:
-            # Saving must not fail because of DeepL: the public site shows French meanwhile.
-            logger.warning("Automatic translation to %s failed: %s", target, error)
-            translation_failed = True
-            continue
-        for field, translation in zip(empty, translations, strict=True):
-            texts[field][target] = translation
-            auto_translated.add(field)
+    texts = {field: getattr(body, field).model_dump() for field in TRANSLATED_FIELDS}
+    # Saving must not fail because of DeepL: on failure the public site shows French meanwhile.
+    auto_translated, translation_failed = await fill_missing(texts, TRANSLATED_FIELDS, translator)
 
     content = HomeContent(
         headline=texts["headline"],

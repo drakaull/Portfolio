@@ -1,37 +1,41 @@
-# Implementation Plan: Feature 8 — Experience (public)
+# Implementation Plan: Feature 9 — Language switcher and Dutch
 
-Spec: [08-experience-public.md](../specs/08-experience-public.md) · Task list: [todo.md](todo.md) · Branch: `feature/experience-public`
+Spec: [09-languages.md](../specs/09-languages.md) · Task list: [todo.md](todo.md) · Branch: `feature/languages`
 
 ## Overview
 
-`experiences` table seeded with the 7 entries from the CV, public list/detail API, timeline carousel page, detail page and a "Recent path" column on the home page.
+Dutch (`nl`) added end to end — backend language list, DeepL target, admin schemas, CLI to translate existing content, interface dictionary, routes — and a new language switcher showing the current language with diagonal-split flags.
 
 ## Architecture Decisions
 
-- **Same layering as the home content**: domain `Experience` dataclass, ORM model, repository converting between them, public routes localizing with `localize()`.
-- **Ordering in SQL** (`start_year desc, end_year desc nulls first, id desc`), so every consumer (timeline, home, later admin) gets the same order.
-- **Vertical timeline** (replaces the first carousel version, Task 6): a semantic ordered list in CSS grid — years column, line, card — collapsing to years-above-card on narrow screens. The carousel code stays in git history (commit f834e2f) for the personal projects section.
-- **One fetch hook per resource** (`useExperiences(lang)`, `useExperience(slug, lang)`), following `useHomeContent` (abort on language change, stale-result guard).
-- **Home column reuses the list endpoint** (first 3 items) — no extra endpoint.
-- **Year formatting in one helper** (`formatYears(start, end, t)`) shared by cards, detail page and home.
+- **One language list per side**: backend `Lang` (domain) drives validation, fallback, auto-fill on save and the CLI; frontend dictionaries drive routes, the switcher and the editor tabs. Adding a language stays a two-place change.
+- **`nl.ts` typed against `en.ts`**: a missing Dutch key fails the build.
+- **Flags as inline SVG components** with a `clipPath` triangle for the diagonal split; no image files, no dependency, crisp at any size.
+- **Switcher = disclosure button + list of links** (not an ARIA menu): simplest accessible pattern; each link keeps the current page and carries `lang`/`hreflang`.
+- **CLI `translate-missing` reuses the save logic's rule** (fill only empty fields from French) through the existing `Translator`; it never overwrites.
 
 ## Task List
 
 ### Phase 1: Backend
-- [x] Task 1: Experience entity, table, seed migration and repository
-- [x] Task 2: Public list and detail endpoints
+- [x] Task 1: Dutch in the backend (language list, DeepL target, admin schemas)
+- [x] Task 2: `translate-missing` command
 
 ### Checkpoint A: after Tasks 1–2
-- [x] ruff + pytest green; migration round trip green
-- [x] Human: `/api/experiences?lang=fr` lists the 7 entries in the right order; a detail URL works
+- [x] ruff + pytest green
+- [x] Human: run `uv run python -m app.cli translate-missing`; `/api/home?lang=nl` and `/api/experiences?lang=nl` answer in Dutch
 
-### Phase 2: Frontend
-- [x] Task 3: Timeline page with carousel
-- [x] Task 4: Experience detail page
-- [x] Task 5: "Recent path" column on the home page
-- [x] Task 6: Replace the carousel with a vertical timeline (years on the left) — decided at Checkpoint B
+### Phase 2: Interface
+- [x] Task 3: Dutch interface (dictionary via DeepL, `/nl` routes, browser redirect, eyebrows)
+- [x] Task 4: Flags and language switcher
 
-### Checkpoint B: complete
+### Checkpoint B: after Tasks 3–4
+- [x] Frontend green; screenshots of the switcher (closed/open, both themes, 390 px) and `/nl`
+- [x] Human: flags look right; Dutch interface texts reviewed
+
+### Phase 3: Editor
+- [x] Task 5: NL tab in the home editor
+
+### Checkpoint C: complete
 - [x] Human browser check of the 5 spec success criteria
 - [x] Code review (`/review`)
 - [x] Merge into `develop` after approval
@@ -40,10 +44,10 @@ Spec: [08-experience-public.md](../specs/08-experience-public.md) · Task list: 
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Carousel unusable with keyboard or on mobile | High | Native scrolling + focusable card links (`scrollIntoView` via focus), buttons with labels; screenshots at 390 px |
-| Buttons' visibility out of sync after resize | Low | Recompute on `scroll` and `resize` |
-| Same-year entries in a random order | Low | `id desc` as final tie-breaker; tested |
-| Seed text needs edits before feature 9 | Low | Léonard can still edit through the API in `/docs` meanwhile; editor comes next |
+| Machine-translated Dutch UI sounds odd | Med | Léonard reviews at Checkpoint B; texts are short UI labels |
+| Flags unrecognisable at 20 px | Med | Screenshots at real size, both themes; design tweak before merge |
+| Admin save now calls DeepL twice (EN + NL) | Low | One request per target language; still well under the free quota |
+| Existing tests assume two languages | Low | Update fixtures; type check catches missing keys |
 
 ## Open Questions
 

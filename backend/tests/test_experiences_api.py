@@ -68,3 +68,9 @@ async def test_detail_includes_the_description(client: AsyncClient) -> None:
 )
 async def test_errors(client: AsyncClient, path: str, params: dict, status: int) -> None:
     assert (await client.get(path, params=params)).status_code == status
+
+
+async def test_dutch_falls_back_to_french_until_translated(client: AsyncClient) -> None:
+    dutch = (await client.get("/api/experiences", params={"lang": "nl"})).json()
+
+    assert dutch[0]["title"] == "Ingénieur R&D"  # no Dutch text yet in the seed

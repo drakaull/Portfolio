@@ -1,12 +1,16 @@
 from collections.abc import Mapping
 from typing import Literal
 
-# Supported languages. Adding one (e.g. "nl") here is enough for the backend: no migration needed.
-Lang = Literal["en", "fr"]
+# Supported languages. Adding one needs no migration, but also its DeepL code
+# (infra/translation.py) and a field in the admin input models (api/admin_home.py).
+Lang = Literal["en", "fr", "nl"]
 # Language the admin writes in; other languages are translations of it.
 SOURCE_LANG: Lang = "fr"
 
-# Translated text as stored in JSON columns: {"en": "...", "fr": "..."}.
+# How a translated text is written: Markdown or plain text.
+TextFormat = Literal["markdown", "plain"]
+
+# Translated text as stored in JSON columns: {"fr": "...", "en": "...", "nl": "..."}.
 Translated = Mapping[str, str]
 
 
