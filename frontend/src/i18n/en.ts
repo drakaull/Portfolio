@@ -2,6 +2,7 @@
 export const en = {
   'site.name': 'Léonard Fontaine',
   'nav.label': 'Main',
+  'nav.home': 'Home',
   'nav.skip': 'Skip to content',
   'nav.menu': 'Menu',
   'link.newTab': 'opens in a new tab',
