@@ -27,6 +27,8 @@ export const en = {
   'experience.loading': 'Loading the timeline…',
   'experience.error': 'The timeline could not be loaded. Please try again later.',
   'experience.empty': 'The timeline is coming soon.',
+  'experience.technologies': 'Technologies',
+  'experience.back': 'Back to the timeline',
   'skills.title': 'Skills',
   'projects.title': 'Projects',
   'contact.title': 'Contact',

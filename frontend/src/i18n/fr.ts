@@ -28,6 +28,8 @@ export const fr: Record<TranslationKey, string> = {
   'experience.loading': 'Chargement du parcours…',
   'experience.error': "Le parcours n'a pas pu être chargé. Réessayez plus tard.",
   'experience.empty': 'Le parcours arrive bientôt.',
+  'experience.technologies': 'Technologies',
+  'experience.back': 'Retour au parcours',
   'skills.title': 'Compétences',
   'projects.title': 'Projets',
   'contact.title': 'Contact',
