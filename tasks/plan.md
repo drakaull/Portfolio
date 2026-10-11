@@ -22,7 +22,7 @@ Dutch (`nl`) added end to end — backend language list, DeepL target, admin sch
 
 ### Checkpoint A: after Tasks 1–2
 - [x] ruff + pytest green
-- [ ] Human: run `uv run python -m app.cli translate-missing`; `/api/home?lang=nl` and `/api/experiences?lang=nl` answer in Dutch
+- [x] Human: run `uv run python -m app.cli translate-missing`; `/api/home?lang=nl` and `/api/experiences?lang=nl` answer in Dutch
 
 ### Phase 2: Interface
 - [x] Task 3: Dutch interface (dictionary via DeepL, `/nl` routes, browser redirect, eyebrows)
@@ -36,9 +36,9 @@ Dutch (`nl`) added end to end — backend language list, DeepL target, admin sch
 - [x] Task 5: NL tab in the home editor
 
 ### Checkpoint C: complete
-- [ ] Human browser check of the 5 spec success criteria
-- [ ] Code review (`/review`)
-- [ ] Merge into `develop` after approval
+- [x] Human browser check of the 5 spec success criteria
+- [x] Code review (`/review`)
+- [x] Merge into `develop` after approval
 
 ## Risks and Mitigations
 
