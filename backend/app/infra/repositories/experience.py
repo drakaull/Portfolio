@@ -75,6 +75,9 @@ class ExperienceRepository:
         await self._session.flush()
         return True
 
+    async def commit(self) -> None:
+        await self._session.commit()
+
     async def _row(self, slug: str) -> ExperienceModel | None:
         return await self._session.scalar(
             select(ExperienceModel).where(ExperienceModel.slug == slug)

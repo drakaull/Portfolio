@@ -1,4 +1,4 @@
-from typing import Annotated, get_args
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
@@ -11,7 +11,7 @@ from app.domain.home import (
     URL_MAX_LENGTH,
     HomeContent,
 )
-from app.domain.language import Lang
+from app.domain.language import Lang, with_every_lang
 from app.infra.repositories.home import HomeContentRepository
 from app.infra.storage import CvTooLargeError, NotAPdfError, cv_file, delete_cv, save_cv
 from app.infra.translation import Translator, fill_missing
@@ -56,13 +56,9 @@ class AdminHomeContentOut(BaseModel):
 
     @classmethod
     def from_domain(cls, content: HomeContent) -> "AdminHomeContentOut":
-        # Rows saved before a language was added lack its key: the editor gets "" instead.
-        def every_lang(value: dict[str, str]) -> dict[str, str]:
-            return {lang: value.get(lang, "") for lang in get_args(Lang)}
-
         return cls(
-            headline=every_lang(content.headline),
-            intro=every_lang(content.intro),
+            headline=with_every_lang(content.headline),
+            intro=with_every_lang(content.intro),
             linkedin_url=content.linkedin_url,
             github_url=content.github_url,
             has_cv=cv_file() is not None,

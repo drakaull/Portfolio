@@ -18,10 +18,10 @@ Admin pages to list, create, edit and delete timeline entries, with the home edi
 
 ### Phase 1: Backend
 - [x] Task 1: Domain + repository (translated fields in the domain, create / update / delete, duplicate-slug error)
-- [ ] Task 2: Admin API routes (list, get, create, update, delete; validation; auto-translation on save)
+- [x] Task 2: Admin API routes (list, get, create, update, delete; validation; auto-translation on save)
 
 ### Checkpoint A: after Tasks 1–2
-- [ ] ruff + pytest green; every new route refused without a session (route-walking test)
+- [x] ruff + pytest green; every new route refused without a session (route-walking test)
 
 ### Phase 2: Frontend
 - [ ] Task 3: Extract the translation block from the home editor (no visible change, existing tests green)
