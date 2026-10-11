@@ -24,7 +24,7 @@ Admin pages to list, create, edit and delete timeline entries, with the home edi
 - [x] ruff + pytest green; every new route refused without a session (route-walking test)
 
 ### Phase 2: Frontend
-- [ ] Task 3: Extract the translation block from the home editor (no visible change, existing tests green)
+- [x] Task 3: Extract the translation block from the home editor (no visible change, existing tests green)
 - [ ] Task 4: Experience list page + dashboard link
 - [ ] Task 5: Experience form (create / edit / delete, slug proposal, technologies, translation)
 
