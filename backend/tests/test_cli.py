@@ -105,6 +105,8 @@ async def test_translate_missing_reports_deepl_failures(session: AsyncSession) -
 
     assert failed
     assert report == []
+    # The seed only lacks Dutch: one attempt for it, not one per item.
+    assert [target for _, target in translator.calls] == ["nl"]
     home = await HomeContentRepository(session).get()
     assert "nl" not in home.headline
 

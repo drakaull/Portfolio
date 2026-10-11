@@ -1,10 +1,13 @@
 import json
 import os
+from typing import get_args
 
 import httpx
 import pytest
 
+from app.domain.language import Lang
 from app.infra.translation import (
+    _DEEPL_LANGS,
     TranslationUnavailable,
     Translator,
     fill_missing,
@@ -160,3 +163,24 @@ async def test_fill_missing_skips_fields_without_source_text() -> None:
     assert not failed
     assert texts["summary"] == {"fr": "  "}
     assert all(items == [("Stage", "plain")] for items, _ in translator.calls)
+
+
+@pytest.mark.parametrize(
+    "answer",
+    [
+        httpx.Response(200, text="<html>proxy error</html>"),
+        httpx.Response(200, json={"unexpected": []}),
+        httpx.Response(200, json={"translations": []}),  # fewer texts than sent
+    ],
+)
+async def test_unexpected_deepl_answers_become_translation_unavailable(
+    answer: httpx.Response,
+) -> None:
+    transport = httpx.MockTransport(lambda request: answer)
+
+    with pytest.raises(TranslationUnavailable):
+        await Translator("key:fx", transport).translate([("Bonjour", "plain")], "en")
+
+
+def test_every_language_has_a_deepl_code() -> None:
+    assert set(_DEEPL_LANGS) == set(get_args(Lang))

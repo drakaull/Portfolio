@@ -20,13 +20,15 @@ from app.domain.auth import (
     WeakPasswordError,
     check_password_policy,
 )
+from app.domain.home import TRANSLATED_FIELDS as HOME_FIELDS
+from app.domain.language import Lang, TextFormat
 from app.infra.config import settings
 from app.infra.database import SessionFactory, engine
 from app.infra.repositories.admin import AdminRepository
 from app.infra.repositories.experience import ExperienceRepository
 from app.infra.repositories.home import HomeContentRepository
 from app.infra.security import hash_password
-from app.infra.translation import TextFormat, Translator, fill_missing
+from app.infra.translation import Translator, fill_missing
 
 
 async def create_admin(session: AsyncSession, username: str, password: str) -> AdminUser:
@@ -40,7 +42,6 @@ async def create_admin(session: AsyncSession, username: str, password: str) -> A
     return user
 
 
-_HOME_FIELDS: dict[str, TextFormat] = {"headline": "plain", "intro": "markdown"}
 _EXPERIENCE_FIELDS: dict[str, TextFormat] = {
     "title": "plain",
     "summary": "plain",
@@ -62,12 +63,14 @@ async def translate_missing(
     """
     report: list[str] = []
     failed = False
+    # A language DeepL failed for (quota, outage) is not asked again for the next items.
+    unavailable: set[Lang] = set()
 
     home_repository = HomeContentRepository(session)
     home = await home_repository.get()
     if home is not None:
         texts = {"headline": dict(home.headline), "intro": dict(home.intro)}
-        filled, home_failed = await fill_missing(texts, _HOME_FIELDS, translator)
+        filled, home_failed = await fill_missing(texts, HOME_FIELDS, translator, unavailable)
         failed |= home_failed
         if filled:
             await home_repository.save(
@@ -78,7 +81,9 @@ async def translate_missing(
     experience_repository = ExperienceRepository(session)
     for entry in await experience_repository.list():
         texts = {field: dict(getattr(entry, field)) for field in _EXPERIENCE_FIELDS}
-        filled, entry_failed = await fill_missing(texts, _EXPERIENCE_FIELDS, translator)
+        filled, entry_failed = await fill_missing(
+            texts, _EXPERIENCE_FIELDS, translator, unavailable
+        )
         failed |= entry_failed
         if filled:
             await experience_repository.save_texts(replace(entry, **texts))

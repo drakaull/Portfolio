@@ -14,6 +14,7 @@ Items collected during code and security reviews. **Required** items must be don
 - [ ] **`DEEPL_API_KEY`** in the server environment (never in git) for automatic translation; without it, saving still works and the English site shows the French text.
 - [ ] **Run `alembic upgrade head`** on each deploy, before starting the new backend.
 - [ ] **Create the admin** on the server: `uv run python -m app.cli create-admin --username leonard`.
+- [ ] **Fill missing translations** once the content is in the database (and after adding a language): `uv run python -m app.cli translate-missing` (needs `DEEPL_API_KEY`; never overwrites written text). Until then the Dutch and English sites show French for untranslated content.
 - [ ] **Dependency audit**: `npm audit` (frontend) and a Python audit (e.g. `uvx pip-audit`) with no unresolved critical/high finding.
 - [ ] **Unknown URLs return HTTP 404** from the server for the SPA's not-found page (or `noindex`), so search engines do not index soft 404s.
 

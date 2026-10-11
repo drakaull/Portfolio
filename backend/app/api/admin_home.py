@@ -4,11 +4,17 @@ from fastapi import Depends, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.dependencies import admin_router, get_home_repository, get_translator
-from app.domain.home import HEADLINE_MAX_LENGTH, INTRO_MAX_LENGTH, URL_MAX_LENGTH, HomeContent
+from app.domain.home import (
+    HEADLINE_MAX_LENGTH,
+    INTRO_MAX_LENGTH,
+    TRANSLATED_FIELDS,
+    URL_MAX_LENGTH,
+    HomeContent,
+)
 from app.domain.language import Lang
 from app.infra.repositories.home import HomeContentRepository
 from app.infra.storage import CvTooLargeError, NotAPdfError, cv_file, delete_cv, save_cv
-from app.infra.translation import TextFormat, Translator, fill_missing
+from app.infra.translation import Translator, fill_missing
 
 router = admin_router()
 
@@ -70,8 +76,6 @@ class AdminHomeSaveOut(AdminHomeContentOut):
 
 Repository = Annotated[HomeContentRepository, Depends(get_home_repository)]
 
-_TRANSLATED_FIELDS: dict[str, TextFormat] = {"headline": "plain", "intro": "markdown"}
-
 
 @router.get("/home")
 async def get_home_content(repository: Repository) -> AdminHomeContentOut:
@@ -87,9 +91,9 @@ async def save_home_content(
     repository: Repository,
     translator: Annotated[Translator, Depends(get_translator)],
 ) -> AdminHomeSaveOut:
-    texts = {field: getattr(body, field).model_dump() for field in _TRANSLATED_FIELDS}
+    texts = {field: getattr(body, field).model_dump() for field in TRANSLATED_FIELDS}
     # Saving must not fail because of DeepL: on failure the public site shows French meanwhile.
-    auto_translated, translation_failed = await fill_missing(texts, _TRANSLATED_FIELDS, translator)
+    auto_translated, translation_failed = await fill_missing(texts, TRANSLATED_FIELDS, translator)
 
     content = HomeContent(
         headline=texts["headline"],
