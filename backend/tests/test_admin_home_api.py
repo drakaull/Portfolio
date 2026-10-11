@@ -23,8 +23,9 @@ async def test_admin_reads_both_languages(admin_client: AsyncClient) -> None:
 
     assert response.status_code == 200
     assert response.json() == {
-        "headline": {"en": "Fullstack developer", "fr": "Développeur fullstack"},
-        "intro": {"en": "Introduction coming soon.", "fr": "Présentation à venir."},
+        # The seeded row has no Dutch: every language is still present, empty.
+        "headline": {"en": "Fullstack developer", "fr": "Développeur fullstack", "nl": ""},
+        "intro": {"en": "Introduction coming soon.", "fr": "Présentation à venir.", "nl": ""},
         "linkedin_url": "https://www.linkedin.com/in/l%C3%A9onard-fontaine-80902437b/",
         "github_url": "https://github.com/drakaull",
         "has_cv": False,
@@ -52,7 +53,7 @@ async def test_saved_content_is_public_immediately(
             "nl": "[nl] Je crée des **applications web**.",
         },
         "has_cv": False,
-        "auto_translated": ["headline", "intro"],
+        "auto_translated": ["en", "nl"],
         "translation_failed": False,
     }
     assert fake_translator.calls == [

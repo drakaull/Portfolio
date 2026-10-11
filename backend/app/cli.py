@@ -11,6 +11,7 @@ import getpass
 import sys
 from dataclasses import replace
 
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.auth import (
@@ -47,6 +48,11 @@ _EXPERIENCE_FIELDS: dict[str, TextFormat] = {
 }
 
 
+def _describe(filled: dict[str, list[str]]) -> str:
+    """E.g. "en (intro); nl (headline, intro)"."""
+    return "; ".join(f"{lang} ({', '.join(fields)})" for lang, fields in filled.items())
+
+
 async def translate_missing(
     session: AsyncSession, translator: Translator
 ) -> tuple[list[str], bool]:
@@ -67,7 +73,7 @@ async def translate_missing(
             await home_repository.save(
                 replace(home, headline=texts["headline"], intro=texts["intro"])
             )
-            report.append(f"home: {', '.join(sorted(filled))}")
+            report.append(f"home: {_describe(filled)}")
 
     experience_repository = ExperienceRepository(session)
     for entry in await experience_repository.list():
@@ -76,16 +82,22 @@ async def translate_missing(
         failed |= entry_failed
         if filled:
             await experience_repository.save_texts(replace(entry, **texts))
-            report.append(f"experience {entry.slug}: {', '.join(sorted(filled))}")
+            report.append(f"experience {entry.slug}: {_describe(filled)}")
 
     await session.commit()
     return report, failed
 
 
 async def _translate_missing() -> int:
-    async with SessionFactory() as session:
-        report, failed = await translate_missing(session, Translator(settings.deepl_api_key))
-    await engine.dispose()
+    try:
+        async with SessionFactory() as session:
+            report, failed = await translate_missing(session, Translator(settings.deepl_api_key))
+    except (SQLAlchemyError, OSError) as error:
+        # Everything is committed at the end, in one transaction: a failure saves nothing.
+        print(f"Translation stopped, nothing was saved: {error}", file=sys.stderr)
+        return 1
+    finally:
+        await engine.dispose()
     for line in report or ["Nothing to translate."]:
         print(line)
     if failed:

@@ -7,9 +7,11 @@ import pytest
 from app.infra.translation import (
     TranslationUnavailable,
     Translator,
+    fill_missing,
     html_to_markdown,
     markdown_to_html,
 )
+from tests.conftest import FakeTranslator
 
 pytestmark = pytest.mark.anyio
 
@@ -146,3 +148,15 @@ async def test_dutch_target_uses_the_deepl_code_nl() -> None:
     await Translator("key:fx", transport).translate([("Bonjour", "plain")], "nl")
 
     assert json.loads(requests[0].content)["target_lang"] == "NL"
+
+
+async def test_fill_missing_skips_fields_without_source_text() -> None:
+    translator = FakeTranslator()
+    texts = {"title": {"fr": "Stage"}, "summary": {"fr": "  "}}
+
+    filled, failed = await fill_missing(texts, {"title": "plain", "summary": "plain"}, translator)
+
+    assert filled == {"en": ["title"], "nl": ["title"]}
+    assert not failed
+    assert texts["summary"] == {"fr": "  "}
+    assert all(items == [("Stage", "plain")] for items, _ in translator.calls)

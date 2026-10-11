@@ -1,10 +1,11 @@
-from typing import Annotated
+from typing import Annotated, get_args
 
 from fastapi import Depends, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.dependencies import admin_router, get_home_repository, get_translator
 from app.domain.home import HEADLINE_MAX_LENGTH, INTRO_MAX_LENGTH, URL_MAX_LENGTH, HomeContent
+from app.domain.language import Lang
 from app.infra.repositories.home import HomeContentRepository
 from app.infra.storage import CvTooLargeError, NotAPdfError, cv_file, delete_cv, save_cv
 from app.infra.translation import TextFormat, Translator, fill_missing
@@ -49,9 +50,13 @@ class AdminHomeContentOut(BaseModel):
 
     @classmethod
     def from_domain(cls, content: HomeContent) -> "AdminHomeContentOut":
+        # Rows saved before a language was added lack its key: the editor gets "" instead.
+        def every_lang(value: dict[str, str]) -> dict[str, str]:
+            return {lang: value.get(lang, "") for lang in get_args(Lang)}
+
         return cls(
-            headline=dict(content.headline),
-            intro=dict(content.intro),
+            headline=every_lang(content.headline),
+            intro=every_lang(content.intro),
             linkedin_url=content.linkedin_url,
             github_url=content.github_url,
             has_cv=cv_file() is not None,
@@ -59,7 +64,7 @@ class AdminHomeContentOut(BaseModel):
 
 
 class AdminHomeSaveOut(AdminHomeContentOut):
-    auto_translated: list[str]  # fields whose empty translations were generated on this save
+    auto_translated: list[Lang]  # languages whose empty texts were generated on this save
     translation_failed: bool
 
 

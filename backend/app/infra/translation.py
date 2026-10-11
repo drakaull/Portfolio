@@ -93,17 +93,22 @@ class Translator:
 
 async def fill_missing(
     texts: dict[str, dict[str, str]], formats: Mapping[str, TextFormat], translator: Translator
-) -> tuple[set[str], bool]:
+) -> tuple[dict[Lang, list[str]], bool]:
     """Translate, in place, every empty non-source text of `texts` from the source language.
 
     `texts` maps a field name to its translations; text already written in a language is never
-    replaced. Returns the fields that received a translation and whether any language failed
-    (the caller keeps the source text meanwhile: the public site falls back to it).
+    replaced. Returns, per language, the fields that received a translation, and whether any
+    language failed (the caller keeps the source text meanwhile: the public site falls back to it).
     """
-    filled: set[str] = set()
+    filled: dict[Lang, list[str]] = {}
     failed = False
     for target in (lang for lang in get_args(Lang) if lang != SOURCE_LANG):
-        empty = [field for field in formats if not texts[field].get(target)]
+        # A field without source text has nothing to translate: it would stay empty anyway.
+        empty = [
+            field
+            for field in formats
+            if texts[field].get(SOURCE_LANG, "").strip() and not texts[field].get(target)
+        ]
         if not empty:
             continue
         items = [(texts[field][SOURCE_LANG], formats[field]) for field in empty]
@@ -115,5 +120,5 @@ async def fill_missing(
             continue
         for field, translation in zip(empty, translations, strict=True):
             texts[field][target] = translation
-            filled.add(field)
+        filled[target] = empty
     return filled, failed

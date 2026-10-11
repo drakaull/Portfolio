@@ -81,8 +81,8 @@ async def test_translate_missing_fills_only_empty_texts(session: AsyncSession) -
     assert_committed(session)
 
     assert not failed
-    assert "home: headline, intro" in report
-    assert "experience helha-computer-science: description, summary, title" in report
+    assert "home: nl (headline, intro)" in report
+    assert "experience helha-computer-science: nl (title, summary, description)" in report
     home = await HomeContentRepository(session).get()
     assert home.headline["nl"] == "[nl] Développeur fullstack"
     assert home.headline["en"] == "Fullstack developer"  # existing English untouched
@@ -107,3 +107,15 @@ async def test_translate_missing_reports_deepl_failures(session: AsyncSession) -
     assert report == []
     home = await HomeContentRepository(session).get()
     assert "nl" not in home.headline
+
+
+def test_translate_missing_reports_database_errors_cleanly(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    async def unreachable(*args: object) -> None:
+        raise ConnectionRefusedError("database unreachable")
+
+    monkeypatch.setattr(cli, "translate_missing", unreachable)
+
+    assert cli.main(["translate-missing"]) == 1
+    assert "nothing was saved" in capsys.readouterr().err
