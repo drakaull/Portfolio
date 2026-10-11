@@ -18,10 +18,10 @@ Dutch (`nl`) added end to end — backend language list, DeepL target, admin sch
 
 ### Phase 1: Backend
 - [x] Task 1: Dutch in the backend (language list, DeepL target, admin schemas)
-- [ ] Task 2: `translate-missing` command
+- [x] Task 2: `translate-missing` command
 
 ### Checkpoint A: after Tasks 1–2
-- [ ] ruff + pytest green
+- [x] ruff + pytest green
 - [ ] Human: run `uv run python -m app.cli translate-missing`; `/api/home?lang=nl` and `/api/experiences?lang=nl` answer in Dutch
 
 ### Phase 2: Interface

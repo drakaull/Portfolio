@@ -6,8 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import cli
 from app.domain.auth import AdminAlreadyExistsError
 from app.infra.repositories.admin import AdminRepository
+from app.infra.repositories.experience import ExperienceRepository
+from app.infra.repositories.home import HomeContentRepository
 from app.infra.security import verify_password
-from tests.conftest import assert_committed
+from tests.conftest import FakeTranslator, assert_committed
 
 
 def answer_prompts(monkeypatch: pytest.MonkeyPatch, *answers: str) -> None:
@@ -69,3 +71,39 @@ def test_create_admin_reports_a_second_account_cleanly(
 
     assert cli.main(["create-admin", "--username", "leonrad"]) == 1
     assert "'leonard'" in capsys.readouterr().err
+
+
+@pytest.mark.anyio
+async def test_translate_missing_fills_only_empty_texts(session: AsyncSession) -> None:
+    translator = FakeTranslator()
+
+    report, failed = await cli.translate_missing(session, translator)
+    assert_committed(session)
+
+    assert not failed
+    assert "home: headline, intro" in report
+    assert "experience helha-computer-science: description, summary, title" in report
+    home = await HomeContentRepository(session).get()
+    assert home.headline["nl"] == "[nl] Développeur fullstack"
+    assert home.headline["en"] == "Fullstack developer"  # existing English untouched
+    helha = await ExperienceRepository(session).get("helha-computer-science")
+    assert helha.title["nl"].startswith("[nl] Bachelier en informatique")
+    assert helha.title["en"] == "Bachelor's degree in Computer Science, Application Development"
+
+    # A second run has nothing left to do.
+    translator.calls.clear()
+    assert await cli.translate_missing(session, translator) == ([], False)
+    assert translator.calls == []
+
+
+@pytest.mark.anyio
+async def test_translate_missing_reports_deepl_failures(session: AsyncSession) -> None:
+    translator = FakeTranslator()
+    translator.fail = True
+
+    report, failed = await cli.translate_missing(session, translator)
+
+    assert failed
+    assert report == []
+    home = await HomeContentRepository(session).get()
+    assert "nl" not in home.headline

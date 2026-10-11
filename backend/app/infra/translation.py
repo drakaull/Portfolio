@@ -1,12 +1,15 @@
 import html
-from collections.abc import Sequence
-from typing import Literal
+import logging
+from collections.abc import Mapping, Sequence
+from typing import Literal, get_args
 
 import httpx
 from markdown_it import MarkdownIt
 from markdownify import markdownify
 
 from app.domain.language import SOURCE_LANG, Lang
+
+logger = logging.getLogger(__name__)
 
 TextFormat = Literal["markdown", "plain"]
 
@@ -86,3 +89,31 @@ class Translator:
         for (index, _, fmt), translation in zip(to_send, translations, strict=True):
             results[index] = _from_html(translation["text"], fmt)
         return results
+
+
+async def fill_missing(
+    texts: dict[str, dict[str, str]], formats: Mapping[str, TextFormat], translator: Translator
+) -> tuple[set[str], bool]:
+    """Translate, in place, every empty non-source text of `texts` from the source language.
+
+    `texts` maps a field name to its translations; text already written in a language is never
+    replaced. Returns the fields that received a translation and whether any language failed
+    (the caller keeps the source text meanwhile: the public site falls back to it).
+    """
+    filled: set[str] = set()
+    failed = False
+    for target in (lang for lang in get_args(Lang) if lang != SOURCE_LANG):
+        empty = [field for field in formats if not texts[field].get(target)]
+        if not empty:
+            continue
+        items = [(texts[field][SOURCE_LANG], formats[field]) for field in empty]
+        try:
+            translations = await translator.translate(items, target)
+        except TranslationUnavailable as error:
+            logger.warning("Automatic translation to %s failed: %s", target, error)
+            failed = True
+            continue
+        for field, translation in zip(empty, translations, strict=True):
+            texts[field][target] = translation
+            filled.add(field)
+    return filled, failed

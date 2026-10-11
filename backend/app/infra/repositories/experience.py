@@ -39,3 +39,15 @@ class ExperienceRepository:
             select(ExperienceModel).where(ExperienceModel.slug == slug)
         )
         return None if row is None else _to_domain(row)
+
+    async def save_texts(self, entry: Experience) -> None:
+        """Update the translated texts of an existing entry, found by slug."""
+        row = await self._session.scalar(
+            select(ExperienceModel).where(ExperienceModel.slug == entry.slug)
+        )
+        if row is None:
+            raise LookupError(f"Unknown experience {entry.slug!r}")
+        row.title = dict(entry.title)
+        row.summary = dict(entry.summary)
+        row.description = dict(entry.description)
+        await self._session.flush()

@@ -1,17 +1,13 @@
-import logging
-from typing import Annotated, get_args
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.dependencies import admin_router, get_home_repository, get_translator
 from app.domain.home import HEADLINE_MAX_LENGTH, INTRO_MAX_LENGTH, URL_MAX_LENGTH, HomeContent
-from app.domain.language import SOURCE_LANG, Lang
 from app.infra.repositories.home import HomeContentRepository
 from app.infra.storage import CvTooLargeError, NotAPdfError, cv_file, delete_cv, save_cv
-from app.infra.translation import TextFormat, TranslationUnavailable, Translator
-
-logger = logging.getLogger(__name__)
+from app.infra.translation import TextFormat, Translator, fill_missing
 
 router = admin_router()
 
@@ -87,25 +83,8 @@ async def save_home_content(
     translator: Annotated[Translator, Depends(get_translator)],
 ) -> AdminHomeSaveOut:
     texts = {field: getattr(body, field).model_dump() for field in _TRANSLATED_FIELDS}
-    auto_translated: set[str] = set()
-    translation_failed = False
-
-    # Fill only empty translations: text the admin wrote in another language is never replaced.
-    for target in (lang for lang in get_args(Lang) if lang != SOURCE_LANG):
-        empty = [field for field in _TRANSLATED_FIELDS if not texts[field][target]]
-        if not empty:
-            continue
-        items = [(texts[field][SOURCE_LANG], _TRANSLATED_FIELDS[field]) for field in empty]
-        try:
-            translations = await translator.translate(items, target)
-        except TranslationUnavailable as error:
-            # Saving must not fail because of DeepL: the public site shows French meanwhile.
-            logger.warning("Automatic translation to %s failed: %s", target, error)
-            translation_failed = True
-            continue
-        for field, translation in zip(empty, translations, strict=True):
-            texts[field][target] = translation
-            auto_translated.add(field)
+    # Saving must not fail because of DeepL: on failure the public site shows French meanwhile.
+    auto_translated, translation_failed = await fill_missing(texts, _TRANSLATED_FIELDS, translator)
 
     content = HomeContent(
         headline=texts["headline"],
