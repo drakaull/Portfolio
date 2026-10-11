@@ -26,7 +26,7 @@ Spec: [08-experience-public.md](../specs/08-experience-public.md) · Task list: 
 - [ ] Human: `/api/experiences?lang=fr` lists the 7 entries in the right order; a detail URL works
 
 ### Phase 2: Frontend
-- [ ] Task 3: Timeline page with carousel
+- [x] Task 3: Timeline page with carousel
 - [ ] Task 4: Experience detail page
 - [ ] Task 5: "Recent path" column on the home page
 
