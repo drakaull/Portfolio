@@ -1,30 +1,76 @@
+import { useEffect, useId, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router'
 import { useTranslation, type Lang } from '../../i18n/useTranslation.ts'
+import { Flag } from '../Flag/Flag.tsx'
 import styles from './LanguageSwitch.module.css'
 
-// Each label is written in its own language, so it is not part of the dictionaries.
-const TARGETS: Record<Lang, { lang: Lang; short: string; label: string }> = {
-  en: { lang: 'fr', short: 'FR', label: 'Français' },
-  fr: { lang: 'en', short: 'EN', label: 'English' },
-  nl: { lang: 'fr', short: 'FR', label: 'Français' },
-}
+// Each name is written in its own language, so it is not part of the dictionaries.
+const LANGUAGES: Record<Lang, string> = { fr: 'Français', en: 'English', nl: 'Nederlands' }
 
 export function LanguageSwitch() {
-  const { lang } = useTranslation()
+  const { t, lang } = useTranslation()
   const { pathname } = useLocation()
-  const target = TARGETS[lang]
-  // Swap only the first path segment: /fr/skills -> /en/skills.
-  const to = pathname.replace(/^\/[^/]*/, `/${target.lang}`)
+  const [open, setOpen] = useState(false)
+  const root = useRef<HTMLDivElement>(null)
+  const button = useRef<HTMLButtonElement>(null)
+  const listId = useId()
+
+  useEffect(() => {
+    if (!open) return
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setOpen(false)
+        button.current?.focus()
+      }
+    }
+    function closeOnOutsideClick(event: PointerEvent) {
+      if (!root.current?.contains(event.target as Node)) setOpen(false)
+    }
+
+    document.addEventListener('keydown', closeOnEscape)
+    document.addEventListener('pointerdown', closeOnOutsideClick)
+    return () => {
+      document.removeEventListener('keydown', closeOnEscape)
+      document.removeEventListener('pointerdown', closeOnOutsideClick)
+    }
+  }, [open])
 
   return (
-    <Link
-      to={to}
-      className={styles.switch}
-      lang={target.lang}
-      hrefLang={target.lang}
-      aria-label={target.label}
-    >
-      {target.short}
-    </Link>
+    <div ref={root} className={styles.root}>
+      <button
+        ref={button}
+        type="button"
+        className={styles.button}
+        aria-label={`${t('language.label')} ${LANGUAGES[lang]}`}
+        aria-expanded={open}
+        aria-controls={listId}
+        onClick={() => setOpen((isOpen) => !isOpen)}
+      >
+        <Flag lang={lang} />
+        <span className={styles.code}>{lang.toUpperCase()}</span>
+        <svg className={styles.chevron} viewBox="0 0 10 6" aria-hidden="true">
+          <path d="M1 1l4 4 4-4" />
+        </svg>
+      </button>
+      <ul id={listId} className={styles.list} hidden={!open}>
+        {(Object.keys(LANGUAGES) as Lang[]).map((code) => (
+          <li key={code}>
+            <Link
+              // Swap only the first path segment: /fr/skills -> /en/skills.
+              to={pathname.replace(/^\/[^/]*/, `/${code}`)}
+              className={styles.item}
+              lang={code}
+              hrefLang={code}
+              aria-current={code === lang ? 'true' : undefined}
+              onClick={() => setOpen(false)}
+            >
+              <Flag lang={code} />
+              {LANGUAGES[code]}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }

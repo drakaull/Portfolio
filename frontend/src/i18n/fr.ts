@@ -6,6 +6,7 @@ export const fr: Record<TranslationKey, string> = {
   'nav.home': 'Accueil',
   'nav.skip': 'Aller au contenu',
   'nav.menu': 'Menu',
+  'language.label': 'Langue :',
   'link.newTab': "s'ouvre dans un nouvel onglet",
   'footer.place': 'Belgique',
   'theme.dark': 'Mode sombre',

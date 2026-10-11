@@ -7,6 +7,7 @@ export const nl: Record<TranslationKey, string> = {
   'nav.home': 'Home',
   'nav.skip': 'Ga naar de inhoud',
   'nav.menu': 'Menu',
+  'language.label': 'Taal:',
   'link.newTab': 'opent in een nieuw tabblad',
   'footer.place': 'België',
   'theme.dark': 'Donkere modus',

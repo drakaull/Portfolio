@@ -5,6 +5,7 @@ export const en = {
   'nav.home': 'Home',
   'nav.skip': 'Skip to content',
   'nav.menu': 'Menu',
+  'language.label': 'Language:',
   'link.newTab': 'opens in a new tab',
   'footer.place': 'Belgium',
   'theme.dark': 'Dark mode',

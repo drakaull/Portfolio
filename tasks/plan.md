@@ -26,11 +26,11 @@ Dutch (`nl`) added end to end — backend language list, DeepL target, admin sch
 
 ### Phase 2: Interface
 - [x] Task 3: Dutch interface (dictionary via DeepL, `/nl` routes, browser redirect, eyebrows)
-- [ ] Task 4: Flags and language switcher
+- [x] Task 4: Flags and language switcher
 
 ### Checkpoint B: after Tasks 3–4
-- [ ] Frontend green; screenshots of the switcher (closed/open, both themes, 390 px) and `/nl`
-- [ ] Human: flags look right; Dutch interface texts reviewed
+- [x] Frontend green; screenshots of the switcher (closed/open, both themes, 390 px) and `/nl`
+- [x] Human: flags look right; Dutch interface texts reviewed
 
 ### Phase 3: Editor
 - [ ] Task 5: NL tab in the home editor

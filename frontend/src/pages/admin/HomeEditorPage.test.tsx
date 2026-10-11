@@ -145,6 +145,7 @@ describe('unsaved changes', () => {
     renderApp('/en/admin/home')
     fireEvent.change(await headline(), { target: { value: 'Changed' } })
 
+    fireEvent.click(screen.getByRole('button', { name: 'Language: English' }))
     fireEvent.click(screen.getByRole('link', { name: 'Français' }))
 
     expect(screen.queryByRole('alertdialog')).toBeNull()
