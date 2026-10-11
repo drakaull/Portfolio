@@ -28,7 +28,7 @@ Spec: [08-experience-public.md](../specs/08-experience-public.md) · Task list: 
 ### Phase 2: Frontend
 - [x] Task 3: Timeline page with carousel
 - [x] Task 4: Experience detail page
-- [ ] Task 5: "Recent path" column on the home page
+- [x] Task 5: "Recent path" column on the home page
 
 ### Checkpoint B: complete
 - [ ] Human browser check of the 5 spec success criteria

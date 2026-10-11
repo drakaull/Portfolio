@@ -1,32 +1,10 @@
 import { fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import type { Experience } from '../api/experiences.ts'
+import { ENTRIES } from '../test/fixtures.ts'
 import { formatYears } from '../lib/years.ts'
 import { mockApi } from '../test/mockApi.ts'
 import { renderApp } from '../test/renderApp.tsx'
-
-export const ENTRIES: Experience[] = [
-  {
-    slug: 'icare-student-job-2026',
-    kind: 'student_job',
-    title: 'Ingénieur R&D',
-    organization: 'I-care Group',
-    start_year: 2026,
-    end_year: 2026,
-    summary: 'Stockage hybride chaud/froid.',
-    technologies: ['Amazon S3', 'Python', 'NoSQL', 'Docker', 'FastAPI'],
-  },
-  {
-    slug: 'helha-computer-science',
-    kind: 'education',
-    title: 'Bachelier en informatique',
-    organization: 'HELHa',
-    start_year: 2023,
-    end_year: null,
-    summary: 'Développement d’applications.',
-    technologies: [],
-  },
-]
 
 function mockTimeline(entries: Experience[] = ENTRIES, status = 200) {
   return mockApi({

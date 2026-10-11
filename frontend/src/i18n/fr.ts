@@ -13,6 +13,8 @@ export const fr: Record<TranslationKey, string> = {
   'eyebrow.skills': '~/portfolio/competences',
   'eyebrow.projects': '~/portfolio/projets',
   'eyebrow.contact': '~/portfolio/contact',
+  'home.recentPath': 'Parcours récent',
+  'home.fullPath': 'Tout le parcours',
   'home.loading': 'Chargement…',
   'home.error': "Ce contenu n'a pas pu être chargé. Réessayez plus tard.",
   'home.cv': 'Voir mon CV',

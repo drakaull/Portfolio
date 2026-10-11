@@ -12,6 +12,8 @@ export const en = {
   'eyebrow.skills': '~/portfolio/skills',
   'eyebrow.projects': '~/portfolio/projects',
   'eyebrow.contact': '~/portfolio/contact',
+  'home.recentPath': 'Recent path',
+  'home.fullPath': 'Full timeline',
   'home.loading': 'Loading…',
   'home.error': 'This content could not be loaded. Please try again later.',
   'home.cv': 'View my CV',
