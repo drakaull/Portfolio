@@ -15,6 +15,12 @@ describe('root redirect', () => {
     expect(screen.getByRole('link', { name: 'Parcours' })).toBeDefined()
   })
 
+  test('goes to Dutch when the browser language is Dutch', () => {
+    vi.spyOn(navigator, 'language', 'get').mockReturnValue('nl-BE')
+    renderApp('/')
+    expect(screen.getByRole('link', { name: 'Ervaring' })).toBeDefined()
+  })
+
   test('goes to English for any other browser language', () => {
     vi.spyOn(navigator, 'language', 'get').mockReturnValue('de-DE')
     renderApp('/')
@@ -142,6 +148,8 @@ describe('path eyebrows', () => {
     ['/fr/skills', '~/portfolio/competences'],
     ['/en/experience', '~/portfolio/experience'],
     ['/fr/nope', '~/portfolio/404'],
+    ['/nl', '~/portfolio — België'],
+    ['/nl/skills', '~/portfolio/vaardigheden'],
   ])('%s shows %s', (path, eyebrow) => {
     renderApp(path)
     expect(screen.getByText(eyebrow)).toBeDefined()

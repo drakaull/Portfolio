@@ -1,4 +1,4 @@
-export type Translated = { en: string; fr: string }
+export type Translated = { en: string; fr: string; nl: string }
 
 export type HomeContentForm = {
   headline: Translated

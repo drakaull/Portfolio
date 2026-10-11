@@ -6,7 +6,8 @@ import { Layout } from '../Layout/Layout.tsx'
 
 /** Redirects to `/<browser language><path>`; the language is read at each visit. */
 export function BrowserLanguageRedirect({ path = '' }: { path?: string }) {
-  const lang = navigator.language.toLowerCase().startsWith('fr') ? 'fr' : DEFAULT_LANG
+  const browser = navigator.language.slice(0, 2).toLowerCase()
+  const lang = isLang(browser) ? browser : DEFAULT_LANG
   return <Navigate to={`/${lang}${path}`} replace />
 }
 

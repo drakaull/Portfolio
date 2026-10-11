@@ -6,6 +6,7 @@ import styles from './LanguageSwitch.module.css'
 const TARGETS: Record<Lang, { lang: Lang; short: string; label: string }> = {
   en: { lang: 'fr', short: 'FR', label: 'Français' },
   fr: { lang: 'en', short: 'EN', label: 'English' },
+  nl: { lang: 'fr', short: 'FR', label: 'Français' },
 }
 
 export function LanguageSwitch() {

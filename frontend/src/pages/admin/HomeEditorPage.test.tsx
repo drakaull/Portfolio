@@ -5,8 +5,12 @@ import { mockApi, signedIn, signedOut } from '../../test/mockApi.ts'
 import { renderApp } from '../../test/renderApp.tsx'
 
 const CONTENT: AdminHomeContent = {
-  headline: { en: 'Fullstack developer', fr: 'Développeur fullstack' },
-  intro: { en: '', fr: 'Je crée des **applications web**.' },
+  headline: {
+    en: 'Fullstack developer',
+    fr: 'Développeur fullstack',
+    nl: 'Fullstack-ontwikkelaar',
+  },
+  intro: { en: '', fr: 'Je crée des **applications web**.', nl: '' },
   linkedin_url: 'https://www.linkedin.com/in/someone',
   github_url: 'https://github.com/someone',
   has_cv: false,
@@ -73,7 +77,7 @@ describe('home editor', () => {
     expect(await screen.findByText('Saved.')).toBeDefined()
     const [, init] = fetchMock.mock.calls.find(([, init]) => init?.method === 'PUT')!
     expect(JSON.parse(String(init?.body))).toEqual({
-      headline: { en: 'Fullstack developer', fr: 'Ingénieur logiciel' },
+      headline: { ...CONTENT.headline, fr: 'Ingénieur logiciel' },
       intro: CONTENT.intro,
       linkedin_url: CONTENT.linkedin_url,
       github_url: CONTENT.github_url,

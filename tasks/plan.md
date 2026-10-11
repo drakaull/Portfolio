@@ -25,7 +25,7 @@ Dutch (`nl`) added end to end — backend language list, DeepL target, admin sch
 - [ ] Human: run `uv run python -m app.cli translate-missing`; `/api/home?lang=nl` and `/api/experiences?lang=nl` answer in Dutch
 
 ### Phase 2: Interface
-- [ ] Task 3: Dutch interface (dictionary via DeepL, `/nl` routes, browser redirect, eyebrows)
+- [x] Task 3: Dutch interface (dictionary via DeepL, `/nl` routes, browser redirect, eyebrows)
 - [ ] Task 4: Flags and language switcher
 
 ### Checkpoint B: after Tasks 3–4
