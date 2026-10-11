@@ -9,7 +9,7 @@ const LANGUAGES: Record<Lang, string> = { fr: 'Français', en: 'English', nl: 'N
 
 export function LanguageSwitch() {
   const { t, lang } = useTranslation()
-  const { pathname } = useLocation()
+  const { pathname, search, hash } = useLocation()
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   const button = useRef<HTMLButtonElement>(null)
@@ -37,7 +37,14 @@ export function LanguageSwitch() {
   }, [open])
 
   return (
-    <div ref={root} className={styles.root}>
+    <div
+      ref={root}
+      className={styles.root}
+      // Keyboard users tabbing out of the list close it.
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
+      }}
+    >
       <button
         ref={button}
         type="button"
@@ -58,7 +65,7 @@ export function LanguageSwitch() {
           <li key={code}>
             <Link
               // Swap only the first path segment: /fr/skills -> /en/skills.
-              to={pathname.replace(/^\/[^/]*/, `/${code}`)}
+              to={{ pathname: pathname.replace(/^\/[^/]*/, `/${code}`), search, hash }}
               className={styles.item}
               lang={code}
               hrefLang={code}

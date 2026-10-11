@@ -182,6 +182,34 @@ describe('language switch', () => {
     expect(document.activeElement).toBe(button)
   })
 
+  test('keeps the query and the anchor', () => {
+    renderApp('/fr/skills?tab=1#top')
+    fireEvent.click(switchButton('Langue : Français'))
+    expect(screen.getByRole('link', { name: 'Nederlands' }).getAttribute('href')).toBe(
+      '/nl/skills?tab=1#top',
+    )
+  })
+
+  test('closes when the focus leaves it', () => {
+    renderApp('/en')
+    const button = switchButton('Language: English')
+    fireEvent.click(button)
+
+    fireEvent.blur(button, { relatedTarget: screen.getByRole('link', { name: 'Skills' }) })
+
+    expect(button.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  test('stays open while the focus moves inside it', () => {
+    renderApp('/en')
+    const button = switchButton('Language: English')
+    fireEvent.click(button)
+
+    fireEvent.blur(button, { relatedTarget: screen.getByRole('link', { name: 'Nederlands' }) })
+
+    expect(button.getAttribute('aria-expanded')).toBe('true')
+  })
+
   test('a click outside closes the list', () => {
     renderApp('/en')
     const button = switchButton('Language: English')

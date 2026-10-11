@@ -19,7 +19,7 @@ export type HomeField = keyof HomeContentForm
 
 /** What PUT returns: the stored content plus what automatic translation did on this save. */
 export type AdminHomeSaved = AdminHomeContent & {
-  auto_translated: string[]
+  auto_translated: TargetLang[] // languages generated on this save
   translation_failed: boolean
 }
 

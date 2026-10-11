@@ -68,7 +68,7 @@ export const en = {
   'admin.home.translateUnavailable':
     'Translation is unavailable right now. Try again later or write the text yourself.',
   'admin.home.autoTranslated':
-    'Missing translations were generated automatically — review them in the EN and NL tabs.',
+    'Missing translations were generated automatically — review them in the tabs:',
   'admin.home.translationFailed':
     'Some translations could not be generated; the French text is shown in their place for now.',
   'admin.home.invalidHeadline': 'French is required; 120 characters max.',

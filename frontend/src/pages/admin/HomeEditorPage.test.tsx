@@ -289,6 +289,17 @@ describe('automatic translation', () => {
     expect(((await headline()) as HTMLInputElement).value).toBe('Fullstack developer')
   })
 
+  test('tabs are locked while a translation runs', async () => {
+    mockEditorApi(savedAsSent, () => new Promise(() => {}) as unknown as Response)
+    renderApp('/en/admin/home')
+    await openEnglishTab()
+    fireEvent.change(await headline(), { target: { value: '' } })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Translate from French' }))
+
+    expect(screen.getByRole('tab', { name: 'NL' }).hasAttribute('disabled')).toBe(true)
+  })
+
   test('a confirmation does not follow to another tab', async () => {
     mockEditorApi()
     renderApp('/en/admin/home')
@@ -314,14 +325,16 @@ describe('automatic translation', () => {
 
   test('tells that missing translations were generated on save', async () => {
     mockEditorApi((body) =>
-      Response.json({ ...(body as object), auto_translated: ['intro'], translation_failed: false }),
+      Response.json({ ...(body as object), auto_translated: ['nl'], translation_failed: false }),
     )
     renderApp('/en/admin/home')
     fireEvent.change(await headline(), { target: { value: 'Ingénieur logiciel' } })
 
     fireEvent.click(saveButton())
 
-    expect(await screen.findByText(/Missing translations were generated/)).toBeDefined()
+    expect((await screen.findByText(/Missing translations were generated/)).textContent).toMatch(
+      /tabs: NL$/,
+    )
   })
 
   test('warns when translations could not be generated on save', async () => {

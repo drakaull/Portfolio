@@ -71,7 +71,7 @@ export const fr: Record<TranslationKey, string> = {
   'admin.home.translateUnavailable':
     'La traduction est indisponible pour le moment. Réessayez plus tard ou écrivez le texte vous-même.',
   'admin.home.autoTranslated':
-    'Les traductions manquantes ont été générées automatiquement — relisez-les dans les onglets EN et NL.',
+    'Les traductions manquantes ont été générées automatiquement — relisez-les dans les onglets :',
   'admin.home.translationFailed':
     "Certaines traductions n'ont pas pu être générées ; le texte français s'affiche à leur place en attendant.",
   'admin.home.invalidHeadline': 'Le français est obligatoire ; 120 caractères maximum.',

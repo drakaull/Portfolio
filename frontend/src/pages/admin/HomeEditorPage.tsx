@@ -5,6 +5,7 @@ import {
   saveAdminHome,
   translateFromFrench,
   type AdminHomeContent,
+  type AdminHomeSaved,
   type HomeContentForm,
   type HomeField,
   type TargetLang,
@@ -30,7 +31,7 @@ const FIELD_ERRORS: Record<HomeField, TranslationKey> = {
 type SaveState = 'idle' | 'saving' | 'saved' | 'expired' | 'error'
 type TranslateState =
   'idle' | 'confirm' | 'translating' | 'done' | 'unavailable' | 'expired' | 'error'
-type SaveNotice = 'autoTranslated' | 'translationFailed' | null
+type SaveNotice = Pick<AdminHomeSaved, 'auto_translated' | 'translation_failed'>
 
 const TRANSLATE_MESSAGES: Partial<Record<TranslateState, TranslationKey>> = {
   done: 'admin.home.reviewTranslation',
@@ -56,7 +57,7 @@ export function HomeEditorPage() {
   const [invalid, setInvalid] = useState<HomeField[]>([])
   const [hasCv, setHasCv] = useState(false)
   const [translateState, setTranslateState] = useState<TranslateState>('idle')
-  const [saveNotice, setSaveNotice] = useState<SaveNotice>(null)
+  const [saveNotice, setSaveNotice] = useState<SaveNotice | null>(null)
 
   useEffect(() => {
     fetchAdminHome()
@@ -115,13 +116,7 @@ export function HomeEditorPage() {
       setInvalid([])
       setSaveState('saved')
       setTranslateState('idle')
-      setSaveNotice(
-        result.content.translation_failed
-          ? 'translationFailed'
-          : result.content.auto_translated.length > 0
-            ? 'autoTranslated'
-            : null,
-      )
+      setSaveNotice(result.content)
     } else if (result.status === 'invalid') {
       setInvalid(result.fields)
       setSaveState('idle')
@@ -210,6 +205,8 @@ export function HomeEditorPage() {
                 type="button"
                 role="tab"
                 aria-selected={textLang === code}
+                // The running translation writes into the tab it was asked from.
+                disabled={translateState === 'translating'}
                 className={styles.tab}
                 onClick={() => selectTextLang(code)}
               >
@@ -327,12 +324,14 @@ export function HomeEditorPage() {
           </Button>
           <span role="status">{saveState === 'saved' && t('admin.home.saved')}</span>
         </div>
-        {saveState === 'saved' && saveNotice === 'autoTranslated' && (
+        {/* Both can show: one language may be generated while the other fails. */}
+        {saveState === 'saved' && saveNotice && saveNotice.auto_translated.length > 0 && (
           <p className={styles.hint} role="status">
-            {t('admin.home.autoTranslated')}
+            {t('admin.home.autoTranslated')}{' '}
+            {saveNotice.auto_translated.map((code) => code.toUpperCase()).join(', ')}
           </p>
         )}
-        {saveState === 'saved' && saveNotice === 'translationFailed' && (
+        {saveState === 'saved' && saveNotice?.translation_failed && (
           <p className={adminStyles.error} role="alert">
             {t('admin.home.translationFailed')}
           </p>

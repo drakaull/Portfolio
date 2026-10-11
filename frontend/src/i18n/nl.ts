@@ -72,7 +72,7 @@ export const nl: Record<TranslationKey, string> = {
   'admin.home.translateUnavailable':
     'Vertalen is momenteel niet mogelijk. Probeer het later opnieuw of schrijf de tekst zelf.',
   'admin.home.autoTranslated':
-    'Ontbrekende vertalingen zijn automatisch gegenereerd — controleer ze op de tabbladen EN en NL.',
+    'Ontbrekende vertalingen zijn automatisch gegenereerd — controleer ze op de tabbladen:',
   'admin.home.translationFailed':
     'Sommige vertalingen konden niet worden gegenereerd; de Franse tekst wordt voorlopig in de plaats getoond.',
   'admin.home.invalidHeadline': 'Frans is verplicht; maximaal 120 tekens.',
