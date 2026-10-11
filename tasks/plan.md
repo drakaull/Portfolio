@@ -33,7 +33,7 @@ Dutch (`nl`) added end to end — backend language list, DeepL target, admin sch
 - [x] Human: flags look right; Dutch interface texts reviewed
 
 ### Phase 3: Editor
-- [ ] Task 5: NL tab in the home editor
+- [x] Task 5: NL tab in the home editor
 
 ### Checkpoint C: complete
 - [ ] Human browser check of the 5 spec success criteria

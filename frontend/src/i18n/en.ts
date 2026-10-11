@@ -59,17 +59,18 @@ export const en = {
   'admin.home.preview': 'Preview',
   'admin.home.linkedin': 'LinkedIn address',
   'admin.home.github': 'GitHub address',
-  'admin.home.enHint': 'Leave a field empty: its translation is generated when you save.',
+  'admin.home.translateHint': 'Leave a field empty: its translation is generated when you save.',
   'admin.home.translate': 'Translate from French',
   'admin.home.translating': 'Translating…',
-  'admin.home.confirmReplace': 'Replace the English text with a new translation from French?',
+  'admin.home.confirmReplace': 'Replace the text of this tab with a new translation from French?',
   'admin.home.replace': 'Replace',
   'admin.home.reviewTranslation': 'Automatic translation — please review it before saving.',
   'admin.home.translateUnavailable':
-    'Translation is unavailable right now. Try again later or write the English text.',
-  'admin.home.autoTranslated': 'English was generated automatically — review it in the EN tab.',
+    'Translation is unavailable right now. Try again later or write the text yourself.',
+  'admin.home.autoTranslated':
+    'Missing translations were generated automatically — review them in the EN and NL tabs.',
   'admin.home.translationFailed':
-    'English could not be generated; the French text is shown on the English site for now.',
+    'Some translations could not be generated; the French text is shown in their place for now.',
   'admin.home.invalidHeadline': 'French is required; 120 characters max.',
   'admin.home.invalidIntro': 'French is required; 5,000 characters max.',
   'admin.home.invalidUrl': 'Enter a full address starting with https://',

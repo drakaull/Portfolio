@@ -61,20 +61,20 @@ export const nl: Record<TranslationKey, string> = {
   'admin.home.preview': 'Voorbeeld',
   'admin.home.linkedin': 'LinkedIn-adres',
   'admin.home.github': 'GitHub-adres',
-  'admin.home.enHint':
+  'admin.home.translateHint':
     'Laat een veld leeg: de vertaling wordt automatisch gegenereerd wanneer je opslaat.',
   'admin.home.translate': 'Vertalen vanuit het Frans',
   'admin.home.translating': 'Bezig met vertalen…',
   'admin.home.confirmReplace':
-    'De Engelse tekst vervangen door een nieuwe vertaling uit het Frans?',
+    'De tekst van dit tabblad vervangen door een nieuwe vertaling uit het Frans?',
   'admin.home.replace': 'Vervangen',
   'admin.home.reviewTranslation': 'Automatische vertaling — controleer ze voordat je opslaat.',
   'admin.home.translateUnavailable':
-    'Vertaling is momenteel niet beschikbaar. Probeer het later nog eens of voer de Engelse tekst in.',
+    'Vertalen is momenteel niet mogelijk. Probeer het later opnieuw of schrijf de tekst zelf.',
   'admin.home.autoTranslated':
-    'De Engelse tekst is automatisch gegenereerd — bekijk deze op het tabblad EN.',
+    'Ontbrekende vertalingen zijn automatisch gegenereerd — controleer ze op de tabbladen EN en NL.',
   'admin.home.translationFailed':
-    'Het was niet mogelijk om een Engelse versie te genereren; de Franse tekst wordt voorlopig op de Engelse website weergegeven.',
+    'Sommige vertalingen konden niet worden gegenereerd; de Franse tekst wordt voorlopig in de plaats getoond.',
   'admin.home.invalidHeadline': 'Frans is verplicht; maximaal 120 tekens.',
   'admin.home.invalidIntro': 'Frans is verplicht; maximaal 5.000 tekens.',
   'admin.home.invalidUrl': 'Voer een volledig adres in, beginnend met https://',

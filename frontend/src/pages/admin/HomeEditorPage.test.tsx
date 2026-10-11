@@ -21,8 +21,10 @@ const savedAsSent = (body: unknown) =>
 
 function mockEditorApi(
   save: (body: unknown) => Response = savedAsSent,
-  translate: (body: { items: { text: string }[] }) => Response = ({ items }) =>
-    Response.json({ translations: items.map((item) => `[en] ${item.text}`) }),
+  translate: (body: { target: string; items: { text: string }[] }) => Response = ({
+    target,
+    items,
+  }) => Response.json({ translations: items.map((item) => `[${target}] ${item.text}`) }),
 ) {
   return mockApi({
     'GET /api/admin/me': signedIn,
@@ -49,7 +51,7 @@ describe('home editor', () => {
     renderApp('/en/admin/home')
 
     expect(((await headline()) as HTMLInputElement).value).toBe('Développeur fullstack')
-    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['FR', 'EN'])
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['FR', 'EN', 'NL'])
     fireEvent.click(screen.getByRole('tab', { name: 'EN' }))
     expect(((await headline()) as HTMLInputElement).value).toBe('Fullstack developer')
     expect(screen.getByText(/its translation is generated when you save/)).toBeDefined()
@@ -271,6 +273,34 @@ describe('automatic translation', () => {
     expect(translateCalls()).toBe(1)
   })
 
+  test('translates the Dutch tab into Dutch, keeping English', async () => {
+    const fetchMock = mockEditorApi()
+    renderApp('/en/admin/home')
+    await headline()
+    fireEvent.click(screen.getByRole('tab', { name: 'NL' }))
+    fireEvent.change(await headline(), { target: { value: '' } })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Translate from French' }))
+
+    expect(await screen.findByDisplayValue('[nl] Développeur fullstack')).toBeDefined()
+    const [, init] = fetchMock.mock.calls.find(([url]) => url === '/api/admin/translate')!
+    expect(JSON.parse(String(init?.body)).target).toBe('nl')
+    fireEvent.click(screen.getByRole('tab', { name: 'EN' }))
+    expect(((await headline()) as HTMLInputElement).value).toBe('Fullstack developer')
+  })
+
+  test('a confirmation does not follow to another tab', async () => {
+    mockEditorApi()
+    renderApp('/en/admin/home')
+    await openEnglishTab()
+    fireEvent.click(screen.getByRole('button', { name: 'Translate from French' }))
+    expect(screen.getByRole('alertdialog')).toBeDefined()
+
+    fireEvent.click(screen.getByRole('tab', { name: 'NL' }))
+
+    expect(screen.queryByRole('alertdialog')).toBeNull()
+  })
+
   test('explains when translation is unavailable', async () => {
     mockEditorApi(savedAsSent, () => new Response(null, { status: 503 }))
     renderApp('/en/admin/home')
@@ -282,7 +312,7 @@ describe('automatic translation', () => {
     expect((await screen.findByRole('alert')).textContent).toContain('Translation is unavailable')
   })
 
-  test('tells which English fields were generated on save', async () => {
+  test('tells that missing translations were generated on save', async () => {
     mockEditorApi((body) =>
       Response.json({ ...(body as object), auto_translated: ['intro'], translation_failed: false }),
     )
@@ -291,10 +321,10 @@ describe('automatic translation', () => {
 
     fireEvent.click(saveButton())
 
-    expect(await screen.findByText(/English was generated automatically/)).toBeDefined()
+    expect(await screen.findByText(/Missing translations were generated/)).toBeDefined()
   })
 
-  test('warns when English could not be generated on save', async () => {
+  test('warns when translations could not be generated on save', async () => {
     mockEditorApi((body) =>
       Response.json({ ...(body as object), auto_translated: [], translation_failed: true }),
     )
