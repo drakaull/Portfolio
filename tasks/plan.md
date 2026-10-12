@@ -25,7 +25,7 @@ Skills grouped in five fixed categories, each a name + optional Simple Icons log
 
 ### Phase 2: Frontend
 - [x] Task 3: Public Skills page + `SkillIcon` component
-- [ ] Task 4: Admin list with ordering arrows + dashboard link
+- [x] Task 4: Admin list with ordering arrows + dashboard link
 - [ ] Task 5: Admin form with Simple Icons search (dependency added here)
 
 ### Checkpoint B: after Tasks 3–5

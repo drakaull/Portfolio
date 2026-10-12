@@ -65,6 +65,9 @@ describe('admin area', () => {
     expect(screen.getByRole('link', { name: 'Parcours' }).getAttribute('href')).toBe(
       '/fr/admin/experiences',
     )
+    expect(screen.getByRole('link', { name: 'Compétences' }).getAttribute('href')).toBe(
+      '/fr/admin/skills',
+    )
   })
 
   test('is hidden from search engines', async () => {
