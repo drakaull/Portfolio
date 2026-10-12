@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from sqlalchemy import (
+    BigInteger,
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -16,6 +18,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.domain.experience import ORGANIZATION_MAX_LENGTH, SLUG_MAX_LENGTH
+from app.domain.project import TEAM_SIZE_MAX, TITLE_MAX_LENGTH
 from app.domain.skill import ICON_SLUG_MAX_LENGTH, NAME_MAX_LENGTH
 from app.infra.database import Base
 
@@ -114,3 +117,40 @@ class SkillModel(Base):
     icon_slug: Mapped[str | None] = mapped_column(String(ICON_SLUG_MAX_LENGTH))
     icon_hex: Mapped[str | None] = mapped_column(String(6))
     icon_path: Mapped[str | None] = mapped_column(Text)
+
+
+class ProjectModel(Base):
+    __tablename__ = "projects"
+    __table_args__ = (
+        CheckConstraint(
+            "context IS NULL OR context IN ('school', 'personal', 'professional')",
+            name="context_values",
+        ),
+        CheckConstraint(
+            f"team_size IS NULL OR team_size BETWEEN 1 AND {TEAM_SIZE_MAX}", name="team_size_range"
+        ),
+        # A repository gone from GitHub is never shown: its link would be broken.
+        CheckConstraint("NOT (visible AND missing)", name="missing_hidden"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # From GitHub, refreshed by every sync.
+    github_id: Mapped[int] = mapped_column(BigInteger, unique=True)
+    name: Mapped[str] = mapped_column(String(100))
+    url: Mapped[str] = mapped_column(String(255))
+    homepage: Mapped[str | None] = mapped_column(String(255))
+    about: Mapped[str | None] = mapped_column(Text)
+    about_lang: Mapped[str | None] = mapped_column(String(5))
+    summary: Mapped[dict[str, str]] = mapped_column(JSONB, server_default="{}")
+    languages: Mapped[dict[str, int]] = mapped_column(JSONB, server_default="{}")
+    topics: Mapped[list[str]] = mapped_column(ARRAY(Text), server_default="{}")
+    github_created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    pushed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    stars: Mapped[int] = mapped_column(Integer, server_default="0")
+    missing: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    # Set by the admin; a sync never changes them (except hiding a missing project).
+    title: Mapped[str] = mapped_column(String(TITLE_MAX_LENGTH))
+    context: Mapped[str | None] = mapped_column(String(20))
+    team_size: Mapped[int | None] = mapped_column(SmallInteger)
+    visible: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    position: Mapped[int] = mapped_column(Integer)
