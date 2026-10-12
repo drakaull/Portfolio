@@ -14,6 +14,10 @@ export function loadSimpleIcons(): Promise<IconChoice[]> {
       )
       .map(({ title, slug, hex, path }) => ({ title, slug, hex, path })),
   )
+  // A failure (e.g. network) is not remembered: the next form tries again.
+  loading.catch(() => {
+    loading = null
+  })
   return loading
 }
 
