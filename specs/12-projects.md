@@ -1,6 +1,6 @@
 # Spec: Feature 12 — Projects (GitHub sync)
 
-Status: **DRAFT** (waiting for Léonard's approval)
+Status: **APPROVED**
 
 ## Objective
 
@@ -90,7 +90,7 @@ Projects come from Léonard's **public GitHub repositories** instead of being ty
 - The summary is the repository's **"About"**, synced from GitHub and translated by DeepL (source language detected); it is not edited in the admin.
 - **Manual order** with arrows.
 
-## Open questions
+## Decisions (round 3)
 
-1. A repository without "About" (2 of the 4 today): it can be made visible with a card that has **no summary** — or should it stay hidden until you fill its "About" on GitHub?
-2. The **title** stays editable in the admin (starting from the cleaned repository name), since GitHub has no nicer display name — OK?
+- A project without "About" can still be made visible (card without summary); Léonard fills the "About" on GitHub himself.
+- The title stays editable in the admin, starting from the cleaned repository name.
