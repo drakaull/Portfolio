@@ -10,7 +10,7 @@ export const fr: Record<TranslationKey, string> = {
   'link.newTab': "s'ouvre dans un nouvel onglet",
   'footer.place': 'Belgique',
   'theme.dark': 'Mode sombre',
-  'eyebrow.home': '~/portfolio — Belgique',
+  'eyebrow.home': '~/portfolio',
   'eyebrow.experience': '~/portfolio/parcours',
   'eyebrow.skills': '~/portfolio/competences',
   'eyebrow.projects': '~/portfolio/projets',

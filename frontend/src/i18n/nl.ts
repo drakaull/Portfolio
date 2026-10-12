@@ -11,7 +11,7 @@ export const nl: Record<TranslationKey, string> = {
   'link.newTab': 'opent in een nieuw tabblad',
   'footer.place': 'België',
   'theme.dark': 'Donkere modus',
-  'eyebrow.home': '~/portfolio — België',
+  'eyebrow.home': '~/portfolio',
   'eyebrow.experience': '~/portfolio/ervaring',
   'eyebrow.skills': '~/portfolio/vaardigheden',
   'eyebrow.projects': '~/portfolio/projecten',

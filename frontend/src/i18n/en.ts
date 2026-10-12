@@ -9,7 +9,7 @@ export const en = {
   'link.newTab': 'opens in a new tab',
   'footer.place': 'Belgium',
   'theme.dark': 'Dark mode',
-  'eyebrow.home': '~/portfolio — Belgium',
+  'eyebrow.home': '~/portfolio',
   'eyebrow.experience': '~/portfolio/experience',
   'eyebrow.skills': '~/portfolio/skills',
   'eyebrow.projects': '~/portfolio/projects',

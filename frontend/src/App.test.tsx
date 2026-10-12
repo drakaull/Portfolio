@@ -233,12 +233,12 @@ describe('language switch', () => {
 
 describe('path eyebrows', () => {
   test.each([
-    ['/fr', '~/portfolio — Belgique'],
-    ['/en', '~/portfolio — Belgium'],
+    ['/fr', '~/portfolio'],
+    ['/en', '~/portfolio'],
     ['/fr/skills', '~/portfolio/competences'],
     ['/en/experience', '~/portfolio/experience'],
     ['/fr/nope', '~/portfolio/404'],
-    ['/nl', '~/portfolio — België'],
+    ['/nl', '~/portfolio'],
     ['/nl/skills', '~/portfolio/vaardigheden'],
   ])('%s shows %s', (path, eyebrow) => {
     renderApp(path)

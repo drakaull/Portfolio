@@ -11,12 +11,12 @@ describe('building blocks', () => {
   test('Eyebrow and Badge render their text', () => {
     render(
       <>
-        <Eyebrow>~/portfolio — Belgique</Eyebrow>
+        <Eyebrow>~/portfolio/competences</Eyebrow>
         <Badge>Stage</Badge>
       </>,
     )
 
-    expect(screen.getByText('~/portfolio — Belgique').tagName).toBe('P')
+    expect(screen.getByText('~/portfolio/competences').tagName).toBe('P')
     expect(screen.getByText('Stage').tagName).toBe('SPAN')
   })
 
