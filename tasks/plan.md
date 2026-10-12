@@ -18,7 +18,7 @@ A "Sync with GitHub" admin button imports Léonard's public repositories (forks 
 ## Task List
 
 ### Phase 1: Backend
-- [ ] Task 1: Model, migration, domain and repository (list, get, update admin fields, move, delete)
+- [x] Task 1: Model, migration, domain and repository (list, get, update admin fields, move, delete)
 - [ ] Task 2: `GitHubClient`, DeepL source detection, `sync_projects`
 - [ ] Task 3: Admin routes (list, get, update, move, delete, sync) + public route
 
