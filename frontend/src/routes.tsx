@@ -17,6 +17,7 @@ import { ExperienceDetailPage } from './pages/ExperienceDetailPage.tsx'
 import { ExperiencePage } from './pages/ExperiencePage.tsx'
 import { HomePage } from './pages/HomePage.tsx'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
+import { PrivacyPage } from './pages/PrivacyPage.tsx'
 import { ProjectsPage } from './pages/ProjectsPage.tsx'
 import { SkillsPage } from './pages/SkillsPage.tsx'
 
@@ -39,6 +40,7 @@ export const routes = createRoutesFromElements(
         <Route path="skills" element={<SkillsPage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="contact" element={<ContactPage />} />
+        <Route path="privacy" element={<PrivacyPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       <Route path="admin" element={<AdminLayout />}>

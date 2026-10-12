@@ -6,7 +6,7 @@ import styles from './Footer.module.css'
 const YEAR = new Date().getFullYear()
 
 export function Footer() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const home = useSharedHomeContent()
 
   return (
@@ -15,20 +15,25 @@ export function Footer() {
         <p className={styles.signature}>
           © {YEAR} {t('site.name')} · {t('footer.place')}
         </p>
-        {home.status === 'ready' && (
-          <ul className={styles.links}>
-            <li>
-              <TextLink to={home.content.linkedin_url} external>
-                LinkedIn
-              </TextLink>
-            </li>
-            <li>
-              <TextLink to={home.content.github_url} external>
-                GitHub
-              </TextLink>
-            </li>
-          </ul>
-        )}
+        <ul className={styles.links}>
+          <li>
+            <TextLink to={`/${lang}/privacy`}>{t('footer.privacy')}</TextLink>
+          </li>
+          {home.status === 'ready' && (
+            <>
+              <li>
+                <TextLink to={home.content.linkedin_url} external>
+                  LinkedIn
+                </TextLink>
+              </li>
+              <li>
+                <TextLink to={home.content.github_url} external>
+                  GitHub
+                </TextLink>
+              </li>
+            </>
+          )}
+        </ul>
       </div>
     </footer>
   )
