@@ -32,16 +32,19 @@ export function ProjectCard({ project, coloured }: { project: Project; coloured:
       </div>
       <h2 className={styles.title}>{project.title}</h2>
       {project.summary && <p className={styles.summary}>{project.summary}</p>}
-      {project.languages.length > 0 && (
-        <LanguageDonut languages={project.languages} coloured={coloured} />
-      )}
-      {project.team_size !== null && (
+      {/* Pinned to the bottom, so the rings of a row line up whatever the summary length. */}
+      <div className={styles.footer}>
+        {project.languages.length > 0 && (
+          <LanguageDonut languages={project.languages} coloured={coloured} />
+        )}
+        {/* Always there (empty when unknown): its height must not shift the ring. */}
         <p className={styles.team}>
-          {project.team_size === 1
-            ? t('projects.solo')
-            : `${t('projects.team')} ${project.team_size}`}
+          {project.team_size === 1 && t('projects.solo')}
+          {project.team_size !== null &&
+            project.team_size > 1 &&
+            `${t('projects.team')} ${project.team_size}`}
         </p>
-      )}
+      </div>
     </article>
   )
 }

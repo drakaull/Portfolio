@@ -55,7 +55,12 @@
 
 .legend {
   display: grid;
+  align-content: center;
   gap: var(--space-1);
+  /* Room for the longest legend (3 languages + "Others"): every card's ring sits at the same
+     height, whatever its number of languages. */
+  min-height: calc(4 * 1.5em + 3 * var(--space-1));
+  line-height: 1.5;
   margin: 0;
   padding: 0;
   color: var(--color-text);

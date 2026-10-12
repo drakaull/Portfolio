@@ -1,7 +1,7 @@
 .card {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-2);
-  align-content: start;
   height: 100%;
   padding: var(--space-5);
   border: 1px solid var(--color-border);
@@ -48,7 +48,15 @@
   line-height: 1.6;
 }
 
+.footer {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-2);
+}
+
 .team {
+  min-height: 1lh;
   margin: 0;
   color: var(--color-text-muted);
   font-size: var(--text-sm);
