@@ -243,9 +243,10 @@ export function ExperienceEditorPage() {
       <UnsavedChangesDialog blocker={blocker} />
 
       <form className={editorStyles.form} onSubmit={handleSubmit} noValidate>
-        <label className={adminStyles.field}>
-          {t('admin.experiences.kind')}
+        <div className={adminStyles.field}>
+          <label htmlFor="experience-kind">{t('admin.experiences.kind')}</label>
           <select
+            id="experience-kind"
             value={form.kind}
             onChange={(event) => update({ kind: event.target.value as ExperienceKind })}
             aria-invalid={hasError('kind')}
@@ -258,11 +259,12 @@ export function ExperienceEditorPage() {
             ))}
           </select>
           {fieldError('kind')}
-        </label>
+        </div>
 
-        <label className={adminStyles.field}>
-          {t('admin.experiences.organization')}
+        <div className={adminStyles.field}>
+          <label htmlFor="experience-organization">{t('admin.experiences.organization')}</label>
           <input
+            id="experience-organization"
             value={form.organization}
             onChange={(event) => update({ organization: event.target.value })}
             maxLength={120}
@@ -271,12 +273,13 @@ export function ExperienceEditorPage() {
             aria-describedby={describedBy('organization')}
           />
           {fieldError('organization')}
-        </label>
+        </div>
 
         <div className={styles.years}>
-          <label className={adminStyles.field}>
-            {t('admin.experiences.startYear')}
+          <div className={adminStyles.field}>
+            <label htmlFor="experience-startYear">{t('admin.experiences.startYear')}</label>
             <input
+              id="experience-startYear"
               inputMode="numeric"
               value={form.start_year}
               onChange={(event) => update({ start_year: event.target.value })}
@@ -286,10 +289,11 @@ export function ExperienceEditorPage() {
               aria-describedby={describedBy('start_year')}
             />
             {fieldError('start_year')}
-          </label>
-          <label className={adminStyles.field}>
-            {t('admin.experiences.endYear')}
+          </div>
+          <div className={adminStyles.field}>
+            <label htmlFor="experience-endYear">{t('admin.experiences.endYear')}</label>
             <input
+              id="experience-endYear"
               inputMode="numeric"
               value={form.end_year}
               onChange={(event) => update({ end_year: event.target.value })}
@@ -298,7 +302,7 @@ export function ExperienceEditorPage() {
               aria-describedby={describedBy('end_year')}
             />
             {fieldError('end_year')}
-          </label>
+          </div>
         </div>
 
         {creating ? (
@@ -334,9 +338,10 @@ export function ExperienceEditorPage() {
           </p>
         )}
 
-        <label className={adminStyles.field}>
-          {t('admin.experiences.technologies')}
+        <div className={adminStyles.field}>
+          <label htmlFor="experience-technologies">{t('admin.experiences.technologies')}</label>
           <input
+            id="experience-technologies"
             value={form.technologies}
             onChange={(event) => update({ technologies: event.target.value })}
             placeholder="Python, Docker, Amazon S3"
@@ -344,7 +349,7 @@ export function ExperienceEditorPage() {
             aria-describedby={describedBy('technologies')}
           />
           {fieldError('technologies')}
-        </label>
+        </div>
 
         <fieldset className={editorStyles.panel}>
           <legend>{t('admin.home.texts')}</legend>
@@ -371,9 +376,10 @@ export function ExperienceEditorPage() {
             }}
           />
 
-          <label className={adminStyles.field}>
-            {t('admin.experiences.titleField')}
+          <div className={adminStyles.field}>
+            <label htmlFor="experience-titleField">{t('admin.experiences.titleField')}</label>
             <input
+              id="experience-titleField"
               value={form.title[textLang]}
               onChange={(event) => updateText('title', event.target.value)}
               maxLength={120}
@@ -382,11 +388,12 @@ export function ExperienceEditorPage() {
               aria-describedby={describedBy('title')}
             />
             {fieldError('title')}
-          </label>
+          </div>
 
-          <label className={adminStyles.field}>
-            {t('admin.experiences.summary')}
+          <div className={adminStyles.field}>
+            <label htmlFor="experience-summary">{t('admin.experiences.summary')}</label>
             <input
+              id="experience-summary"
               value={form.summary[textLang]}
               onChange={(event) => updateText('summary', event.target.value)}
               maxLength={220}
@@ -395,12 +402,13 @@ export function ExperienceEditorPage() {
               aria-describedby={describedBy('summary')}
             />
             {fieldError('summary')}
-          </label>
+          </div>
 
           <div className={editorStyles.introRow}>
-            <label className={adminStyles.field}>
-              {t('admin.experiences.description')}
+            <div className={adminStyles.field}>
+              <label htmlFor="experience-description">{t('admin.experiences.description')}</label>
               <textarea
+                id="experience-description"
                 value={form.description[textLang]}
                 onChange={(event) => updateText('description', event.target.value)}
                 maxLength={5000}
@@ -409,7 +417,7 @@ export function ExperienceEditorPage() {
                 aria-describedby={describedBy('description')}
               />
               {fieldError('description')}
-            </label>
+            </div>
             <div
               className={editorStyles.preview}
               aria-label={t('admin.home.preview')}

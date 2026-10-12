@@ -142,9 +142,10 @@ export function HomeEditorPage() {
             }}
           />
 
-          <label className={adminStyles.field}>
-            {t('admin.home.headline')}
+          <div className={adminStyles.field}>
+            <label htmlFor="home-headline">{t('admin.home.headline')}</label>
             <input
+              id="home-headline"
               value={form.headline[textLang]}
               onChange={(event) => updateText('headline', event.target.value)}
               maxLength={120}
@@ -153,12 +154,13 @@ export function HomeEditorPage() {
               aria-describedby={describedBy('headline')}
             />
             {fieldError('headline')}
-          </label>
+          </div>
 
           <div className={styles.introRow}>
-            <label className={adminStyles.field}>
-              {t('admin.home.intro')}
+            <div className={adminStyles.field}>
+              <label htmlFor="home-intro">{t('admin.home.intro')}</label>
               <textarea
+                id="home-intro"
                 value={form.intro[textLang]}
                 onChange={(event) => updateText('intro', event.target.value)}
                 maxLength={5000}
@@ -168,7 +170,7 @@ export function HomeEditorPage() {
                 aria-describedby={describedBy('intro')}
               />
               {fieldError('intro')}
-            </label>
+            </div>
             <div className={styles.preview} aria-label={t('admin.home.preview')} role="region">
               <span className={styles.previewLabel}>{t('admin.home.preview')}</span>
               <MarkdownText>{form.intro[textLang] || form.intro.fr}</MarkdownText>
@@ -176,9 +178,10 @@ export function HomeEditorPage() {
           </div>
         </fieldset>
 
-        <label className={adminStyles.field}>
-          {t('admin.home.linkedin')}
+        <div className={adminStyles.field}>
+          <label htmlFor="home-linkedin">{t('admin.home.linkedin')}</label>
           <input
+            id="home-linkedin"
             type="url"
             value={form.linkedin_url}
             onChange={(event) => update({ linkedin_url: event.target.value })}
@@ -187,10 +190,11 @@ export function HomeEditorPage() {
             aria-describedby={describedBy('linkedin_url')}
           />
           {fieldError('linkedin_url')}
-        </label>
-        <label className={adminStyles.field}>
-          {t('admin.home.github')}
+        </div>
+        <div className={adminStyles.field}>
+          <label htmlFor="home-github">{t('admin.home.github')}</label>
           <input
+            id="home-github"
             type="url"
             value={form.github_url}
             onChange={(event) => update({ github_url: event.target.value })}
@@ -199,7 +203,7 @@ export function HomeEditorPage() {
             aria-describedby={describedBy('github_url')}
           />
           {fieldError('github_url')}
-        </label>
+        </div>
 
         <CvField hasCv={hasCv} onChange={setHasCv} />
 

@@ -103,6 +103,8 @@ describe('creating an experience', () => {
 
     expect(await screen.findByText(/Empty while ongoing, otherwise/)).toBeDefined()
     expect(screen.getByText('French is required; 120 characters max.')).toBeDefined()
+    // The error describes the field without becoming part of its name.
+    expect(screen.getByLabelText('Title').getAttribute('aria-invalid')).toBe('true')
   })
 })
 
