@@ -20,11 +20,11 @@ A "Sync with GitHub" admin button imports Léonard's public repositories (forks 
 ### Phase 1: Backend
 - [x] Task 1: Model, migration, domain and repository (list, get, update admin fields, move, delete)
 - [x] Task 2: `GitHubClient`, DeepL source detection, `sync_projects`
-- [ ] Task 3: Admin routes (list, get, update, move, delete, sync) + public route
+- [x] Task 3: Admin routes (list, get, update, move, delete, sync) + public route
 
 ### Checkpoint A: after Tasks 1–3
-- [ ] ruff + pytest green; migration up/down; every admin route refused without a session
-- [ ] Optional live test against the real GitHub API passes
+- [x] ruff + pytest green; migration up/down; every admin route refused without a session
+- [x] Optional live test against the real GitHub API passes
 
 ### Phase 2: Admin
 - [ ] Task 4: Admin project list (sync button + report, visibility toggle, arrows, not-found mark, delete) + dashboard link

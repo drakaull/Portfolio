@@ -8,9 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.auth import AdminUser
 from app.infra.config import settings
 from app.infra.database import SessionFactory
+from app.infra.github import GitHubClient
 from app.infra.repositories.admin import AdminRepository
 from app.infra.repositories.experience import ExperienceRepository
 from app.infra.repositories.home import HomeContentRepository
+from app.infra.repositories.project import ProjectRepository
 from app.infra.repositories.skill import SkillRepository
 from app.infra.security import hash_token
 from app.infra.translation import Translator
@@ -42,6 +44,12 @@ def get_skill_repository(
     return SkillRepository(session)
 
 
+def get_project_repository(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> ProjectRepository:
+    return ProjectRepository(session)
+
+
 def get_admin_repository(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> AdminRepository:
@@ -66,3 +74,7 @@ def admin_router() -> APIRouter:
 
 def get_translator() -> Translator:
     return Translator(settings.deepl_api_key)
+
+
+def get_github_client() -> GitHubClient:
+    return GitHubClient(settings.github_username)
