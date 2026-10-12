@@ -32,10 +32,10 @@ A "Sync with GitHub" admin button imports Léonard's public repositories (forks 
 
 ### Checkpoint B: after Tasks 4–5
 - [x] Screenshots (both themes, desktop and 390 px)
-- [ ] Human: sync the real repositories, fill them in; **decide the public card design together**
+- [x] Human: sync the real repositories, fill them in; **decide the public card design together** (grid of cards)
 
 ### Phase 3: Public
-- [ ] Task 6: Public Projects page (design decided at Checkpoint B)
+- [x] Task 6: Public Projects page (grid of cards: context · year, title, About, 3 main languages, team, GitHub / website links)
 
 ### Checkpoint C: complete
 - [ ] Code review (`/review`)
