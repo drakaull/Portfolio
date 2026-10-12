@@ -94,3 +94,8 @@ Projects come from Léonard's **public GitHub repositories** instead of being ty
 
 - A project without "About" can still be made visible (card without summary); Léonard fills the "About" on GitHub himself.
 - The title stays editable in the admin, starting from the cleaned repository name.
+
+## Decisions (round 4, Checkpoint B)
+
+- Public page: a **grid of cards** (layout details in Task 6).
+- The "About" of OTEAL_ceremony, AemtHackatonBackend and Projet_TTMC were written from an analysis of each repository and set on GitHub with Léonard's approval.
