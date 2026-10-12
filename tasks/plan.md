@@ -24,7 +24,7 @@ Skills grouped in five fixed categories, each a name + optional Simple Icons log
 - [x] ruff + pytest green; migration up/down; every admin route refused without a session
 
 ### Phase 2: Frontend
-- [ ] Task 3: Public Skills page + `SkillIcon` component
+- [x] Task 3: Public Skills page + `SkillIcon` component
 - [ ] Task 4: Admin list with ordering arrows + dashboard link
 - [ ] Task 5: Admin form with Simple Icons search (dependency added here)
 
