@@ -36,7 +36,7 @@ Contact form saved in the database and emailed to Léonard (Mailpit locally), pr
 
 ### Checkpoint C: complete
 - [x] Code review
-- [ ] Merge into `develop` after approval
+- [x] Merge into `develop` after approval
 
 ## Risks and Mitigations
 
