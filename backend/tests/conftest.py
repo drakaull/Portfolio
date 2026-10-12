@@ -126,12 +126,19 @@ class FakeTranslator:
     def __init__(self) -> None:
         self.fail = False
         self.calls: list[tuple[list[tuple[str, str]], str]] = []
+        self.detected = "fr"  # language translate_detecting "finds" in any text
 
     async def translate(self, items: list[tuple[str, str]], target: str) -> list[str]:
         self.calls.append((list(items), target))
         if self.fail:
             raise TranslationUnavailable("fake failure")
         return [f"[{target}] {text}" for text, _ in items]
+
+    async def translate_detecting(self, text: str, target: str) -> tuple[str, str]:
+        self.calls.append(([(text, "plain")], target))
+        if self.fail:
+            raise TranslationUnavailable("fake failure")
+        return (text if target == self.detected else f"[{target}] {text}"), self.detected
 
 
 @pytest.fixture

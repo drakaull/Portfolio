@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     storage_dir: Path = Path("storage")
     # DeepL API key for automatic translation; without it, translation is reported as unavailable.
     deepl_api_key: str | None = None
+    # GitHub account whose public repositories become the projects.
+    github_username: str = "drakaull"
 
 
 settings = Settings()

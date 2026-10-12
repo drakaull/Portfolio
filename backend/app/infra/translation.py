@@ -53,21 +53,46 @@ class Translator:
         self._transport = transport  # tests inject a fake; production uses the network
 
     async def translate(self, items: Sequence[tuple[str, TextFormat]], target: Lang) -> list[str]:
-        if not self._api_key:
-            raise TranslationUnavailable("DeepL is not configured")
+        """Translate admin texts from French (the writing language)."""
         to_send = [(index, text, fmt) for index, (text, fmt) in enumerate(items) if text.strip()]
         results = [""] * len(items)
         if not to_send:
+            self._check_configured()
             return results
+        translations = await self._request(
+            [_to_html(text, fmt) for _, text, fmt in to_send], target, SOURCE_LANG
+        )
+        try:
+            for (index, _, fmt), translation in zip(to_send, translations, strict=True):
+                results[index] = _from_html(translation["text"], fmt)
+        except (ValueError, KeyError, TypeError) as error:  # not DeepL's shape
+            raise TranslationUnavailable("DeepL sent an unexpected answer") from error
+        return results
 
+    async def translate_detecting(self, text: str, target: Lang) -> tuple[str, str]:
+        """Translate a plain text written in any language; returns the translation and the
+        source language DeepL detected (lowercase, e.g. "en")."""
+        [translation] = await self._request([html.escape(text)], target, None)
+        try:
+            return html.unescape(translation["text"]), translation[
+                "detected_source_language"
+            ].lower()
+        except (KeyError, TypeError, AttributeError) as error:  # not DeepL's shape
+            raise TranslationUnavailable("DeepL sent an unexpected answer") from error
+
+    def _check_configured(self) -> str:
+        if not self._api_key:
+            raise TranslationUnavailable("DeepL is not configured")
+        return self._api_key
+
+    async def _request(self, texts: list[str], target: Lang, source: Lang | None) -> list:
+        """POST HTML texts to DeepL; `source` None lets DeepL detect it."""
+        api_key = self._check_configured()
         # Free-plan keys end with ":fx" and use a separate host.
-        host = "api-free.deepl.com" if self._api_key.endswith(":fx") else "api.deepl.com"
-        payload = {
-            "text": [_to_html(text, fmt) for _, text, fmt in to_send],
-            "source_lang": _DEEPL_LANGS[SOURCE_LANG],
-            "target_lang": _DEEPL_LANGS[target],
-            "tag_handling": "html",
-        }
+        host = "api-free.deepl.com" if api_key.endswith(":fx") else "api.deepl.com"
+        payload = {"text": texts, "target_lang": _DEEPL_LANGS[target], "tag_handling": "html"}
+        if source is not None:
+            payload["source_lang"] = _DEEPL_LANGS[source]
         try:
             async with httpx.AsyncClient(
                 timeout=_TIMEOUT_SECONDS, transport=self._transport
@@ -75,21 +100,20 @@ class Translator:
                 response = await client.post(
                     f"https://{host}/v2/translate",
                     json=payload,
-                    headers={"Authorization": f"DeepL-Auth-Key {self._api_key}"},
+                    headers={"Authorization": f"DeepL-Auth-Key {api_key}"},
                 )
         except httpx.HTTPError as error:
             raise TranslationUnavailable(f"DeepL request failed: {type(error).__name__}") from error
         # 403: bad key, 456: monthly quota reached, 429/5xx: DeepL busy or down.
         if response.status_code != 200:
             raise TranslationUnavailable(f"DeepL answered HTTP {response.status_code}")
-
         try:
             translations = response.json()["translations"]
-            for (index, _, fmt), translation in zip(to_send, translations, strict=True):
-                results[index] = _from_html(translation["text"], fmt)
         except (ValueError, KeyError, TypeError) as error:  # not JSON, or not DeepL's shape
             raise TranslationUnavailable("DeepL sent an unexpected answer") from error
-        return results
+        if not isinstance(translations, list) or len(translations) != len(texts):
+            raise TranslationUnavailable("DeepL sent an unexpected answer")
+        return translations
 
 
 async def fill_missing(

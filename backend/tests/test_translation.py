@@ -184,3 +184,33 @@ async def test_unexpected_deepl_answers_become_translation_unavailable(
 
 def test_every_language_has_a_deepl_code() -> None:
     assert set(_DEEPL_LANGS) == set(get_args(Lang))
+
+
+async def test_detecting_translation_lets_deepl_find_the_source() -> None:
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(
+            200,
+            json={
+                "translations": [{"text": "Jeu &amp; plateau", "detected_source_language": "EN"}]
+            },
+        )
+
+    translation, source = await Translator(
+        "key:fx", httpx.MockTransport(handler)
+    ).translate_detecting("Board & game", "fr")
+
+    assert (translation, source) == ("Jeu & plateau", "en")
+    body = json.loads(requests[0].content)
+    assert "source_lang" not in body
+    assert body["target_lang"] == "FR"
+    assert body["text"] == ["Board &amp; game"]  # plain text travels escaped, comes back as typed
+
+
+async def test_detecting_translation_without_detected_language_is_unavailable() -> None:
+    transport, _ = fake_deepl()  # answers without "detected_source_language"
+
+    with pytest.raises(TranslationUnavailable):
+        await Translator("key:fx", transport).translate_detecting("Hello", "fr")
