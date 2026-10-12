@@ -34,7 +34,7 @@ Skills grouped in five fixed categories, each a name + optional Simple Icons log
 
 ### Checkpoint C: complete
 - [x] Code review (`/review`)
-- [ ] Merge into `develop` after approval
+- [x] Merge into `develop` after approval
 
 ## Risks and Mitigations
 
