@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { logout } from '../../api/admin.ts'
+import type { Inbox } from '../../api/adminContact.ts'
+import { useJson } from '../../api/useJson.ts'
 import { Button } from '../../components/Button/Button.tsx'
 import { useAdmin } from '../../components/RequireAdmin/useAdmin.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
@@ -11,6 +13,8 @@ export function AdminDashboardPage() {
   const { username } = useAdmin()
   const navigate = useNavigate()
   const [logoutFailed, setLogoutFailed] = useState(false)
+  const inbox = useJson<Inbox>('/api/admin/messages')
+  const unread = inbox.status === 'ready' ? inbox.data.unread : 0
 
   async function handleLogout() {
     try {
@@ -44,6 +48,13 @@ export function AdminDashboardPage() {
           </li>
           <li>
             <Link to={`/${lang}/admin/projects`}>{t('admin.sections.projects')}</Link>
+          </li>
+          <li>
+            <Link to={`/${lang}/admin/messages`}>
+              {t('admin.sections.messages')}
+              {unread > 0 &&
+                ` (${unread} ${t(unread === 1 ? 'admin.messages.unreadOne' : 'admin.messages.unreadMany')})`}
+            </Link>
           </li>
         </ul>
       </nav>

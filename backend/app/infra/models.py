@@ -17,6 +17,8 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.domain.contact import EMAIL_MAX_LENGTH
+from app.domain.contact import NAME_MAX_LENGTH as CONTACT_NAME_MAX_LENGTH
 from app.domain.experience import ORGANIZATION_MAX_LENGTH, SLUG_MAX_LENGTH
 from app.domain.project import TEAM_SIZE_MAX, TITLE_MAX_LENGTH
 from app.domain.skill import ICON_SLUG_MAX_LENGTH, NAME_MAX_LENGTH
@@ -154,3 +156,19 @@ class ProjectModel(Base):
     team_size: Mapped[int | None] = mapped_column(SmallInteger)
     visible: Mapped[bool] = mapped_column(Boolean, server_default="false")
     position: Mapped[int] = mapped_column(Integer)
+
+
+class ContactMessageModel(Base):
+    __tablename__ = "contact_messages"
+    __table_args__ = (CheckConstraint("lang IN ('en', 'fr', 'nl')", name="lang_values"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(CONTACT_NAME_MAX_LENGTH))
+    email: Mapped[str] = mapped_column(String(EMAIL_MAX_LENGTH))
+    message: Mapped[str] = mapped_column(Text)
+    lang: Mapped[str] = mapped_column(String(2))
+    # Indexed: the 12-month purge and the inbox order both read it.
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
+    read: Mapped[bool] = mapped_column(Boolean, server_default="false")

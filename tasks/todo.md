@@ -1,64 +1,61 @@
-# Todo: Feature 12 — Projects (GitHub sync)
+# Todo: Feature 13 — Contact
 
 Plan: [plan.md](plan.md)
 
-## Task 1: Model, migration, domain, repository
+## Task 1: Model, repository, mailer
 
 **Acceptance criteria:**
-- [ ] Migration creates `projects` (dropped on downgrade); unique `github_id`; context values checked
-- [ ] Repository: list by position, get, update admin fields, move up/down, delete
-- [ ] Tests on the real test database
+- [ ] Migration creates `contact_messages` (dropped on downgrade); no IP column
+- [ ] Repository: add, list (newest first), get, set read, delete, purge older than 12 months
+- [ ] `Mailer.send(message)` builds a plain-text email (From = `SMTP_FROM`, To = `CONTACT_EMAIL`, Reply-To = visitor) and sends it through SMTP in a thread; errors → `MailUnavailable`
+- [ ] Settings with Mailpit defaults; `.env.example` updated
 
-**Files:** `backend/app/domain/project.py`, `backend/app/infra/models.py`, migration, `backend/app/infra/repositories/project.py`, tests
+**Files:** `backend/app/domain/contact.py`, `backend/app/infra/models.py`, migration, `backend/app/infra/repositories/contact.py`, `backend/app/infra/mail.py`, `backend/app/infra/config.py`, tests
 **Scope:** M
 
-## Task 2: GitHub client, DeepL detection, sync
+## Task 2: API routes
 
 **Acceptance criteria:**
-- [ ] `GitHubClient.public_repositories()` → kept repositories (not fork, not archived) with their languages; errors / rate limit → `GitHubUnavailable`
-- [ ] `Translator` can translate with the source language detected, returning it
-- [ ] `sync_projects`: new (hidden, last), updated (admin fields kept), gone (hidden + missing), back (missing cleared, still hidden); "About" translated only when changed; DeepL failure keeps the original; GitHub failure writes nothing; returns a report
-- [ ] Optional live GitHub test (skipped by default)
+- [ ] `POST /api/contact` → 204; 422 (fields, line breaks); trap field → 204, nothing saved or sent; 6th message within an hour from one IP → 429
+- [ ] Email failure → still 204, message saved, warning logged
+- [ ] Admin: list (purges first), get (marks read), mark unread, delete; unread count in the list response
 
-**Files:** `backend/app/infra/github.py`, `backend/app/infra/translation.py`, `backend/app/infra/project_sync.py`, tests
-**Scope:** M
-
-## Task 3: API routes
-
-**Acceptance criteria:**
-- [ ] Admin: list, get, `PUT` (title, context, team size, visible), move, delete, `POST /sync` (report; 503 when GitHub is unavailable)
-- [ ] Public `GET /api/projects?lang=` → visible projects in order, localized "About"
-- [ ] Validation 422, 404 unknown id
-
-**Files:** `backend/app/api/admin_projects.py`, `backend/app/api/projects.py`, `backend/app/main.py`, `backend/app/api/dependencies.py`, tests
+**Files:** `backend/app/api/contact.py`, `backend/app/api/admin_contact.py`, `backend/app/api/dependencies.py`, `backend/app/main.py`, tests
 **Scope:** M
 
 ## Checkpoint A
-- [ ] ruff + pytest green
+- [ ] ruff + pytest green · message caught by Mailpit
 
-## Task 4: Admin list
+## Task 3: Contact page
 
 **Acceptance criteria:**
-- [ ] `/:lang/admin/projects`: sync button with report and errors, visibility checkbox saved at once, ▲ ▼ arrows, "not found on GitHub" mark, delete with confirmation
-- [ ] Dashboard link; texts in en/fr/nl
+- [ ] Name, email, message with labels and server errors next to fields; trap field hidden from people and screen readers
+- [ ] Success message; limit and server errors keep the text; link to the privacy page
+- [ ] Texts in en/fr/nl
 
-**Files:** `frontend/src/api/adminProjects.ts`, `frontend/src/pages/admin/ProjectListPage.*`, routes, dashboard, i18n, tests
+**Files:** `frontend/src/api/contact.ts`, `frontend/src/pages/ContactPage.*`, i18n, tests
 **Scope:** M
 
-## Task 5: Admin form
+## Task 4: Privacy page
 
 **Acceptance criteria:**
-- [ ] Title, context, team size, visible; GitHub data, "About" and its translations read-only with a link to the repository
-- [ ] Unsaved-changes guard; validation messages
+- [ ] French text drafted and approved by Léonard, then EN/NL
+- [ ] `/:lang/privacy` route; links from the footer and under the form
 
-**Files:** `frontend/src/pages/admin/ProjectEditorPage.*`, i18n, tests
+**Files:** `frontend/src/content/privacy.*.md`, `frontend/src/pages/PrivacyPage.tsx`, routes, footer, i18n, tests
 **Scope:** S
 
-## Checkpoint B
-- [ ] Screenshots · human sync of the real repositories · public design decided
+## Task 5: Admin inbox
 
-## Task 6: Public page
-(Defined at Checkpoint B.)
+**Acceptance criteria:**
+- [ ] `/:lang/admin/messages`: list (unread marked), open, reply (mailto), mark unread, delete with confirmation
+- [ ] Dashboard link with the unread count
+
+**Files:** `frontend/src/api/adminContact.ts`, `frontend/src/pages/admin/MessageListPage.*`, `MessagePage.*`, routes, dashboard, i18n, tests
+**Scope:** M
+
+## Checkpoint B
+- [ ] Screenshots · privacy text approved · real message end to end
 
 ## Checkpoint C
-- [ ] `/review` · merge approval
+- [ ] Review · merge approval

@@ -7,6 +7,8 @@ import { AdminDashboardPage } from './pages/admin/AdminDashboardPage.tsx'
 import { AdminLoginPage } from './pages/admin/AdminLoginPage.tsx'
 import { ExperienceEditorPage } from './pages/admin/ExperienceEditorPage.tsx'
 import { ExperienceListPage } from './pages/admin/ExperienceListPage.tsx'
+import { MessageListPage } from './pages/admin/MessageListPage.tsx'
+import { MessagePage } from './pages/admin/MessagePage.tsx'
 import { ProjectEditorPage } from './pages/admin/ProjectEditorPage.tsx'
 import { ProjectListPage } from './pages/admin/ProjectListPage.tsx'
 import { SkillEditorPage } from './pages/admin/SkillEditorPage.tsx'
@@ -17,6 +19,7 @@ import { ExperienceDetailPage } from './pages/ExperienceDetailPage.tsx'
 import { ExperiencePage } from './pages/ExperiencePage.tsx'
 import { HomePage } from './pages/HomePage.tsx'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
+import { PrivacyPage } from './pages/PrivacyPage.tsx'
 import { ProjectsPage } from './pages/ProjectsPage.tsx'
 import { SkillsPage } from './pages/SkillsPage.tsx'
 
@@ -39,6 +42,7 @@ export const routes = createRoutesFromElements(
         <Route path="skills" element={<SkillsPage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="contact" element={<ContactPage />} />
+        <Route path="privacy" element={<PrivacyPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       <Route path="admin" element={<AdminLayout />}>
@@ -54,6 +58,8 @@ export const routes = createRoutesFromElements(
           <Route path="skills/:id" element={<SkillEditorPage />} />
           <Route path="projects" element={<ProjectListPage />} />
           <Route path="projects/:id" element={<ProjectEditorPage />} />
+          <Route path="messages" element={<MessageListPage />} />
+          <Route path="messages/:id" element={<MessagePage />} />
         </Route>
       </Route>
     </Route>
