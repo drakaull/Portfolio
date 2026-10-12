@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.dependencies import get_contact_repository, get_mailer
@@ -34,8 +34,17 @@ class ContactIn(BaseModel):
     email: str = Field(max_length=EMAIL_MAX_LENGTH, pattern=_EMAIL)
     message: str = Field(min_length=MESSAGE_MIN_LENGTH, max_length=MESSAGE_MAX_LENGTH)
     lang: Lang
-    # Trap: hidden from people, filled in by robots that complete every field.
-    website: str = Field(default="", max_length=200)
+    # Trap: hidden from people, filled in by robots that complete every field. Its name matches
+    # no browser autofill category, so a real visitor's message is never dropped by mistake.
+    leave_empty: str = Field(default="", max_length=200)
+
+
+async def _email(mailer: Mailer, message: ContactMessage) -> None:
+    """Runs after the visitor got their answer: a slow mail server never makes them wait."""
+    try:
+        await mailer.send(message)
+    except MailUnavailable as error:
+        logger.warning("Contact message %s saved but not emailed: %s", message.id, error)
 
 
 def _client_ip(request: Request) -> str:
@@ -46,10 +55,11 @@ def _client_ip(request: Request) -> str:
 async def send_message(
     body: ContactIn,
     request: Request,
+    background: BackgroundTasks,
     repository: Annotated[ContactMessageRepository, Depends(get_contact_repository)],
     mailer: Annotated[Mailer, Depends(get_mailer)],
 ) -> Response:
-    if body.website:
+    if body.leave_empty:
         # A robot: it is told "sent" so it does not adapt, but nothing is kept or emailed.
         logger.info("Contact message dropped by the trap field")
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -77,8 +87,5 @@ async def send_message(
     # Saved before emailing: an email failure never loses a message.
     await repository.commit()
 
-    try:
-        await mailer.send(message)
-    except MailUnavailable as error:
-        logger.warning("Contact message %s saved but not emailed: %s", message.id, error)
+    background.add_task(_email, mailer, message)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

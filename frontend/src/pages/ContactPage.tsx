@@ -7,7 +7,7 @@ import type { TranslationKey } from '../i18n/en.ts'
 import { useTranslation } from '../i18n/useTranslation.ts'
 import styles from './ContactPage.module.css'
 
-const EMPTY: ContactForm = { name: '', email: '', message: '', website: '' }
+const EMPTY: ContactForm = { name: '', email: '', message: '', leave_empty: '' }
 
 const FIELD_ERRORS: Record<ContactField, TranslationKey> = {
   name: 'contact.invalidName',
@@ -103,14 +103,14 @@ export function ContactPage() {
 
         {/* Trap for robots: out of sight, out of the tab order, ignored by screen readers. */}
         <div className={styles.trap} aria-hidden="true">
-          <label htmlFor="contact-website">Website</label>
+          <label htmlFor="contact-leave-empty">Leave this field empty</label>
           <input
-            id="contact-website"
-            name="website"
+            id="contact-leave-empty"
+            name="leave_empty"
             tabIndex={-1}
             autoComplete="off"
-            value={form.website}
-            onChange={(event) => update({ website: event.target.value })}
+            value={form.leave_empty}
+            onChange={(event) => update({ leave_empty: event.target.value })}
           />
         </div>
 

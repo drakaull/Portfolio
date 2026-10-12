@@ -80,7 +80,7 @@ async def test_email_failure_keeps_the_message(
 async def test_trap_field_drops_the_message_silently(
     admin_client: AsyncClient, mailer: FakeMailer
 ) -> None:
-    response = await admin_client.post(URL, json={**BODY, "website": "http://spam.example"})
+    response = await admin_client.post(URL, json={**BODY, "leave_empty": "http://spam.example"})
 
     assert response.status_code == 204  # the robot believes it worked
     assert mailer.sent == []

@@ -33,7 +33,7 @@ describe('contact form', () => {
       name: 'Ada',
       email: 'ada@example.com',
       message: 'Bonjour, une question.',
-      website: '',
+      leave_empty: '',
       lang: 'fr',
     })
   })
@@ -70,10 +70,10 @@ describe('contact form', () => {
     mockApi({})
     renderApp('/en/contact')
 
-    const trap = document.getElementById('contact-website') as HTMLInputElement
+    const trap = document.getElementById('contact-leave-empty') as HTMLInputElement
     expect(trap.tabIndex).toBe(-1)
     expect(trap.closest('[aria-hidden="true"]')).not.toBeNull()
-    expect(screen.queryByRole('textbox', { name: 'Website' })).toBeNull()
+    expect(screen.queryByRole('textbox', { name: 'Leave this field empty' })).toBeNull()
   })
 
   test('links to the privacy page', () => {

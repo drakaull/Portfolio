@@ -4,7 +4,7 @@ export type ContactForm = {
   name: string
   email: string
   message: string
-  website: string // trap: stays empty for people, filled in by robots
+  leave_empty: string // trap: stays empty for people, filled in by robots
 }
 
 export type ContactField = 'name' | 'email' | 'message'
