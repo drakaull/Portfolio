@@ -30,7 +30,7 @@ Admin pages to list, create, edit and delete timeline entries, with the home edi
 
 ### Checkpoint B: after Tasks 3–5
 - [x] Frontend green; screenshots of list and form (both themes, desktop and 390 px)
-- [ ] Human: create, edit and delete an entry in the browser; texts reviewed
+- [x] Human: create, edit and delete an entry in the browser; texts reviewed
 
 ### Checkpoint C: complete
 - [ ] Code review (`/review`)
