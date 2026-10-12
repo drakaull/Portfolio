@@ -30,7 +30,7 @@ Skills grouped in five fixed categories, each a name + optional Simple Icons log
 
 ### Checkpoint B: after Tasks 3–5
 - [x] Frontend green; Simple Icons absent from the public bundle; screenshots (both themes, desktop and 390 px, hover colours)
-- [ ] Human: add, edit, reorder and delete skills in the browser; texts reviewed
+- [x] Human: add, edit, reorder and delete skills in the browser; texts reviewed
 
 ### Checkpoint C: complete
 - [ ] Code review (`/review`)
