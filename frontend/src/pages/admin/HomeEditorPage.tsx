@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, useBlocker } from 'react-router'
+import { Link } from 'react-router'
 import {
   fetchAdminHome,
   saveAdminHome,
@@ -13,9 +13,11 @@ import { MarkdownText } from '../../components/MarkdownText/MarkdownText.tsx'
 import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation, type Lang } from '../../i18n/useTranslation.ts'
 import adminStyles from './Admin.module.css'
+import { SessionExpiredAlert, UnsavedChangesDialog } from './EditorParts.tsx'
 import { CvField } from './CvField.tsx'
-import styles from './HomeEditorPage.module.css'
+import styles from './Editor.module.css'
 import { TranslationTabs } from './TranslationTabs.tsx'
+import { useUnsavedChanges } from './useUnsavedChanges.ts'
 
 const FIELD_ERRORS: Record<HomeField, TranslationKey> = {
   headline: 'admin.home.invalidHeadline',
@@ -30,9 +32,6 @@ type SaveNotice = Pick<AdminHomeSaved, 'auto_translated' | 'translation_failed'>
 function toForm({ headline, intro, linkedin_url, github_url }: AdminHomeContent): HomeContentForm {
   return { headline, intro, linkedin_url, github_url }
 }
-
-// "/fr/admin/home" and "/en/admin/home" are the same page: switching the UI language keeps the form.
-const withoutLang = (pathname: string) => pathname.replace(/^\/[^/]+/, '')
 
 export function HomeEditorPage() {
   const { t, lang } = useTranslation()
@@ -59,17 +58,7 @@ export function HomeEditorPage() {
 
   const dirty = form !== null && JSON.stringify(form) !== JSON.stringify(saved)
 
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      dirty && withoutLang(currentLocation.pathname) !== withoutLang(nextLocation.pathname),
-  )
-
-  useEffect(() => {
-    if (!dirty) return
-    const warn = (event: BeforeUnloadEvent) => event.preventDefault()
-    window.addEventListener('beforeunload', warn)
-    return () => window.removeEventListener('beforeunload', warn)
-  }, [dirty])
+  const blocker = useUnsavedChanges(dirty)
 
   if (loadFailed) {
     return (
@@ -127,15 +116,7 @@ export function HomeEditorPage() {
       <Link to={`/${lang}/admin`}>{t('admin.home.backToDashboard')}</Link>
       <h1 className={adminStyles.title}>{t('admin.home.title')}</h1>
 
-      {blocker.state === 'blocked' && (
-        <div className={styles.confirm} role="alertdialog" aria-labelledby="unsaved-message">
-          <p id="unsaved-message">{t('admin.home.unsaved')}</p>
-          <Button onClick={() => blocker.reset()}>{t('admin.home.stay')}</Button>
-          <button type="button" className={styles.secondary} onClick={() => blocker.proceed()}>
-            {t('admin.home.leave')}
-          </button>
-        </div>
-      )}
+      <UnsavedChangesDialog blocker={blocker} />
 
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <fieldset className={styles.panel}>
@@ -240,14 +221,7 @@ export function HomeEditorPage() {
             {t('admin.home.translationFailed')}
           </p>
         )}
-        {saveState === 'expired' && (
-          <p className={adminStyles.error} role="alert">
-            {t('admin.home.expired')}{' '}
-            <a href={`/${lang}/admin/login`} target="_blank" rel="noopener noreferrer">
-              {t('admin.home.signInNewTab')}
-            </a>
-          </p>
-        )}
+        {saveState === 'expired' && <SessionExpiredAlert />}
         {saveState === 'error' && (
           <p className={adminStyles.error} role="alert">
             {t('admin.error')}

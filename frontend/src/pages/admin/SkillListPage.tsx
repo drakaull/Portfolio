@@ -10,7 +10,6 @@ import {
 import { SkillIcon } from '../../components/SkillIcon/SkillIcon.tsx'
 import { useTranslation } from '../../i18n/useTranslation.ts'
 import adminStyles from './Admin.module.css'
-import listStyles from './ExperienceListPage.module.css'
 import styles from './SkillListPage.module.css'
 
 type Direction = 'up' | 'down'
@@ -49,12 +48,12 @@ export function SkillListPage() {
   }
 
   return (
-    <section className={listStyles.page}>
+    <section className={adminStyles.listPage}>
       <title>{`${t('admin.skills.title')} · ${t('admin.title')}`}</title>
       <Link to={`/${lang}/admin`}>{t('admin.home.backToDashboard')}</Link>
-      <div className={listStyles.header}>
+      <div className={adminStyles.listHeader}>
         <h1 className={adminStyles.title}>{t('admin.skills.title')}</h1>
-        <Link to={`/${lang}/admin/skills/new`} className={listStyles.newLink}>
+        <Link to={`/${lang}/admin/skills/new`} className={adminStyles.newLink}>
           {t('admin.skills.new')}
         </Link>
       </div>
@@ -81,12 +80,15 @@ export function SkillListPage() {
               {inCategory.length === 0 ? (
                 <p className={styles.none}>{t('admin.skills.none')}</p>
               ) : (
-                <ol className={listStyles.list}>
+                <ol className={adminStyles.list}>
                   {inCategory.map((skill, index) => (
                     <li key={skill.id} className={styles.item}>
                       <span className={styles.name}>
                         {skill.icon && <SkillIcon icon={skill.icon} />}
-                        <Link to={`/${lang}/admin/skills/${skill.id}`} className={listStyles.title}>
+                        <Link
+                          to={`/${lang}/admin/skills/${skill.id}`}
+                          className={adminStyles.listTitle}
+                        >
                           {skill.name}
                         </Link>
                       </span>

@@ -11,12 +11,12 @@ export function ExperienceListPage() {
   const state = useAdminExperiences()
 
   return (
-    <section className={styles.page}>
+    <section className={adminStyles.listPage}>
       <title>{`${t('admin.experiences.title')} · ${t('admin.title')}`}</title>
       <Link to={`/${lang}/admin`}>{t('admin.home.backToDashboard')}</Link>
-      <div className={styles.header}>
+      <div className={adminStyles.listHeader}>
         <h1 className={adminStyles.title}>{t('admin.experiences.title')}</h1>
-        <Link to={`/${lang}/admin/experiences/new`} className={styles.newLink}>
+        <Link to={`/${lang}/admin/experiences/new`} className={adminStyles.newLink}>
           {t('admin.experiences.new')}
         </Link>
       </div>
@@ -30,14 +30,17 @@ export function ExperienceListPage() {
       {state.status === 'ready' && state.data.length === 0 && <p>{t('admin.experiences.empty')}</p>}
       {state.status === 'ready' && state.data.length > 0 && (
         // Same order as the public timeline (the server sorts by years).
-        <ul className={styles.list}>
+        <ul className={adminStyles.list}>
           {state.data.map((entry) => (
             <li key={entry.slug} className={styles.item}>
               <span className={styles.years}>
                 {formatYears(entry.start_year, entry.end_year, t('experience.present'))}
               </span>
               <span className={styles.main}>
-                <Link to={`/${lang}/admin/experiences/${entry.slug}`} className={styles.title}>
+                <Link
+                  to={`/${lang}/admin/experiences/${entry.slug}`}
+                  className={adminStyles.listTitle}
+                >
                   {entry.title[lang] || entry.title.fr}
                 </Link>
                 <span className={styles.organization}>{entry.organization}</span>

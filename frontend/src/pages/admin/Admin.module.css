@@ -54,3 +54,45 @@
   color: var(--color-accent);
   font-weight: 500;
 }
+
+/* Admin lists (experiences, skills). */
+
+.listPage {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.listHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.newLink {
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  list-style: none;
+}
+
+.listTitle {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.listTitle:hover {
+  color: var(--color-accent);
+}

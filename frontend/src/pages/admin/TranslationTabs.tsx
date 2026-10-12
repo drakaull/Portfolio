@@ -4,7 +4,7 @@ import { Button } from '../../components/Button/Button.tsx'
 import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation, type Lang } from '../../i18n/useTranslation.ts'
 import adminStyles from './Admin.module.css'
-import styles from './HomeEditorPage.module.css'
+import styles from './Editor.module.css'
 
 // French is the writing language: first tab, selected by default.
 const LANGS: Lang[] = ['fr', 'en', 'nl']

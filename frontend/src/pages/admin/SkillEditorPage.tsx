@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Link, useBlocker, useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import {
   SKILL_CATEGORIES,
   deleteSkill,
@@ -15,8 +15,10 @@ import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
 import { loadSimpleIcons, searchIcons, type IconChoice } from '../../lib/simpleIcons.ts'
 import adminStyles from './Admin.module.css'
-import editorStyles from './HomeEditorPage.module.css'
+import { SessionExpiredAlert, UnsavedChangesDialog } from './EditorParts.tsx'
+import editorStyles from './Editor.module.css'
 import styles from './SkillEditorPage.module.css'
+import { useUnsavedChanges } from './useUnsavedChanges.ts'
 
 const FIELD_ERRORS: Record<SkillField, TranslationKey> = {
   name: 'admin.skills.invalidName',
@@ -27,9 +29,6 @@ const FIELD_ERRORS: Record<SkillField, TranslationKey> = {
 const EMPTY_FORM: SkillBody = { name: '', category: 'languages', icon: null }
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'expired' | 'error'
-
-// "/fr/admin/..." and "/en/admin/..." are the same page: switching the UI language keeps the form.
-const withoutLang = (pathname: string) => pathname.replace(/^\/[^/]+/, '')
 
 export function SkillEditorPage() {
   const { t, lang } = useTranslation()
@@ -75,19 +74,7 @@ export function SkillEditorPage() {
 
   const dirty = form !== null && JSON.stringify(form) !== JSON.stringify(saved)
 
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      !leaving.current &&
-      dirty &&
-      withoutLang(currentLocation.pathname) !== withoutLang(nextLocation.pathname),
-  )
-
-  useEffect(() => {
-    if (!dirty) return
-    const warn = (event: BeforeUnloadEvent) => event.preventDefault()
-    window.addEventListener('beforeunload', warn)
-    return () => window.removeEventListener('beforeunload', warn)
-  }, [dirty])
+  const blocker = useUnsavedChanges(dirty, leaving)
 
   const listPath = `/${lang}/admin/skills`
   const backToList = <Link to={listPath}>{t('admin.skills.back')}</Link>
@@ -170,19 +157,7 @@ export function SkillEditorPage() {
       {backToList}
       <h1 className={adminStyles.title}>{heading}</h1>
 
-      {blocker.state === 'blocked' && (
-        <div className={editorStyles.confirm} role="alertdialog" aria-labelledby="unsaved-message">
-          <p id="unsaved-message">{t('admin.home.unsaved')}</p>
-          <Button onClick={() => blocker.reset()}>{t('admin.home.stay')}</Button>
-          <button
-            type="button"
-            className={editorStyles.secondary}
-            onClick={() => blocker.proceed()}
-          >
-            {t('admin.home.leave')}
-          </button>
-        </div>
-      )}
+      <UnsavedChangesDialog blocker={blocker} />
 
       <form className={editorStyles.form} onSubmit={handleSubmit} noValidate>
         <div className={adminStyles.field}>
@@ -284,7 +259,7 @@ export function SkillEditorPage() {
           )}
         </fieldset>
 
-        <div className={styles.actions}>
+        <div className={editorStyles.footer}>
           <span className={editorStyles.actions}>
             <Button type="submit" disabled={(!creating && !dirty) || saveState === 'saving'}>
               {saveState === 'saving' ? t('admin.home.saving') : t('admin.home.save')}
@@ -294,7 +269,7 @@ export function SkillEditorPage() {
           {!creating && deleteState !== 'confirm' && (
             <button
               type="button"
-              className={styles.danger}
+              className={editorStyles.danger}
               onClick={() => setDeleteState('confirm')}
               disabled={deleteState === 'deleting'}
             >
@@ -323,14 +298,7 @@ export function SkillEditorPage() {
             {t('admin.error')}
           </p>
         )}
-        {saveState === 'expired' && (
-          <p className={adminStyles.error} role="alert">
-            {t('admin.home.expired')}{' '}
-            <a href={`/${lang}/admin/login`} target="_blank" rel="noopener noreferrer">
-              {t('admin.home.signInNewTab')}
-            </a>
-          </p>
-        )}
+        {saveState === 'expired' && <SessionExpiredAlert />}
         {saveState === 'error' && (
           <p className={adminStyles.error} role="alert">
             {t('admin.error')}
