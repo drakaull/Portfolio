@@ -111,7 +111,7 @@ async def test_unknown_skill_is_404(
         ({"icon": {**ICON, "hex": "#3776AB"}}, "hex"),
         ({"icon": {**ICON, "path": "M0 0<script>"}}, "path"),
         ({"icon": {**ICON, "path": 'M0 0" onload="x'}}, "path"),
-        ({"icon": {**ICON, "path": "M" + "0" * 20_000}}, "path"),
+        ({"icon": {**ICON, "path": "M" + "0" * 60_000}}, "path"),
         ({"icon": {"slug": "python"}}, "hex"),
         ({"unknown": 1}, "unknown"),
     ],

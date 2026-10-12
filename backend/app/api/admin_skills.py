@@ -26,7 +26,7 @@ class _StrictModel(BaseModel):
 
 
 class SkillIconIn(_StrictModel):
-    slug: str = Field(min_length=1, max_length=ICON_SLUG_MAX_LENGTH, pattern=r"^[a-z0-9]+$")
+    slug: str = Field(min_length=1, max_length=ICON_SLUG_MAX_LENGTH, pattern=r"^[a-z0-9_]+$")
     hex: str = Field(pattern=r"^[0-9A-Fa-f]{6}$")
     # SVG path commands, numbers and separators only: nothing that could become markup.
     path: str = Field(

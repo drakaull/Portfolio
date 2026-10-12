@@ -7,7 +7,8 @@ CATEGORIES: tuple[SkillCategory, ...] = get_args(SkillCategory)
 
 NAME_MAX_LENGTH = 60
 ICON_SLUG_MAX_LENGTH = 60
-ICON_PATH_MAX_LENGTH = 20_000
+# Longest Simple Icons path: ~54,000 characters (Elsevier); PostCSS and Composer exceed 20,000.
+ICON_PATH_MAX_LENGTH = 60_000
 
 
 @dataclass(frozen=True)

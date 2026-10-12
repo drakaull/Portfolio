@@ -64,7 +64,7 @@ Logo       [search: pyth    ]   → [▣ Python] [▣ PyTorch] [▣ PyPI] …   
 |---|---|
 | name | required, 1–60 characters, unique within its category (case-insensitive) → 409 otherwise |
 | category | one of `languages`, `frontend`, `backend`, `tools`, `ides` |
-| icon | optional; if given: `slug` (a-z0-9, ≤ 60), `hex` (6 hex digits), `path` (SVG path commands and numbers only, ≤ 20,000 characters) |
+| icon | optional; if given: `slug` (a-z0-9 and `_`, ≤ 60), `hex` (6 hex digits), `path` (SVG path commands and numbers only, ≤ 60,000 characters) |
 
 The stored path is only ever rendered as the `d` attribute of an `<svg><path>` (never as HTML), and its characters are checked server-side.
 
@@ -99,3 +99,4 @@ The stored path is only ever rendered as the `d` attribute of an `<svg><path>` (
 - `simple-icons` approved as a dependency (admin only).
 - Category labels: Langages · Front-end · Back-end · Outils · IDE (FR); Languages · Front-end · Back-end · Tools · IDEs (EN); Talen · Front-end · Back-end · Tools · IDE's (NL).
 - Skill names: 60 characters max.
+- Icon limits widened while adding Simple Icons 16.32.0: 14 of its 3,461 logos used `_` in their slug or a path over 20,000 characters (PostCSS, Composer); now `_` is allowed and paths go up to 60,000 characters (longest: 54,054).

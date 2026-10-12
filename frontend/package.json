@@ -19,7 +19,8 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-markdown": "^10.1.0",
-    "react-router": "^8.4.0"
+    "react-router": "^8.4.0",
+    "simple-icons": "16.32.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.3",

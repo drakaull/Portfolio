@@ -26,10 +26,10 @@ Skills grouped in five fixed categories, each a name + optional Simple Icons log
 ### Phase 2: Frontend
 - [x] Task 3: Public Skills page + `SkillIcon` component
 - [x] Task 4: Admin list with ordering arrows + dashboard link
-- [ ] Task 5: Admin form with Simple Icons search (dependency added here)
+- [x] Task 5: Admin form with Simple Icons search (dependency added here)
 
 ### Checkpoint B: after Tasks 3–5
-- [ ] Frontend green; Simple Icons absent from the public bundle; screenshots (both themes, desktop and 390 px, hover colours)
+- [x] Frontend green; Simple Icons absent from the public bundle; screenshots (both themes, desktop and 390 px, hover colours)
 - [ ] Human: add, edit, reorder and delete skills in the browser; texts reviewed
 
 ### Checkpoint C: complete
