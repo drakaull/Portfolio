@@ -133,3 +133,27 @@
   gap: var(--space-3);
   justify-items: start;
 }
+
+/* Bottom row of an editor: save on the left, delete on the right. */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.danger {
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.danger:hover {
+  background: var(--color-surface);
+}

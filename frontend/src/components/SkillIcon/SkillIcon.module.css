@@ -1,0 +1,12 @@
+.icon {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  fill: currentColor;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+:global(:root[data-theme='light']) :hover > .icon[data-brand-light],
+:global(:root[data-theme='dark']) :hover > .icon[data-brand-dark] {
+  color: var(--brand);
+}

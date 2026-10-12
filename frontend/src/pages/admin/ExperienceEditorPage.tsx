@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Link, useBlocker, useLocation, useNavigate, useParams } from 'react-router'
+import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import {
   deleteExperience,
   fetchAdminExperience,
@@ -17,9 +17,11 @@ import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation, type Lang } from '../../i18n/useTranslation.ts'
 import { SLUG_MAX_LENGTH, slugify } from '../../lib/slug.ts'
 import adminStyles from './Admin.module.css'
+import { SessionExpiredAlert, UnsavedChangesDialog } from './EditorParts.tsx'
 import styles from './ExperienceEditorPage.module.css'
-import editorStyles from './HomeEditorPage.module.css'
+import editorStyles from './Editor.module.css'
 import { TranslationTabs } from './TranslationTabs.tsx'
+import { useUnsavedChanges } from './useUnsavedChanges.ts'
 
 const KINDS: ExperienceKind[] = ['job', 'student_job', 'internship', 'education']
 
@@ -96,9 +98,6 @@ function toBody(form: ExperienceForm): ExperienceBody {
   }
 }
 
-// "/fr/admin/..." and "/en/admin/..." are the same page: switching the UI language keeps the form.
-const withoutLang = (pathname: string) => pathname.replace(/^\/[^/]+/, '')
-
 export function ExperienceEditorPage() {
   const { t, lang } = useTranslation()
   const { slug: editedSlug } = useParams()
@@ -149,19 +148,7 @@ export function ExperienceEditorPage() {
       : slugify(form.title.fr, form.organization)
   const dirty = form !== null && JSON.stringify(form) !== JSON.stringify(saved)
 
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      !leaving.current &&
-      dirty &&
-      withoutLang(currentLocation.pathname) !== withoutLang(nextLocation.pathname),
-  )
-
-  useEffect(() => {
-    if (!dirty) return
-    const warn = (event: BeforeUnloadEvent) => event.preventDefault()
-    window.addEventListener('beforeunload', warn)
-    return () => window.removeEventListener('beforeunload', warn)
-  }, [dirty])
+  const blocker = useUnsavedChanges(dirty, leaving)
 
   const backToList = <Link to={`/${lang}/admin/experiences`}>{t('admin.experiences.back')}</Link>
 
@@ -253,24 +240,13 @@ export function ExperienceEditorPage() {
       {backToList}
       <h1 className={adminStyles.title}>{heading}</h1>
 
-      {blocker.state === 'blocked' && (
-        <div className={editorStyles.confirm} role="alertdialog" aria-labelledby="unsaved-message">
-          <p id="unsaved-message">{t('admin.home.unsaved')}</p>
-          <Button onClick={() => blocker.reset()}>{t('admin.home.stay')}</Button>
-          <button
-            type="button"
-            className={editorStyles.secondary}
-            onClick={() => blocker.proceed()}
-          >
-            {t('admin.home.leave')}
-          </button>
-        </div>
-      )}
+      <UnsavedChangesDialog blocker={blocker} />
 
       <form className={editorStyles.form} onSubmit={handleSubmit} noValidate>
-        <label className={adminStyles.field}>
-          {t('admin.experiences.kind')}
+        <div className={adminStyles.field}>
+          <label htmlFor="experience-kind">{t('admin.experiences.kind')}</label>
           <select
+            id="experience-kind"
             value={form.kind}
             onChange={(event) => update({ kind: event.target.value as ExperienceKind })}
             aria-invalid={hasError('kind')}
@@ -283,11 +259,12 @@ export function ExperienceEditorPage() {
             ))}
           </select>
           {fieldError('kind')}
-        </label>
+        </div>
 
-        <label className={adminStyles.field}>
-          {t('admin.experiences.organization')}
+        <div className={adminStyles.field}>
+          <label htmlFor="experience-organization">{t('admin.experiences.organization')}</label>
           <input
+            id="experience-organization"
             value={form.organization}
             onChange={(event) => update({ organization: event.target.value })}
             maxLength={120}
@@ -296,12 +273,13 @@ export function ExperienceEditorPage() {
             aria-describedby={describedBy('organization')}
           />
           {fieldError('organization')}
-        </label>
+        </div>
 
         <div className={styles.years}>
-          <label className={adminStyles.field}>
-            {t('admin.experiences.startYear')}
+          <div className={adminStyles.field}>
+            <label htmlFor="experience-startYear">{t('admin.experiences.startYear')}</label>
             <input
+              id="experience-startYear"
               inputMode="numeric"
               value={form.start_year}
               onChange={(event) => update({ start_year: event.target.value })}
@@ -311,10 +289,11 @@ export function ExperienceEditorPage() {
               aria-describedby={describedBy('start_year')}
             />
             {fieldError('start_year')}
-          </label>
-          <label className={adminStyles.field}>
-            {t('admin.experiences.endYear')}
+          </div>
+          <div className={adminStyles.field}>
+            <label htmlFor="experience-endYear">{t('admin.experiences.endYear')}</label>
             <input
+              id="experience-endYear"
               inputMode="numeric"
               value={form.end_year}
               onChange={(event) => update({ end_year: event.target.value })}
@@ -323,7 +302,7 @@ export function ExperienceEditorPage() {
               aria-describedby={describedBy('end_year')}
             />
             {fieldError('end_year')}
-          </label>
+          </div>
         </div>
 
         {creating ? (
@@ -359,9 +338,10 @@ export function ExperienceEditorPage() {
           </p>
         )}
 
-        <label className={adminStyles.field}>
-          {t('admin.experiences.technologies')}
+        <div className={adminStyles.field}>
+          <label htmlFor="experience-technologies">{t('admin.experiences.technologies')}</label>
           <input
+            id="experience-technologies"
             value={form.technologies}
             onChange={(event) => update({ technologies: event.target.value })}
             placeholder="Python, Docker, Amazon S3"
@@ -369,7 +349,7 @@ export function ExperienceEditorPage() {
             aria-describedby={describedBy('technologies')}
           />
           {fieldError('technologies')}
-        </label>
+        </div>
 
         <fieldset className={editorStyles.panel}>
           <legend>{t('admin.home.texts')}</legend>
@@ -396,9 +376,10 @@ export function ExperienceEditorPage() {
             }}
           />
 
-          <label className={adminStyles.field}>
-            {t('admin.experiences.titleField')}
+          <div className={adminStyles.field}>
+            <label htmlFor="experience-titleField">{t('admin.experiences.titleField')}</label>
             <input
+              id="experience-titleField"
               value={form.title[textLang]}
               onChange={(event) => updateText('title', event.target.value)}
               maxLength={120}
@@ -407,11 +388,12 @@ export function ExperienceEditorPage() {
               aria-describedby={describedBy('title')}
             />
             {fieldError('title')}
-          </label>
+          </div>
 
-          <label className={adminStyles.field}>
-            {t('admin.experiences.summary')}
+          <div className={adminStyles.field}>
+            <label htmlFor="experience-summary">{t('admin.experiences.summary')}</label>
             <input
+              id="experience-summary"
               value={form.summary[textLang]}
               onChange={(event) => updateText('summary', event.target.value)}
               maxLength={220}
@@ -420,12 +402,13 @@ export function ExperienceEditorPage() {
               aria-describedby={describedBy('summary')}
             />
             {fieldError('summary')}
-          </label>
+          </div>
 
           <div className={editorStyles.introRow}>
-            <label className={adminStyles.field}>
-              {t('admin.experiences.description')}
+            <div className={adminStyles.field}>
+              <label htmlFor="experience-description">{t('admin.experiences.description')}</label>
               <textarea
+                id="experience-description"
                 value={form.description[textLang]}
                 onChange={(event) => updateText('description', event.target.value)}
                 maxLength={5000}
@@ -434,7 +417,7 @@ export function ExperienceEditorPage() {
                 aria-describedby={describedBy('description')}
               />
               {fieldError('description')}
-            </label>
+            </div>
             <div
               className={editorStyles.preview}
               aria-label={t('admin.home.preview')}
@@ -446,7 +429,7 @@ export function ExperienceEditorPage() {
           </div>
         </fieldset>
 
-        <div className={styles.actions}>
+        <div className={editorStyles.footer}>
           <span className={editorStyles.actions}>
             <Button type="submit" disabled={(!creating && !dirty) || saveState === 'saving'}>
               {saveState === 'saving' ? t('admin.home.saving') : t('admin.home.save')}
@@ -456,7 +439,7 @@ export function ExperienceEditorPage() {
           {!creating && deleteState !== 'confirm' && (
             <button
               type="button"
-              className={styles.danger}
+              className={editorStyles.danger}
               onClick={() => setDeleteState('confirm')}
               disabled={deleteState === 'deleting'}
             >
@@ -498,14 +481,7 @@ export function ExperienceEditorPage() {
             {t('admin.home.translationFailed')}
           </p>
         )}
-        {saveState === 'expired' && (
-          <p className={adminStyles.error} role="alert">
-            {t('admin.home.expired')}{' '}
-            <a href={`/${lang}/admin/login`} target="_blank" rel="noopener noreferrer">
-              {t('admin.home.signInNewTab')}
-            </a>
-          </p>
-        )}
+        {saveState === 'expired' && <SessionExpiredAlert />}
         {saveState === 'error' && (
           <p className={adminStyles.error} role="alert">
             {t('admin.error')}

@@ -11,6 +11,7 @@ from app.infra.database import SessionFactory
 from app.infra.repositories.admin import AdminRepository
 from app.infra.repositories.experience import ExperienceRepository
 from app.infra.repositories.home import HomeContentRepository
+from app.infra.repositories.skill import SkillRepository
 from app.infra.security import hash_token
 from app.infra.translation import Translator
 
@@ -33,6 +34,12 @@ def get_experience_repository(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> ExperienceRepository:
     return ExperienceRepository(session)
+
+
+def get_skill_repository(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> SkillRepository:
+    return SkillRepository(session)
 
 
 def get_admin_repository(
