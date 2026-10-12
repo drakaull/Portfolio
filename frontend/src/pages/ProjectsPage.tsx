@@ -2,6 +2,7 @@ import { useProjects } from '../api/projects.ts'
 import { PageHeader } from '../components/PageHeader/PageHeader.tsx'
 import { ProjectCard } from '../components/ProjectCard/ProjectCard.tsx'
 import { useTranslation } from '../i18n/useTranslation.ts'
+import { colouredLanguages } from '../lib/languages.ts'
 import styles from './ProjectsPage.module.css'
 
 export function ProjectsPage() {
@@ -18,9 +19,9 @@ export function ProjectsPage() {
       {state.status === 'ready' && state.data.length === 0 && <p>{t('projects.empty')}</p>}
       {state.status === 'ready' && state.data.length > 0 && (
         <ul className={styles.grid}>
-          {state.data.map((project) => (
+          {state.data.map((project, _, projects) => (
             <li key={project.url}>
-              <ProjectCard project={project} />
+              <ProjectCard project={project} coloured={colouredLanguages(projects)} />
             </li>
           ))}
         </ul>

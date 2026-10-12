@@ -1,12 +1,12 @@
 import type { Project } from '../../api/projects.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
+import { LanguageDonut } from '../LanguageDonut/LanguageDonut.tsx'
 import { TextLink } from '../TextLink/TextLink.tsx'
 import styles from './ProjectCard.module.css'
 
-const SHOWN_LANGUAGES = 3
-
-/** One public project: context and year, title, translated "About", main languages, team. */
-export function ProjectCard({ project }: { project: Project }) {
+/** One public project: context and year, title, translated "About", languages, team.
+ * `coloured`: the languages coloured on the page (see lib/languages.ts). */
+export function ProjectCard({ project, coloured }: { project: Project; coloured: string[] }) {
   const { t } = useTranslation()
   const year = new Date(project.created_at).getFullYear()
   const meta = [project.context && t(`projects.context.${project.context}`), year]
@@ -33,12 +33,7 @@ export function ProjectCard({ project }: { project: Project }) {
       <h2 className={styles.title}>{project.title}</h2>
       {project.summary && <p className={styles.summary}>{project.summary}</p>}
       {project.languages.length > 0 && (
-        <p className={styles.languages}>
-          {project.languages
-            .slice(0, SHOWN_LANGUAGES)
-            .map((language) => language.name)
-            .join(' · ')}
-        </p>
+        <LanguageDonut languages={project.languages} coloured={coloured} />
       )}
       {project.team_size !== null && (
         <p className={styles.team}>

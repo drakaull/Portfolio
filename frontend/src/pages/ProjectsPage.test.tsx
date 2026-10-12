@@ -58,7 +58,14 @@ describe('projects page', () => {
     const ttmc = cards[0]
     expect(within(ttmc).getByText('École · 2025')).toBeDefined()
     expect(within(ttmc).getByText('Jeu de plateau de quiz.')).toBeDefined()
-    expect(within(ttmc).getByText('Java · CSS · HTML')).toBeDefined() // 3 main languages
+    // The three most used languages of the page have a colour; the rest is "Autres".
+    const legend = within(ttmc).getByRole('list', { name: 'Langages' })
+    expect(
+      within(legend)
+        .getAllByRole('listitem')
+        // French puts a no-break space before "%".
+        .map((item) => item.textContent?.replace(/\s/g, ' ')),
+    ).toEqual(['Java 80 %', 'CSS 15 %', 'HTML 4 %', 'Autres 1 %'])
     expect(within(ttmc).getByText('Équipe de 4')).toBeDefined()
   })
 
@@ -82,6 +89,7 @@ describe('projects page', () => {
     expect(within(card).getByText('2026')).toBeDefined()
     expect(within(card).getByText('Projet solo')).toBeDefined()
     expect(card.querySelectorAll('p')).toHaveLength(1) // only the team line
+    expect(within(card).queryByRole('list')).toBeNull() // no languages, no ring
   })
 
   test('says when there is nothing yet, or when loading fails', async () => {

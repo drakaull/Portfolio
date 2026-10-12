@@ -50,6 +50,8 @@ export const fr: Record<TranslationKey, string> = {
   'projects.empty': 'Projets à venir.',
   'projects.site': 'Site',
   'projects.team': 'Équipe de',
+  'projects.languages': 'Langages',
+  'projects.otherLanguages': 'Autres',
   'projects.solo': 'Projet solo',
   'contact.title': 'Contact',
   'admin.title': 'Administration',

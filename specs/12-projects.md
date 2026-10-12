@@ -99,3 +99,4 @@ Projects come from Léonard's **public GitHub repositories** instead of being ty
 
 - Public page: a **grid of cards** (layout details in Task 6).
 - The "About" of OTEAL_ceremony, AemtHackatonBackend and Projet_TTMC were written from an analysis of each repository and set on GitHub with Léonard's approval.
+- Languages shown as a **donut** per card with a legend (name and %), chosen by Léonard. Three colours (terracotta, teal, violet) for the three most used languages of the page, "Others" in grey; the palette was validated with the dataviz skill's script for colour-blind readers in both themes (a fourth hue could not pass).

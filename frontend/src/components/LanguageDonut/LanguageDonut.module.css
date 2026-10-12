@@ -1,0 +1,84 @@
+/* Language colours, validated (scripts/validate_palette.js, all pairs) on --color-surface of
+   each theme: distinct for deutan, protan and tritan readers. Text never wears them. */
+.donut {
+  --lang-1: #a8502b; /* terracotta */
+  --lang-2: #009696; /* teal: 2.99:1 on the surface, so the legend always names it */
+  --lang-3: #6953a0; /* violet */
+  --lang-others: #9c9587;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+:global(:root[data-theme='dark']) .donut {
+  --lang-1: #cb6440;
+  --lang-2: #009696;
+  --lang-3: #957fd0;
+  --lang-others: #6f695e;
+}
+
+.ring {
+  flex: none;
+  width: 4rem;
+  height: 4rem;
+}
+
+.segment {
+  fill: none;
+  stroke-width: 6;
+}
+
+.segment[data-slot='1'],
+.swatch[data-slot='1'] {
+  stroke: var(--lang-1);
+  background: var(--lang-1);
+}
+
+.segment[data-slot='2'],
+.swatch[data-slot='2'] {
+  stroke: var(--lang-2);
+  background: var(--lang-2);
+}
+
+.segment[data-slot='3'],
+.swatch[data-slot='3'] {
+  stroke: var(--lang-3);
+  background: var(--lang-3);
+}
+
+.segment[data-slot='others'],
+.swatch[data-slot='others'] {
+  stroke: var(--lang-others);
+  background: var(--lang-others);
+}
+
+.legend {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  list-style: none;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.swatch {
+  flex: none;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+}
+
+.value {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+}

@@ -49,6 +49,8 @@ export const en = {
   'projects.empty': 'Projects coming soon.',
   'projects.site': 'Website',
   'projects.team': 'Team of',
+  'projects.languages': 'Languages',
+  'projects.otherLanguages': 'Others',
   'projects.solo': 'Solo project',
   'contact.title': 'Contact',
   'admin.title': 'Administration',
