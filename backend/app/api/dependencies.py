@@ -9,7 +9,9 @@ from app.domain.auth import AdminUser
 from app.infra.config import settings
 from app.infra.database import SessionFactory
 from app.infra.github import GitHubClient
+from app.infra.mail import Mailer
 from app.infra.repositories.admin import AdminRepository
+from app.infra.repositories.contact import ContactMessageRepository
 from app.infra.repositories.experience import ExperienceRepository
 from app.infra.repositories.home import HomeContentRepository
 from app.infra.repositories.project import ProjectRepository
@@ -50,6 +52,12 @@ def get_project_repository(
     return ProjectRepository(session)
 
 
+def get_contact_repository(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> ContactMessageRepository:
+    return ContactMessageRepository(session)
+
+
 def get_admin_repository(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> AdminRepository:
@@ -78,3 +86,15 @@ def get_translator() -> Translator:
 
 def get_github_client() -> GitHubClient:
     return GitHubClient(settings.github_username)
+
+
+def get_mailer() -> Mailer:
+    return Mailer(
+        host=settings.smtp_host,
+        port=settings.smtp_port,
+        sender=settings.smtp_from,
+        recipient=settings.contact_email,
+        username=settings.smtp_username,
+        password=settings.smtp_password,
+        starttls=settings.smtp_starttls,
+    )

@@ -39,3 +39,5 @@ class LoginRateLimiter:
 
 
 login_limiter = LoginRateLimiter()
+# Same sliding window for the contact form: every accepted message counts, 5 per hour per IP.
+contact_limiter = LoginRateLimiter(max_failures=5, window_seconds=60 * 60)

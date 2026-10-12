@@ -19,10 +19,10 @@ Contact form saved in the database and emailed to Léonard (Mailpit locally), pr
 
 ### Phase 1: Backend
 - [x] Task 1: Model, migration, repository (add, list, get, mark read / unread, delete, purge), settings and `Mailer`
-- [ ] Task 2: `POST /api/contact` (validation, trap, limit, save, email) and admin routes
+- [x] Task 2: `POST /api/contact` (validation, trap, limit, save, email) and admin routes
 
 ### Checkpoint A: after Tasks 1–2
-- [ ] ruff + pytest green; migration up/down; every admin route refused without a session
+- [x] ruff + pytest green; migration up/down; every admin route refused without a session
 - [ ] Human: a message posted to the API shows up in Mailpit (http://localhost:8025)
 
 ### Phase 2: Frontend
