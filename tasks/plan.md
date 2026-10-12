@@ -33,7 +33,7 @@ Skills grouped in five fixed categories, each a name + optional Simple Icons log
 - [x] Human: add, edit, reorder and delete skills in the browser; texts reviewed
 
 ### Checkpoint C: complete
-- [ ] Code review (`/review`)
+- [x] Code review (`/review`)
 - [ ] Merge into `develop` after approval
 
 ## Risks and Mitigations
