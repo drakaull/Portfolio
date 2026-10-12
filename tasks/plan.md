@@ -18,10 +18,10 @@ Skills grouped in five fixed categories, each a name + optional Simple Icons log
 
 ### Phase 1: Backend
 - [x] Task 1: Model, migration, domain and repository (list, get, create, update, delete, move)
-- [ ] Task 2: Public and admin API routes with validation
+- [x] Task 2: Public and admin API routes with validation
 
 ### Checkpoint A: after Tasks 1–2
-- [ ] ruff + pytest green; migration up/down; every admin route refused without a session
+- [x] ruff + pytest green; migration up/down; every admin route refused without a session
 
 ### Phase 2: Frontend
 - [ ] Task 3: Public Skills page + `SkillIcon` component
