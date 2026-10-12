@@ -7,6 +7,8 @@ from app.domain.language import TextFormat, Translated
 ExperienceKind = Literal["job", "student_job", "internship", "education"]
 
 SLUG_PATTERN = r"^[a-z0-9-]+$"
+# /admin/experiences/new is the creation page, so no entry may use that address.
+RESERVED_SLUGS = frozenset({"new"})
 SLUG_MAX_LENGTH = 80
 ORGANIZATION_MAX_LENGTH = 120
 TITLE_MAX_LENGTH = 120

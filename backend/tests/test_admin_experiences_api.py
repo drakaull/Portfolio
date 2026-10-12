@@ -155,6 +155,7 @@ async def test_delete_removes_the_entry_everywhere(
         ({"start_year": 2022, "end_year": 2021}, "end_year"),
         ({"slug": "Not A Slug"}, "slug"),
         ({"slug": "x" * 81}, "slug"),
+        ({"slug": "new"}, "slug"),  # the creation page's address
         ({"technologies": ["x"] * 16}, "technologies"),
         ({"technologies": ["x" * 41]}, 0),
         ({"technologies": [" "]}, 0),

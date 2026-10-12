@@ -7,6 +7,7 @@ from app.api.dependencies import admin_router, get_experience_repository, get_tr
 from app.domain.experience import (
     DESCRIPTION_MAX_LENGTH,
     ORGANIZATION_MAX_LENGTH,
+    RESERVED_SLUGS,
     SLUG_MAX_LENGTH,
     SLUG_PATTERN,
     SUMMARY_MAX_LENGTH,
@@ -94,6 +95,13 @@ class ExperienceIn(_StrictModel):
 
 class ExperienceCreateIn(ExperienceIn):
     slug: str = Field(max_length=SLUG_MAX_LENGTH, pattern=SLUG_PATTERN)
+
+    @field_validator("slug")
+    @classmethod
+    def _not_reserved(cls, slug: str) -> str:
+        if slug in RESERVED_SLUGS:
+            raise ValueError("This address is reserved")
+        return slug
 
 
 class AdminExperienceOut(BaseModel):

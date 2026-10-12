@@ -136,6 +136,36 @@ describe('editing an experience', () => {
     expect(body.end_year).toBeNull()
   })
 
+  test('saves twice in a row', async () => {
+    const fetchMock = mockEdit({
+      [`PUT ${ENTRY_URL}`]: (init) => savedAs(JSON.parse(String(init?.body)), ['nl']),
+    })
+    renderApp('/en/admin/experiences/icare-internship-2026')
+
+    await change('Organisation', 'First')
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await screen.findByText('Saved.')
+    await change('Organisation', 'Second')
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await screen.findByText('Saved.')
+
+    const bodies = fetchMock.mock.calls
+      .filter(([, init]) => init?.method === 'PUT')
+      .map(([, init]) => JSON.parse(String(init?.body)))
+    expect(bodies.map((body) => body.organization)).toEqual(['First', 'Second'])
+    // Only the form's fields go back: the server refuses unknown ones.
+    expect(Object.keys(bodies[1]).sort()).toEqual([
+      'description',
+      'end_year',
+      'kind',
+      'organization',
+      'start_year',
+      'summary',
+      'technologies',
+      'title',
+    ])
+  })
+
   test('translates the Dutch tab from French', async () => {
     mockEdit({
       'POST /api/admin/translate': (init) => {

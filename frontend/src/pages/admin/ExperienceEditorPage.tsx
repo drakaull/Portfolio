@@ -64,12 +64,20 @@ const EMPTY_FORM: ExperienceForm = {
   description: EMPTY_TEXT,
 }
 
+// Fields picked one by one: a save response also carries auto_translated and translation_failed,
+// which the server refuses if they are sent back.
 function toForm(entry: AdminExperience): ExperienceForm {
+  const { slug, kind, organization, title, summary, description } = entry
   return {
-    ...entry,
+    slug,
+    kind,
+    organization,
     start_year: String(entry.start_year),
     end_year: entry.end_year === null ? '' : String(entry.end_year),
     technologies: entry.technologies.join(', '),
+    title,
+    summary,
+    description,
   }
 }
 
@@ -97,7 +105,8 @@ export function ExperienceEditorPage() {
   const creating = editedSlug === undefined
   const navigate = useNavigate()
   // Right after a creation, the edit page shows what the save did (see handleSubmit).
-  const createdNotice = (useLocation().state as { notice?: SaveNotice } | null)?.notice ?? null
+  const location = useLocation()
+  const createdNotice = (location.state as { notice?: SaveNotice } | null)?.notice ?? null
   const [saved, setSaved] = useState<ExperienceForm | null>(creating ? EMPTY_FORM : null)
   const [form, setForm] = useState<ExperienceForm | null>(creating ? EMPTY_FORM : null)
   const [loadState, setLoadState] = useState<'ok' | 'notFound' | 'error'>('ok')
@@ -113,6 +122,11 @@ export function ExperienceEditorPage() {
   const [deleteState, setDeleteState] = useState<'idle' | 'confirm' | 'deleting' | 'error'>('idle')
   // Set right before navigating away after a save or a delete: nothing is left to lose.
   const leaving = useRef(false)
+
+  useEffect(() => {
+    // Shown once: the history entry forgets it, so a reload does not show it again.
+    if (createdNotice) navigate(location.pathname, { replace: true, state: null })
+  }, [createdNotice, location.pathname, navigate])
 
   useEffect(() => {
     if (editedSlug === undefined) return

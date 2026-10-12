@@ -33,7 +33,7 @@ Admin pages to list, create, edit and delete timeline entries, with the home edi
 - [x] Human: create, edit and delete an entry in the browser; texts reviewed
 
 ### Checkpoint C: complete
-- [ ] Code review (`/review`)
+- [x] Code review (`/review`)
 - [ ] Merge into `develop` after approval
 
 ## Risks and Mitigations
