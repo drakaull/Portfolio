@@ -32,7 +32,7 @@ Contact form saved in the database and emailed to Léonard (Mailpit locally), pr
 
 ### Checkpoint B: after Tasks 3–5
 - [x] Screenshots (both themes, desktop and 390 px)
-- [ ] Human: privacy text approved; a real message sent from the site, read and deleted in the admin
+- [x] Human: privacy text approved; a real message sent from the site, read and deleted in the admin
 
 ### Checkpoint C: complete
 - [ ] Code review
