@@ -26,7 +26,7 @@ Contact form saved in the database and emailed to Léonard (Mailpit locally), pr
 - [ ] Human: a message posted to the API shows up in Mailpit (http://localhost:8025)
 
 ### Phase 2: Frontend
-- [ ] Task 3: Contact form page
+- [x] Task 3: Contact form page
 - [ ] Task 4: Privacy page — French draft for review, then EN/NL, footer and form links
 - [ ] Task 5: Admin inbox + unread count on the dashboard
 
