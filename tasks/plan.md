@@ -34,7 +34,7 @@ Admin pages to list, create, edit and delete timeline entries, with the home edi
 
 ### Checkpoint C: complete
 - [x] Code review (`/review`)
-- [ ] Merge into `develop` after approval
+- [x] Merge into `develop` after approval
 
 ## Risks and Mitigations
 
