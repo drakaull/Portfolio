@@ -4,7 +4,7 @@ Status: **DRAFT** (waiting for Léonard's approval)
 
 ## Objective
 
-Projects come from Léonard's **public GitHub repositories** instead of being typed by hand: a **"Sync with GitHub"** button in the admin imports or refreshes them in one go; Léonard then completes each project and chooses which ones visitors see. The public page layout is decided **after** seeing the real data (a later step of this feature).
+Projects come from Léonard's **public GitHub repositories** instead of being typed by hand: a **"Sync with GitHub"** button in the admin imports or refreshes them in one go, **summary included (the repository's "About")**; Léonard then completes each project, orders them and chooses which ones visitors see. The public page layout is decided **after** seeing the real data (a later step of this feature).
 
 ## Decisions already taken
 
@@ -20,16 +20,18 @@ Projects come from Léonard's **public GitHub repositories** instead of being ty
 |---|---|---|
 | GitHub id, name, link, homepage, description, languages (with share), topics, created / last pushed dates, stars | GitHub, refreshed on every sync | no |
 | Title | starts as the repository name, cleaned (`Projet_TTMC` → "Projet TTMC") | yes |
-| Summary FR / EN / NL | written by Léonard (the GitHub description is shown as a hint); EN/NL translated by DeepL like the other editors | yes |
+| Summary FR / EN / NL | the repository's **"About"** (GitHub `description`), kept in its own language; DeepL detects that language and translates to the two others | no — edited on GitHub |
 | Context | school / personal / professional | yes |
 | Team size | number, empty if unknown | yes |
 | Visible on the site | hidden by default | yes |
+| Position | new projects go last | yes (arrows, like the skills) |
 | "Not found on GitHub" | set by the sync | no |
 
 ## Sync rules
 
 - New public repository (not fork, not archived) → new project, **hidden**.
-- Known repository → GitHub fields refreshed; admin fields untouched.
+- Known repository → GitHub fields refreshed; admin fields untouched. The summary is translated again **only when the "About" changed** (no DeepL characters spent otherwise).
+- DeepL unavailable during a sync → the "About" is still saved; the missing languages fall back to the original text and are translated at the next sync.
 - Repository gone from the public list (deleted, made private, archived) → project **kept, hidden automatically, marked "not found on GitHub"** in the admin; Léonard can delete it for good. If it comes back, the mark is removed but it stays hidden until Léonard shows it again.
 - A sync reports what it did: "2 new, 3 updated, 1 not found".
 - GitHub unreachable or rate limit reached (60 calls/hour without a token; one sync uses 1 call + 1 per repository for its languages): nothing changes, a clear message is shown.
@@ -50,7 +52,8 @@ Projects come from Léonard's **public GitHub repositories** instead of being ty
 ```
 
 - The visibility checkbox in the list saves at once (no form to open).
-- A project can be made **visible only once it has a French summary** (otherwise the public card would be empty).
+- Projects keep a **manual order** (▲ ▼ arrows, like the skills); new ones are added last.
+- The "About" and its translations are shown read-only, with a link to edit it on GitHub.
 
 ## Backend
 
@@ -61,10 +64,10 @@ Projects come from Léonard's **public GitHub repositories** instead of being ty
 
 ## Testing Strategy
 
-- Sync with a fake GitHub: new, updated, gone, back again, forks/archived ignored, admin fields kept, GitHub errors / rate limit leave the database unchanged.
-- Admin routes require a session; visibility refused without a French summary; delete.
+- Sync with a fake GitHub and a fake translator: new, updated, gone, back again, forks/archived ignored, admin fields kept, "About" translated only when it changed, GitHub errors / rate limit leave the database unchanged.
+- Admin routes require a session; update (title, context, team size, visibility), move up/down, delete.
 - Public route returns only visible projects, localized.
-- Frontend: list, sync button and its report, visibility toggle, edit form with translation tabs, not-found mark.
+- Frontend: list with order arrows, sync button and its report, visibility toggle, edit form (About and translations read-only), not-found mark.
 - One optional live test against the real GitHub API (skipped by default, like DeepL's).
 
 ## Boundaries
@@ -76,12 +79,18 @@ Projects come from Léonard's **public GitHub repositories** instead of being ty
 ## Success Criteria
 
 1. One click imports the 4 current public repositories, hidden.
-2. Léonard writes a summary, sets the context, makes one visible; it appears on the public API in FR/EN/NL.
+2. Léonard sets the context, orders the projects and makes one visible; it appears on the public API in FR/EN/NL with its translated "About".
 3. A second sync changes nothing he wrote; a deleted test repository ends up hidden and marked.
 4. All checks pass; admin screenshots in both themes, desktop and 390 px.
 
+## Decisions (round 2)
+
+- Public repositories only (no token).
+- A repository that disappears is kept, **hidden automatically** and marked "not found on GitHub".
+- The summary is the repository's **"About"**, synced from GitHub and translated by DeepL (source language detected); it is not edited in the admin.
+- **Manual order** with arrows.
+
 ## Open questions
 
-1. Rule for a repository that disappears (keep, hide, mark) — confirmed?
-2. "Visible only with a French summary" — OK?
-3. Order of projects (admin and public): **most recently updated on GitHub first** — or manual order with arrows like the skills?
+1. A repository without "About" (2 of the 4 today): it can be made visible with a card that has **no summary** — or should it stay hidden until you fill its "About" on GitHub?
+2. The **title** stays editable in the admin (starting from the cleaned repository name), since GitHub has no nicer display name — OK?
