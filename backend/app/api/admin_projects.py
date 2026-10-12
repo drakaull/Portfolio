@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.api.admin_skills import MoveIn
+from app.api.common import MoveIn
 from app.api.dependencies import (
     admin_router,
     get_github_client,

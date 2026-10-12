@@ -1,4 +1,6 @@
+import re
 from datetime import datetime
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -12,6 +14,26 @@ _HEADERS = {
     "X-GitHub-Api-Version": "2022-11-28",
     "User-Agent": "leonard-fontaine-portfolio",  # GitHub refuses requests without one
 }
+
+
+_SCHEME = re.compile(r"^[a-z][a-z0-9+.-]*:(?!\d)", re.IGNORECASE)
+
+
+def _web_address(value: str | None) -> str | None:
+    """The repository's website as a safe link: "https://" added when missing (GitHub accepts
+    "example.com"), anything but an http(s) address with a host left out."""
+    value = (value or "").strip()
+    if not value:
+        return None
+    # A "scheme:" prefix (but not "host:8080") means the address chose its own protocol.
+    if not _SCHEME.match(value):
+        value = f"https://{value}"
+    try:
+        parts = urlsplit(value)
+        parts.port  # noqa: B018 - raises on a malformed port
+    except ValueError:
+        return None
+    return value if parts.scheme in ("http", "https") and parts.hostname else None
 
 
 class GitHubUnavailable(Exception):
@@ -51,7 +73,7 @@ class GitHubClient:
                         github_id=repo["id"],
                         name=repo["name"],
                         url=repo["html_url"],
-                        homepage=repo.get("homepage") or None,
+                        homepage=_web_address(repo.get("homepage")),
                         about=(repo.get("description") or "").strip() or None,
                         languages=await self._get(client, f"/repos/{repo['full_name']}/languages"),
                         topics=tuple(repo.get("topics") or ()),

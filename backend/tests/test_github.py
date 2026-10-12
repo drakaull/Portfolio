@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 import httpx
 import pytest
 
-from app.infra.github import GitHubClient, GitHubUnavailable
+from app.infra.github import GitHubClient, GitHubUnavailable, _web_address
 
 pytestmark = pytest.mark.anyio
 
@@ -104,6 +104,26 @@ async def test_network_errors_and_odd_answers_become_github_unavailable() -> Non
     transport, _ = fake_github([[{"id": 1, "fork": False, "archived": False}]])
     with pytest.raises(GitHubUnavailable):
         await GitHubClient("drakaull", transport).public_repositories()
+
+
+@pytest.mark.parametrize(
+    ("homepage", "link"),
+    [
+        ("https://oteal.app", "https://oteal.app"),
+        ("http://example.com/x?y=1", "http://example.com/x?y=1"),
+        ("  oteal.app/play ", "https://oteal.app/play"),  # GitHub accepts it without a scheme
+        ("javascript:alert(1)", None),
+        ("JavaScript:alert(1)", None),
+        ("data:text/html,x", None),
+        ("example.com:8080/x", "https://example.com:8080/x"),
+        ("ftp://files.example.com", None),
+        ("https://", None),
+        ("", None),
+        (None, None),
+    ],
+)
+def test_website_becomes_a_safe_link(homepage: str | None, link: str | None) -> None:
+    assert _web_address(homepage) == link
 
 
 @pytest.mark.skipif(not os.environ.get("GITHUB_LIVE_TEST"), reason="set GITHUB_LIVE_TEST=1")

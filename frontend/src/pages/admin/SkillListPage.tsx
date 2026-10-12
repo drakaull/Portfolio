@@ -92,11 +92,11 @@ export function SkillListPage() {
                           {skill.name}
                         </Link>
                       </span>
-                      <span className={styles.arrows}>
+                      <span className={adminStyles.arrows}>
                         <button
                           id={`move-up-${skill.id}`}
                           type="button"
-                          className={styles.arrow}
+                          className={adminStyles.arrow}
                           aria-label={`${t('admin.moveUp')}: ${skill.name}`}
                           disabled={index === 0}
                           onClick={() => void move(skill.id, 'up')}
@@ -106,7 +106,7 @@ export function SkillListPage() {
                         <button
                           id={`move-down-${skill.id}`}
                           type="button"
-                          className={styles.arrow}
+                          className={adminStyles.arrow}
                           aria-label={`${t('admin.moveDown')}: ${skill.name}`}
                           disabled={index === inCategory.length - 1}
                           onClick={() => void move(skill.id, 'down')}

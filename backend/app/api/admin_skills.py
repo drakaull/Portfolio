@@ -1,8 +1,9 @@
-from typing import Annotated, Literal
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.api.common import MoveIn
 from app.api.dependencies import admin_router, get_skill_repository
 from app.api.skills import SkillIconOut
 from app.domain.skill import (
@@ -44,10 +45,6 @@ class SkillIn(_StrictModel):
     def to_domain(self, skill_id: int | None) -> Skill:
         icon = None if self.icon is None else SkillIcon(**self.icon.model_dump())
         return Skill(id=skill_id, name=self.name, category=self.category, icon=icon)
-
-
-class MoveIn(_StrictModel):
-    direction: Literal["up", "down"]
 
 
 class AdminSkillOut(BaseModel):

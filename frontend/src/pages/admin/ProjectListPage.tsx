@@ -18,7 +18,6 @@ import adminStyles from './Admin.module.css'
 import { SessionExpiredAlert } from './EditorParts.tsx'
 import editorStyles from './Editor.module.css'
 import styles from './ProjectListPage.module.css'
-import skillStyles from './SkillListPage.module.css'
 
 type Direction = 'up' | 'down'
 type ActionResult = 'ok' | 'expired' | 'error'
@@ -174,11 +173,11 @@ export function ProjectListPage() {
                     <span className={styles.missing}>⚠ {t('admin.projects.missing')}</span>
                   )}
                 </span>
-                <span className={skillStyles.arrows}>
+                <span className={adminStyles.arrows}>
                   <button
                     id={`move-up-${project.id}`}
                     type="button"
-                    className={skillStyles.arrow}
+                    className={adminStyles.arrow}
                     aria-label={`${t('admin.moveUp')}: ${project.title}`}
                     disabled={index === 0}
                     onClick={() => void move(project.id, 'up')}
@@ -188,7 +187,7 @@ export function ProjectListPage() {
                   <button
                     id={`move-down-${project.id}`}
                     type="button"
-                    className={skillStyles.arrow}
+                    className={adminStyles.arrow}
                     aria-label={`${t('admin.moveDown')}: ${project.title}`}
                     disabled={index === projects.length - 1}
                     onClick={() => void move(project.id, 'down')}

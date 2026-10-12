@@ -8,6 +8,7 @@ import styles from './ProjectsPage.module.css'
 export function ProjectsPage() {
   const { t, lang } = useTranslation()
   const state = useProjects(lang)
+  const coloured = state.status === 'ready' ? colouredLanguages(state.data) : []
 
   return (
     <>
@@ -19,9 +20,9 @@ export function ProjectsPage() {
       {state.status === 'ready' && state.data.length === 0 && <p>{t('projects.empty')}</p>}
       {state.status === 'ready' && state.data.length > 0 && (
         <ul className={styles.grid}>
-          {state.data.map((project, _, projects) => (
+          {state.data.map((project) => (
             <li key={project.url}>
-              <ProjectCard project={project} coloured={colouredLanguages(projects)} />
+              <ProjectCard project={project} coloured={coloured} />
             </li>
           ))}
         </ul>
