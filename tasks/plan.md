@@ -38,7 +38,7 @@ A "Sync with GitHub" admin button imports Léonard's public repositories (forks 
 - [x] Task 6: Public Projects page (grid of cards: context · year, title, About, 3 main languages, team, GitHub / website links)
 
 ### Checkpoint C: complete
-- [ ] Code review (`/review`)
+- [x] Code review (`/review`)
 - [ ] Merge into `develop` after approval
 
 ## Risks and Mitigations
