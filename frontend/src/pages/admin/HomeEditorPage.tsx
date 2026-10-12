@@ -3,12 +3,10 @@ import { Link, useBlocker } from 'react-router'
 import {
   fetchAdminHome,
   saveAdminHome,
-  translateFromFrench,
   type AdminHomeContent,
   type AdminHomeSaved,
   type HomeContentForm,
   type HomeField,
-  type TargetLang,
 } from '../../api/adminHome.ts'
 import { Button } from '../../components/Button/Button.tsx'
 import { MarkdownText } from '../../components/MarkdownText/MarkdownText.tsx'
@@ -17,9 +15,7 @@ import { useTranslation, type Lang } from '../../i18n/useTranslation.ts'
 import adminStyles from './Admin.module.css'
 import { CvField } from './CvField.tsx'
 import styles from './HomeEditorPage.module.css'
-
-// French is the writing language: first tab, selected by default.
-const LANGS: Lang[] = ['fr', 'en', 'nl']
+import { TranslationTabs } from './TranslationTabs.tsx'
 
 const FIELD_ERRORS: Record<HomeField, TranslationKey> = {
   headline: 'admin.home.invalidHeadline',
@@ -29,16 +25,7 @@ const FIELD_ERRORS: Record<HomeField, TranslationKey> = {
 }
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'expired' | 'error'
-type TranslateState =
-  'idle' | 'confirm' | 'translating' | 'done' | 'unavailable' | 'expired' | 'error'
 type SaveNotice = Pick<AdminHomeSaved, 'auto_translated' | 'translation_failed'>
-
-const TRANSLATE_MESSAGES: Partial<Record<TranslateState, TranslationKey>> = {
-  done: 'admin.home.reviewTranslation',
-  unavailable: 'admin.home.translateUnavailable',
-  expired: 'admin.home.expired',
-  error: 'admin.error',
-}
 
 function toForm({ headline, intro, linkedin_url, github_url }: AdminHomeContent): HomeContentForm {
   return { headline, intro, linkedin_url, github_url }
@@ -56,7 +43,8 @@ export function HomeEditorPage() {
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [invalid, setInvalid] = useState<HomeField[]>([])
   const [hasCv, setHasCv] = useState(false)
-  const [translateState, setTranslateState] = useState<TranslateState>('idle')
+  // Bumped on each save: remounts the translation tabs, which clears their messages.
+  const [saves, setSaves] = useState(0)
   const [saveNotice, setSaveNotice] = useState<SaveNotice | null>(null)
 
   useEffect(() => {
@@ -115,7 +103,7 @@ export function HomeEditorPage() {
       setForm(toForm(result.content))
       setInvalid([])
       setSaveState('saved')
-      setTranslateState('idle')
+      setSaves((count) => count + 1)
       setSaveNotice(result.content)
     } else if (result.status === 'invalid') {
       setInvalid(result.fields)
@@ -124,52 +112,6 @@ export function HomeEditorPage() {
       setSaveState(result.status)
     }
   }
-
-  function selectTextLang(code: Lang) {
-    setTextLang(code)
-    // A translation message or confirmation belongs to the tab it was asked from.
-    setTranslateState('idle')
-  }
-
-  function requestTranslation(target: TargetLang) {
-    if (!form) return
-    // Replacing text the admin may have written needs an explicit confirmation.
-    const hasText = form.headline[target].trim() !== '' || form.intro[target].trim() !== ''
-    if (hasText && translateState !== 'confirm') {
-      setTranslateState('confirm')
-      return
-    }
-    void runTranslation(target)
-  }
-
-  async function runTranslation(target: TargetLang) {
-    if (!form) return
-    setTranslateState('translating')
-    const result = await translateFromFrench(
-      [
-        { text: form.headline.fr, format: 'plain' },
-        { text: form.intro.fr, format: 'markdown' },
-      ],
-      target,
-    )
-    if (result.status !== 'ok') {
-      setTranslateState(result.status)
-      return
-    }
-    const [headline, intro] = result.translations
-    setForm(
-      (current) =>
-        current && {
-          ...current,
-          headline: { ...current.headline, [target]: headline },
-          intro: { ...current.intro, [target]: intro },
-        },
-    )
-    setSaveState('idle')
-    setTranslateState('done')
-  }
-
-  const translateMessage = TRANSLATE_MESSAGES[translateState]
 
   const fieldError = (field: HomeField) =>
     invalid.includes(field) && (
@@ -198,64 +140,26 @@ export function HomeEditorPage() {
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <fieldset className={styles.panel}>
           <legend>{t('admin.home.texts')}</legend>
-          <div role="tablist" aria-label={t('admin.home.textLanguage')} className={styles.tabs}>
-            {LANGS.map((code) => (
-              <button
-                key={code}
-                type="button"
-                role="tab"
-                aria-selected={textLang === code}
-                // The running translation writes into the tab it was asked from.
-                disabled={translateState === 'translating'}
-                className={styles.tab}
-                onClick={() => selectTextLang(code)}
-              >
-                {code.toUpperCase()}
-              </button>
-            ))}
-          </div>
-          {textLang !== 'fr' && (
-            <div className={styles.translate}>
-              <p className={styles.hint}>{t('admin.home.translateHint')}</p>
-              <button
-                type="button"
-                className={styles.secondary}
-                onClick={() => requestTranslation(textLang)}
-                disabled={translateState === 'translating' || form.headline.fr.trim() === ''}
-              >
-                {translateState === 'translating'
-                  ? t('admin.home.translating')
-                  : t('admin.home.translate')}
-              </button>
-              {translateState === 'confirm' && (
-                <div
-                  className={styles.confirm}
-                  role="alertdialog"
-                  aria-labelledby="replace-translation-message"
-                >
-                  <p id="replace-translation-message">{t('admin.home.confirmReplace')}</p>
-                  <Button onClick={() => void runTranslation(textLang)}>
-                    {t('admin.home.replace')}
-                  </Button>
-                  <button
-                    type="button"
-                    className={styles.secondary}
-                    onClick={() => setTranslateState('idle')}
-                  >
-                    {t('admin.cv.cancel')}
-                  </button>
-                </div>
-              )}
-              {translateMessage && (
-                <p
-                  role={translateState === 'done' ? 'status' : 'alert'}
-                  className={translateState === 'done' ? styles.hint : adminStyles.error}
-                >
-                  {t(translateMessage)}
-                </p>
-              )}
-            </div>
-          )}
+          <TranslationTabs
+            key={saves}
+            textLang={textLang}
+            onSelect={setTextLang}
+            fields={[
+              { value: form.headline, format: 'plain' },
+              { value: form.intro, format: 'markdown' },
+            ]}
+            onTranslated={(target, [headline, intro]) => {
+              setForm(
+                (current) =>
+                  current && {
+                    ...current,
+                    headline: { ...current.headline, [target]: headline },
+                    intro: { ...current.intro, [target]: intro },
+                  },
+              )
+              setSaveState('idle')
+            }}
+          />
 
           <label className={adminStyles.field}>
             {t('admin.home.headline')}

@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from app.api.admin_auth import protected_router as admin_router
 from app.api.admin_auth import public_router as admin_auth_router
+from app.api.admin_experiences import router as admin_experiences_router
 from app.api.admin_home import router as admin_home_router
 from app.api.admin_translate import router as admin_translate_router
 from app.api.body_limit import BodySizeLimitMiddleware
@@ -18,4 +19,5 @@ app.include_router(experiences_router, prefix="/api")
 app.include_router(admin_auth_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(admin_home_router, prefix="/api")
+app.include_router(admin_experiences_router, prefix="/api")
 app.include_router(admin_translate_router, prefix="/api")

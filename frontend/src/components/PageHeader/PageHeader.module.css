@@ -6,6 +6,8 @@
 
 .title {
   margin: 0;
+  /* Same face as the name on the home page; the size stays smaller. */
+  font-family: var(--font-display);
   font-size: var(--text-2xl);
   font-weight: 700;
   line-height: 1.2;

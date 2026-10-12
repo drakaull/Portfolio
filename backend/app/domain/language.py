@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Literal
+from typing import Literal, get_args
 
 # Supported languages. Adding one needs no migration, but also its DeepL code
 # (infra/translation.py) and a field in the admin input models (api/admin_home.py).
@@ -17,3 +17,8 @@ Translated = Mapping[str, str]
 def localize(value: Translated, lang: Lang) -> str:
     """Text in the requested language, or in French (the source) when it is missing or empty."""
     return value.get(lang) or value[SOURCE_LANG]
+
+
+def with_every_lang(value: Translated) -> dict[str, str]:
+    """Every supported language as a key; rows saved before a language existed get "" for it."""
+    return {lang: value.get(lang, "") for lang in get_args(Lang)}

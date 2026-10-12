@@ -5,6 +5,8 @@ import { BrowserLanguageRedirect, LocalizedRoutes } from './components/Routing/R
 import { RequireAdmin } from './components/RequireAdmin/RequireAdmin.tsx'
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage.tsx'
 import { AdminLoginPage } from './pages/admin/AdminLoginPage.tsx'
+import { ExperienceEditorPage } from './pages/admin/ExperienceEditorPage.tsx'
+import { ExperienceListPage } from './pages/admin/ExperienceListPage.tsx'
 import { HomeEditorPage } from './pages/admin/HomeEditorPage.tsx'
 import { ContactPage } from './pages/ContactPage.tsx'
 import { ExperienceDetailPage } from './pages/ExperienceDetailPage.tsx'
@@ -40,6 +42,9 @@ export const routes = createRoutesFromElements(
         <Route element={<RequireAdmin />}>
           <Route index element={<AdminDashboardPage />} />
           <Route path="home" element={<HomeEditorPage />} />
+          <Route path="experiences" element={<ExperienceListPage />} />
+          <Route path="experiences/new" element={<ExperienceEditorPage />} />
+          <Route path="experiences/:slug" element={<ExperienceEditorPage />} />
         </Route>
       </Route>
     </Route>
