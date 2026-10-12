@@ -39,7 +39,7 @@ A "Sync with GitHub" admin button imports Léonard's public repositories (forks 
 
 ### Checkpoint C: complete
 - [x] Code review (`/review`)
-- [ ] Merge into `develop` after approval
+- [x] Merge into `develop` after approval
 
 ## Risks and Mitigations
 
