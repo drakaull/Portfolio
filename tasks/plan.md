@@ -28,10 +28,10 @@ Contact form saved in the database and emailed to Léonard (Mailpit locally), pr
 ### Phase 2: Frontend
 - [x] Task 3: Contact form page
 - [x] Task 4: Privacy page — French draft for review, then EN/NL, footer and form links
-- [ ] Task 5: Admin inbox + unread count on the dashboard
+- [x] Task 5: Admin inbox + unread count on the dashboard
 
 ### Checkpoint B: after Tasks 3–5
-- [ ] Screenshots (both themes, desktop and 390 px)
+- [x] Screenshots (both themes, desktop and 390 px)
 - [ ] Human: privacy text approved; a real message sent from the site, read and deleted in the admin
 
 ### Checkpoint C: complete
