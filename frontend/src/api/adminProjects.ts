@@ -13,6 +13,11 @@ export type ProjectDetails = {
   visible: boolean
 }
 
+/** What the form sends; a team size that is not a whole number is sent as typed. */
+export type ProjectDetailsBody = Omit<ProjectDetails, 'team_size'> & {
+  team_size: number | string | null
+}
+
 export type AdminProject = ProjectDetails & {
   id: number
   missing: boolean // gone from the public repositories at the last sync
@@ -87,7 +92,7 @@ type ValidationError = { loc: (string | number)[] }
 
 export async function saveProjectDetails(
   id: number,
-  details: ProjectDetails,
+  details: ProjectDetailsBody,
 ): Promise<DetailsResult> {
   try {
     const response = await fetch(`/api/admin/projects/${id}`, {

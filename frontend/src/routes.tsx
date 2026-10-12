@@ -7,6 +7,7 @@ import { AdminDashboardPage } from './pages/admin/AdminDashboardPage.tsx'
 import { AdminLoginPage } from './pages/admin/AdminLoginPage.tsx'
 import { ExperienceEditorPage } from './pages/admin/ExperienceEditorPage.tsx'
 import { ExperienceListPage } from './pages/admin/ExperienceListPage.tsx'
+import { ProjectEditorPage } from './pages/admin/ProjectEditorPage.tsx'
 import { ProjectListPage } from './pages/admin/ProjectListPage.tsx'
 import { SkillEditorPage } from './pages/admin/SkillEditorPage.tsx'
 import { SkillListPage } from './pages/admin/SkillListPage.tsx'
@@ -52,6 +53,7 @@ export const routes = createRoutesFromElements(
           <Route path="skills/new" element={<SkillEditorPage />} />
           <Route path="skills/:id" element={<SkillEditorPage />} />
           <Route path="projects" element={<ProjectListPage />} />
+          <Route path="projects/:id" element={<ProjectEditorPage />} />
         </Route>
       </Route>
     </Route>

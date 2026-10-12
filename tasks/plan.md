@@ -28,10 +28,10 @@ A "Sync with GitHub" admin button imports Léonard's public repositories (forks 
 
 ### Phase 2: Admin
 - [x] Task 4: Admin project list (sync button + report, visibility toggle, arrows, not-found mark, delete) + dashboard link
-- [ ] Task 5: Admin project form (title, context, team size, visible; GitHub data and translated "About" read-only)
+- [x] Task 5: Admin project form (title, context, team size, visible; GitHub data and translated "About" read-only)
 
 ### Checkpoint B: after Tasks 4–5
-- [ ] Screenshots (both themes, desktop and 390 px)
+- [x] Screenshots (both themes, desktop and 390 px)
 - [ ] Human: sync the real repositories, fill them in; **decide the public card design together**
 
 ### Phase 3: Public
