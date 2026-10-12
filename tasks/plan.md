@@ -35,7 +35,7 @@ Contact form saved in the database and emailed to Léonard (Mailpit locally), pr
 - [x] Human: privacy text approved; a real message sent from the site, read and deleted in the admin
 
 ### Checkpoint C: complete
-- [ ] Code review
+- [x] Code review
 - [ ] Merge into `develop` after approval
 
 ## Risks and Mitigations
