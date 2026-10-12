@@ -17,7 +17,7 @@ Skills grouped in five fixed categories, each a name + optional Simple Icons log
 ## Task List
 
 ### Phase 1: Backend
-- [ ] Task 1: Model, migration, domain and repository (list, get, create, update, delete, move)
+- [x] Task 1: Model, migration, domain and repository (list, get, create, update, delete, move)
 - [ ] Task 2: Public and admin API routes with validation
 
 ### Checkpoint A: after Tasks 1–2

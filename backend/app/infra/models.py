@@ -1,10 +1,22 @@
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, SmallInteger, String, Text, func
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    SmallInteger,
+    String,
+    Text,
+    func,
+    text,
+)
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.domain.experience import ORGANIZATION_MAX_LENGTH, SLUG_MAX_LENGTH
+from app.domain.skill import ICON_SLUG_MAX_LENGTH, NAME_MAX_LENGTH
 from app.infra.database import Base
 
 
@@ -76,3 +88,29 @@ class ExperienceModel(Base):
     summary: Mapped[dict[str, str]] = mapped_column(JSONB)
     description: Mapped[dict[str, str]] = mapped_column(JSONB)
     technologies: Mapped[list[str]] = mapped_column(ARRAY(Text), server_default="{}")
+
+
+class SkillModel(Base):
+    __tablename__ = "skills"
+    __table_args__ = (
+        CheckConstraint(
+            "category IN ('languages', 'frontend', 'backend', 'tools', 'ides')",
+            name="category_values",
+        ),
+        # A logo is all three values or none.
+        CheckConstraint(
+            "(icon_slug IS NULL) = (icon_hex IS NULL) AND (icon_hex IS NULL) = (icon_path IS NULL)",
+            name="icon_complete",
+        ),
+        CheckConstraint("icon_hex ~ '^[0-9A-Fa-f]{6}$'", name="icon_hex_format"),
+        # Unique name per category, ignoring case ("python" and "Python" are the same skill).
+        Index("uq_skills_category_name", "category", text("lower(name)"), unique=True),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(NAME_MAX_LENGTH))
+    category: Mapped[str] = mapped_column(String(20))
+    position: Mapped[int] = mapped_column(Integer)
+    icon_slug: Mapped[str | None] = mapped_column(String(ICON_SLUG_MAX_LENGTH))
+    icon_hex: Mapped[str | None] = mapped_column(String(6))
+    icon_path: Mapped[str | None] = mapped_column(Text)
