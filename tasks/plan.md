@@ -27,7 +27,7 @@ A "Sync with GitHub" admin button imports Léonard's public repositories (forks 
 - [x] Optional live test against the real GitHub API passes
 
 ### Phase 2: Admin
-- [ ] Task 4: Admin project list (sync button + report, visibility toggle, arrows, not-found mark, delete) + dashboard link
+- [x] Task 4: Admin project list (sync button + report, visibility toggle, arrows, not-found mark, delete) + dashboard link
 - [ ] Task 5: Admin project form (title, context, team size, visible; GitHub data and translated "About" read-only)
 
 ### Checkpoint B: after Tasks 4–5

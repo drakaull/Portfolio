@@ -97,7 +97,7 @@ export function SkillListPage() {
                           id={`move-up-${skill.id}`}
                           type="button"
                           className={styles.arrow}
-                          aria-label={`${t('admin.skills.moveUp')}: ${skill.name}`}
+                          aria-label={`${t('admin.moveUp')}: ${skill.name}`}
                           disabled={index === 0}
                           onClick={() => void move(skill.id, 'up')}
                         >
@@ -107,7 +107,7 @@ export function SkillListPage() {
                           id={`move-down-${skill.id}`}
                           type="button"
                           className={styles.arrow}
-                          aria-label={`${t('admin.skills.moveDown')}: ${skill.name}`}
+                          aria-label={`${t('admin.moveDown')}: ${skill.name}`}
                           disabled={index === inCategory.length - 1}
                           onClick={() => void move(skill.id, 'down')}
                         >
