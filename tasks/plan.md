@@ -35,7 +35,7 @@ A photo uploaded from the home editor, cleaned and resized by Pillow, stored as 
 ### Checkpoint C: complete
 - [x] Human: a real phone photo uploaded and checked
 - [x] Code review
-- [ ] Merge into `develop` after approval
+- [x] Merge into `develop` after approval
 
 ## Risks and Mitigations
 
