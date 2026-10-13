@@ -23,7 +23,7 @@ A photo uploaded from the home editor, cleaned and resized by Pillow, stored as 
 - [x] ruff + pytest green (metadata stripped, orientation, resize, refusals, session)
 
 ### Phase 2: Admin and placement
-- [ ] Task 2: Photo block in the home editor (upload / replace / remove, preview)
+- [x] Task 2: Photo block in the home editor (upload / replace / remove, preview)
 - [ ] Task 3: 2–3 placement variants as screenshots with a test photo
 
 ### Checkpoint B

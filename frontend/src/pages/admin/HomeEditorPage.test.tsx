@@ -14,6 +14,7 @@ const CONTENT: AdminHomeContent = {
   linkedin_url: 'https://www.linkedin.com/in/someone',
   github_url: 'https://github.com/someone',
   has_cv: false,
+  photo_url: null,
 }
 
 const savedAsSent = (body: unknown) =>
@@ -347,5 +348,61 @@ describe('automatic translation', () => {
     fireEvent.click(saveButton())
 
     expect((await screen.findByRole('alert')).textContent).toContain('could not be generated')
+  })
+})
+
+describe('photo', () => {
+  const photo = () => new File(['fake-jpeg'], 'me.jpg', { type: 'image/jpeg' })
+  const fileInput = () => screen.findByLabelText(/Upload a photo|Replace the photo/)
+
+  function mockPhotoApi(photoUrl: string | null, status = 204) {
+    return mockApi({
+      'GET /api/admin/me': signedIn,
+      'GET /api/admin/home': () => Response.json({ ...CONTENT, photo_url: photoUrl }),
+      'PUT /api/admin/photo': () => new Response(null, { status }),
+      'DELETE /api/admin/photo': () => new Response(null, { status: 204 }),
+    })
+  }
+
+  test('uploads a photo and shows its preview', async () => {
+    const fetchMock = mockPhotoApi(null)
+    renderApp('/en/admin/home')
+    expect(await screen.findByText(/No photo online/)).toBeDefined()
+    expect(screen.queryByRole('img', { name: 'Current photo' })).toBeNull()
+
+    fireEvent.change(await fileInput(), { target: { files: [photo()] } })
+
+    expect(await screen.findByText(/Photo uploaded: turned upright/)).toBeDefined()
+    expect(screen.getByRole('img', { name: 'Current photo' })).toBeDefined()
+    const [, init] = fetchMock.mock.calls.find(([url]) => url === '/api/admin/photo')!
+    expect(init?.method).toBe('PUT')
+    expect((init!.body as FormData).get('file')).toBeInstanceOf(File)
+  })
+
+  test.each([
+    [415, 'This file is not a JPEG, PNG or WebP image.'],
+    [413, /larger than 5 MB/],
+  ])('explains a refused upload (%i)', async (status, message) => {
+    mockPhotoApi(null, status)
+    renderApp('/en/admin/home')
+
+    fireEvent.change(await fileInput(), { target: { files: [photo()] } })
+
+    expect((await screen.findByRole('alert')).textContent).toMatch(message)
+  })
+
+  test('removes the photo after confirming', async () => {
+    const fetchMock = mockPhotoApi('/api/photo?v=1')
+    renderApp('/en/admin/home')
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Remove the photo' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
+
+    expect(await screen.findByText('Photo removed.')).toBeDefined()
+    expect(
+      fetchMock.mock.calls.some(
+        ([url, init]) => url === '/api/admin/photo' && init?.method === 'DELETE',
+      ),
+    ).toBe(true)
   })
 })
