@@ -251,6 +251,11 @@ export const nl: Record<TranslationKey, string> = {
   'admin.photo.online': 'Er staat een foto online.',
   'admin.photo.none': 'Geen foto online.',
   'admin.photo.preview': 'Huidige foto',
+  'admin.photo.framing': 'Uitsnede van de foto',
+  'admin.photo.framingResult': 'Op de startpagina',
+  'admin.photo.framingHint':
+    'Sleep het kader (of gebruik de pijltjestoetsen, Shift om sneller te gaan) om te kiezen wat er op de startpagina verschijnt. Sla daarna op.',
+  'admin.photo.framingNotNeeded': 'De foto heeft al de vorm van het kader: niets bij te snijden.',
   'admin.photo.upload': 'Een foto uploaden (JPEG, PNG of WebP, max. 5 MB)',
   'admin.photo.replace': 'De foto vervangen (JPEG, PNG of WebP, max. 5 MB)',
   'admin.photo.uploaded':

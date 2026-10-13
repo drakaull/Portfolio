@@ -16,6 +16,7 @@ import adminStyles from './Admin.module.css'
 import { SessionExpiredAlert, UnsavedChangesDialog } from './EditorParts.tsx'
 import { CvField, PhotoField } from './FileField.tsx'
 import styles from './Editor.module.css'
+import { PhotoFraming } from './PhotoFraming.tsx'
 import { TranslationTabs } from './TranslationTabs.tsx'
 import { useUnsavedChanges } from './useUnsavedChanges.ts'
 
@@ -49,6 +50,8 @@ export function HomeEditorPage() {
   const [invalid, setInvalid] = useState<HomeField[]>([])
   const [hasCv, setHasCv] = useState(false)
   const [hasPhoto, setHasPhoto] = useState(false)
+  // Bumped on each upload, so the framing tool never shows a cached older photo.
+  const [photoVersion, setPhotoVersion] = useState(0)
   // Bumped on each save: remounts the translation tabs, which clears their messages.
   const [saves, setSaves] = useState(0)
   const [saveNotice, setSaveNotice] = useState<SaveNotice | null>(null)
@@ -213,7 +216,25 @@ export function HomeEditorPage() {
           {fieldError('github_url')}
         </div>
 
-        <PhotoField present={hasPhoto} onChange={setHasPhoto} />
+        <PhotoField
+          present={hasPhoto}
+          onChange={(present) => {
+            setHasPhoto(present)
+            if (!present) return
+            setPhotoVersion((count) => count + 1)
+            // The server frames a new photo from the centre: follow it, without making it a change.
+            const centred = (current: HomeContentForm | null) =>
+              current && { ...current, photo_focus: { x: 50, y: 50 } }
+            setSaved(centred)
+            setForm(centred)
+          }}
+        >
+          <PhotoFraming
+            src={`/api/photo?preview=${photoVersion}`}
+            focus={form.photo_focus}
+            onChange={(photo_focus) => update({ photo_focus })}
+          />
+        </PhotoField>
         <CvField present={hasCv} onChange={setHasCv} />
 
         <div className={styles.actions}>
