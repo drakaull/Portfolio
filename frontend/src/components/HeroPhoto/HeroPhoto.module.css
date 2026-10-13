@@ -1,0 +1,71 @@
+.photo {
+  position: relative;
+  width: 10.5rem;
+  height: 10.5rem;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--color-border);
+  cursor: pointer;
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The code panel waits off to the right (clipped away), then wipes in from right to left. */
+.code {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: var(--space-3);
+  overflow: hidden;
+  background: #1f1d1a;
+  color: #ece7dc;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path var(--duration-slow) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .photo:hover .code {
+    clip-path: inset(0);
+  }
+}
+
+.photo[data-code] .code {
+  clip-path: inset(0);
+}
+
+/* Fixed dark panel in both themes: these colours are read on #1f1d1a. */
+.tag {
+  color: #e0896a;
+}
+
+.attribute {
+  color: #5fc2c2;
+}
+
+.value {
+  color: #e8d9b5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code {
+    clip-path: inset(0);
+    opacity: 0;
+    transition: opacity var(--duration-fast) linear;
+  }
+
+  .photo:hover .code,
+  .photo[data-code] .code {
+    opacity: 1;
+  }
+}

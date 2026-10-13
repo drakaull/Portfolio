@@ -20,6 +20,7 @@ export const en = {
   'home.fullPath': 'Full timeline',
   'home.loading': 'Loading…',
   'home.error': 'This content could not be loaded. Please try again later.',
+  'home.photoAlt': 'Photo of Léonard Fontaine',
   'home.cv': 'View my CV',
   'experience.title': 'Experience',
   'experience.timeline': 'Career timeline',

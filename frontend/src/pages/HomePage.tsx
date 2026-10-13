@@ -3,6 +3,7 @@ import { useSharedHomeContent } from '../api/homeContentContext.ts'
 import type { HomeContent } from '../api/useHomeContent.ts'
 import { ExperienceCard } from '../components/ExperienceCard/ExperienceCard.tsx'
 import { Eyebrow } from '../components/Eyebrow/Eyebrow.tsx'
+import { HeroPhoto } from '../components/HeroPhoto/HeroPhoto.tsx'
 import { MarkdownText } from '../components/MarkdownText/MarkdownText.tsx'
 import { Reveal } from '../components/Reveal/Reveal.tsx'
 import { TextLink } from '../components/TextLink/TextLink.tsx'
@@ -17,6 +18,9 @@ export function HomePage() {
     <section className={styles.hero}>
       <title>{t('site.name')}</title>
       <Reveal className={styles.intro}>
+        {state.status === 'ready' && state.content.photo_url && (
+          <HeroPhoto src={state.content.photo_url} alt={t('home.photoAlt')} />
+        )}
         <Eyebrow>{t('eyebrow.home')}</Eyebrow>
         <h1 className={styles.name}>{t('site.name')}</h1>
         {state.status === 'loading' && (

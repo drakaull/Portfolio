@@ -21,6 +21,7 @@ export const fr: Record<TranslationKey, string> = {
   'home.fullPath': 'Tout le parcours',
   'home.loading': 'Chargement…',
   'home.error': "Ce contenu n'a pas pu être chargé. Réessayez plus tard.",
+  'home.photoAlt': 'Photo de Léonard Fontaine',
   'home.cv': 'Voir mon CV',
   'experience.title': 'Parcours',
   'experience.timeline': 'Frise du parcours',

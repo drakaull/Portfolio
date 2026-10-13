@@ -7,6 +7,7 @@ export type HomeContent = {
   linkedin_url: string
   github_url: string
   cv_url: string | null
+  photo_url: string | null // versioned: changes when the photo is replaced
 }
 
 type Result = { lang: Lang; content: HomeContent } | { lang: Lang; error: true }

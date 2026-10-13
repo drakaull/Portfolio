@@ -22,6 +22,7 @@ export const nl: Record<TranslationKey, string> = {
   'home.fullPath': 'Volledige tijdlijn',
   'home.loading': 'Bezig met laden…',
   'home.error': 'Deze inhoud kon niet worden geladen. Probeer het later nog eens.',
+  'home.photoAlt': 'Foto van Léonard Fontaine',
   'home.cv': 'Bekijk mijn cv',
   'experience.title': 'Ervaring',
   'experience.timeline': 'Loopbaantijdlijn',
