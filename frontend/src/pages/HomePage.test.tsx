@@ -151,7 +151,7 @@ describe('home page', () => {
     expect(screen.queryByRole('link', { name: /View my CV/ })).toBeNull()
   })
 
-  test('shows the photo with its alt text, and the real HTML of the image behind it', async () => {
+  test('shows the photo with its alt text, and the HTML of the image behind it', async () => {
     mockApi({ fr: { photo_url: '/api/photo?v=123' } })
     renderApp('/fr')
 
@@ -164,7 +164,7 @@ describe('home page', () => {
       [
         '<img',
         '  src="/api/photo?v=…"',
-        '  alt="Photo de Léonard Fontaine"',
+        '  alt="homepage_portfolio.webp"', // reads like code; the real alt stays descriptive
         '  width="168"',
         '  height="168"',
         '/>',

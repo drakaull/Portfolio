@@ -1,11 +1,10 @@
+/* The figure keeps the photo's size; the code panel is a layer on top of it, as wide as the
+   code needs (never cut), hidden until the photo is hovered or tapped. */
 .photo {
   position: relative;
   width: 10.5rem;
   height: 10.5rem;
   margin: 0;
-  overflow: hidden;
-  border-radius: 12px;
-  box-shadow: 0 0 0 1px var(--color-border);
   cursor: pointer;
 }
 
@@ -13,35 +12,48 @@
   display: block;
   width: 100%;
   height: 100%;
+  border-radius: 12px;
   object-fit: cover;
+  box-shadow: 0 0 0 1px var(--color-border);
 }
 
-/* The code panel waits off to the right (clipped away), then wipes in from right to left. */
+/* Waits clipped away on the left, then wipes in from left to right. */
 .code {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 100%;
+  max-width: calc(100vw - 2 * var(--gutter));
+  min-height: 100%;
   margin: 0;
-  padding: var(--space-3);
-  overflow: hidden;
+  padding: var(--space-4);
+  overflow-x: auto;
+  border-radius: 12px;
   background: #1f1d1a;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.08),
+    0 12px 32px rgb(0 0 0 / 0.25);
   color: #ece7dc;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  line-height: 1.55;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  clip-path: inset(0 0 0 100%);
+  font-size: var(--text-xs);
+  line-height: 1.7;
+  white-space: pre;
+  clip-path: inset(0 100% 0 0 round 12px);
+  pointer-events: none;
   transition: clip-path var(--duration-slow) var(--ease-out);
 }
 
 @media (hover: hover) {
   .photo:hover .code {
-    clip-path: inset(0);
+    clip-path: inset(0 round 12px);
   }
 }
 
 .photo[data-code] .code {
-  clip-path: inset(0);
+  clip-path: inset(0 round 12px);
 }
 
 /* Fixed dark panel in both themes: these colours are read on #1f1d1a. */
@@ -59,7 +71,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .code {
-    clip-path: inset(0);
+    clip-path: inset(0 round 12px);
     opacity: 0;
     transition: opacity var(--duration-fast) linear;
   }

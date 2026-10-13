@@ -2,10 +2,13 @@ import { useState } from 'react'
 import styles from './HeroPhoto.module.css'
 
 const SIZE = 168
+// Shown in the code instead of the alt text, to read like code; the real alt stays descriptive.
+const SHOWN_ALT = 'homepage_portfolio.webp'
 
 /**
  * The home photo. Hovering it (or tapping, on touch screens) wipes in the real HTML of the image
- * from the right. The code is decorative: screen readers only get the alt text.
+ * from the left, over the photo. The code is decorative: screen readers only get the real alt
+ * text, never the file-like one shown in the code.
  */
 export function HeroPhoto({ src, alt }: { src: string; alt: string }) {
   const [showCode, setShowCode] = useState(false)
@@ -28,7 +31,7 @@ export function HeroPhoto({ src, alt }: { src: string; alt: string }) {
           <span className={styles.value}>"{shownSrc}"</span>
           {'\n  '}
           <span className={styles.attribute}>alt</span>=
-          <span className={styles.value}>"{alt}"</span>
+          <span className={styles.value}>"{SHOWN_ALT}"</span>
           {'\n  '}
           <span className={styles.attribute}>width</span>=
           <span className={styles.value}>"{SIZE}"</span>
