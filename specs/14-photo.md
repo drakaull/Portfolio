@@ -65,3 +65,8 @@ Stored as `storage/photo.webp` (fixed name, never from the request), next to the
 ## Decisions (round 2)
 
 - Upload limit **5 MB**; the 6 MB request limit is unchanged (a heavier photo is exported smaller first).
+
+## Decisions (round 3, Checkpoint B)
+
+- Placement **B**: a 168 px rounded square above the "~/portfolio" eyebrow, in the left column.
+- **Hover wipe**: a code panel slides over the photo from the right and shows the real HTML of the image (its address, alt text and size), in JetBrains Mono with a light colouring from the palette. Touch screens: a tap toggles photo / code. Reduced motion: a fade instead of the slide. The code is decorative (`aria-hidden`); screen readers get the alt text only.

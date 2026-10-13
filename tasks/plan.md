@@ -24,10 +24,10 @@ A photo uploaded from the home editor, cleaned and resized by Pillow, stored as 
 
 ### Phase 2: Admin and placement
 - [x] Task 2: Photo block in the home editor (upload / replace / remove, preview)
-- [ ] Task 3: 2–3 placement variants as screenshots with a test photo
+- [x] Task 3: 2–3 placement variants as screenshots with a test photo
 
 ### Checkpoint B
-- [ ] Human: placement chosen
+- [x] Human: placement chosen (B, with a hover wipe showing the image HTML)
 
 ### Phase 3: Public
 - [ ] Task 4: Photo on the home page at the chosen place (alt text, fixed size, both themes, 390 px)
