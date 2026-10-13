@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import type { PhotoFocus } from '../../api/useHomeContent.ts'
+import { HERO_PHOTO_HEIGHT, HERO_PHOTO_WIDTH } from '../../lib/heroPhoto.ts'
 import styles from './HeroPhoto.module.css'
 
-// Same size as the code panel, so the wipe swaps one for the other.
-const WIDTH = 240
-const HEIGHT = 156
 // Shown in the code instead of the alt text, to read like code; the real alt stays descriptive.
 const SHOWN_ALT = 'homepage_portfolio.webp'
 
@@ -31,8 +29,8 @@ export function HeroPhoto({ src, alt, focus }: { src: string; alt: string; focus
       <img
         src={src}
         alt={alt}
-        width={WIDTH}
-        height={HEIGHT}
+        width={HERO_PHOTO_WIDTH}
+        height={HERO_PHOTO_HEIGHT}
         // The framing chosen in the admin: this point of the photo stays in view.
         style={{ objectPosition: `${focus.x}% ${focus.y}%` }}
       />
@@ -47,10 +45,10 @@ export function HeroPhoto({ src, alt, focus }: { src: string; alt: string; focus
           <span className={styles.value}>"{SHOWN_ALT}"</span>
           {'\n  '}
           <span className={styles.attribute}>width</span>=
-          <span className={styles.value}>"{WIDTH}"</span>
+          <span className={styles.value}>"{HERO_PHOTO_WIDTH}"</span>
           {'\n  '}
           <span className={styles.attribute}>height</span>=
-          <span className={styles.value}>"{HEIGHT}"</span>
+          <span className={styles.value}>"{HERO_PHOTO_HEIGHT}"</span>
           {'\n'}
           <span className={styles.tag}>{'/>'}</span>
         </code>

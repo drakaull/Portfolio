@@ -1,11 +1,8 @@
 import { useState, type KeyboardEvent, type PointerEvent } from 'react'
 import type { PhotoFocus } from '../../api/useHomeContent.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
+import { HERO_PHOTO_HEIGHT, HERO_PHOTO_WIDTH } from '../../lib/heroPhoto.ts'
 import styles from './PhotoFraming.module.css'
-
-// Size of the photo on the home page (HeroPhoto): keep in sync.
-const FRAME_WIDTH = 240
-const FRAME_HEIGHT = 156
 
 const clamp = (value: number) => Math.min(100, Math.max(0, Math.round(value)))
 
@@ -27,7 +24,7 @@ export function PhotoFraming({
   // Width / height of the photo, known once it has loaded.
   const [ratio, setRatio] = useState<number | null>(null)
 
-  const frameRatio = FRAME_WIDTH / FRAME_HEIGHT
+  const frameRatio = HERO_PHOTO_WIDTH / HERO_PHOTO_HEIGHT
   // The frame's size, as a share (0–1) of the photo's width and height.
   const frameWidth = ratio === null ? 1 : Math.min(1, frameRatio / ratio)
   const frameHeight = ratio === null ? 1 : Math.min(1, ratio / frameRatio)
@@ -75,6 +72,7 @@ export function PhotoFraming({
         className={styles.stage}
         data-axis={axis ?? undefined}
         onPointerDown={(event) => {
+          if (event.button !== 0) return // a right or middle click must not move the frame
           event.currentTarget.setPointerCapture(event.pointerId)
           follow(event)
         }}
@@ -120,8 +118,8 @@ export function PhotoFraming({
         <img
           src={src}
           alt=""
-          width={FRAME_WIDTH}
-          height={FRAME_HEIGHT}
+          width={HERO_PHOTO_WIDTH}
+          height={HERO_PHOTO_HEIGHT}
           style={{ objectPosition: `${focus.x}% ${focus.y}%` }}
         />
       </div>

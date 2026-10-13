@@ -8,6 +8,7 @@ import {
   type HomeContentForm,
   type HomeField,
 } from '../../api/adminHome.ts'
+import { PHOTO_FOCUS_CENTRE } from '../../api/useHomeContent.ts'
 import { Button } from '../../components/Button/Button.tsx'
 import { MarkdownText } from '../../components/MarkdownText/MarkdownText.tsx'
 import type { TranslationKey } from '../../i18n/en.ts'
@@ -224,7 +225,7 @@ export function HomeEditorPage() {
             setPhotoVersion((count) => count + 1)
             // The server frames a new photo from the centre: follow it, without making it a change.
             const centred = (current: HomeContentForm | null) =>
-              current && { ...current, photo_focus: { x: 50, y: 50 } }
+              current && { ...current, photo_focus: PHOTO_FOCUS_CENTRE }
             setSaved(centred)
             setForm(centred)
           }}

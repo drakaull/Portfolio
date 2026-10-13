@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import FileResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.dependencies import get_home_repository
 from app.domain.home import PHOTO_FOCUS_MAX, PHOTO_FOCUS_MIN, HomeContent
@@ -15,6 +15,8 @@ router = APIRouter(tags=["home"])
 
 class PhotoFocus(BaseModel):
     """The point of the photo (in % of its width and height) kept in view by its frame."""
+
+    model_config = ConfigDict(extra="forbid")  # also an admin input
 
     x: int = Field(ge=PHOTO_FOCUS_MIN, le=PHOTO_FOCUS_MAX)
     y: int = Field(ge=PHOTO_FOCUS_MIN, le=PHOTO_FOCUS_MAX)

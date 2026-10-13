@@ -131,6 +131,7 @@ async def test_surrounding_spaces_are_trimmed(admin_client: AsyncClient) -> None
         (with_changes(has_cv=True), "has_cv"),
         (with_changes(photo_focus={"x": -1, "y": 50}), "x"),
         (with_changes(photo_focus={"x": 50, "y": 101}), "y"),
+        (with_changes(photo_focus={"x": 50, "y": 50, "z": 1}), "z"),
         ({k: v for k, v in VALID.items() if k != "photo_focus"}, "photo_focus"),
     ],
 )

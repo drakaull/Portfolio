@@ -2,6 +2,7 @@
    code needs (never cut), hidden until the photo is hovered or tapped. */
 .photo {
   position: relative;
+  /* HERO_PHOTO_WIDTH × HERO_PHOTO_HEIGHT (240 × 156 px). */
   width: 15rem;
   height: 9.75rem;
   margin: 0;
