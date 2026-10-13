@@ -1,11 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- "LF" monogram drawn with rectangles, so it stays crisp at 16 px without any font. -->
-  <rect width="32" height="32" rx="7" fill="#9b4527"/>
-  <g fill="#fbf8f2">
-    <rect x="6" y="8" width="3.5" height="16"/>
-    <rect x="6" y="20.5" width="8" height="3.5"/>
-    <rect x="17" y="8" width="3.5" height="16"/>
-    <rect x="17" y="8" width="9" height="3.5"/>
-    <rect x="17" y="14.5" width="7" height="3.2"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- "LF" monogram: upright L, F slanted 15° like the / of a path (~/portfolio). Drawn as shapes,
+       with thick stems, so it stays crisp at 16 px without any font. -->
+  <rect width="256" height="256" rx="56" fill="#9b4527"/>
+  <path fill="#fbf8f2" d="M34 61.86H71.46V154.69H104.03V192.14H34ZM148.71 61.86H222L211.96 99.31H176.13L173.73 108.27H192.46L182.43 145.73H163.7L151.26 192.14H113.8Z"/>
 </svg>
