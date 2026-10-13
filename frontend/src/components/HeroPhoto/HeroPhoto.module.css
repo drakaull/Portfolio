@@ -35,8 +35,8 @@
   overflow-x: auto;
   border: 1px solid var(--color-border);
   border-radius: 13px;
-  background: #1f1d1a;
-  color: #ece7dc;
+  background: var(--color-surface);
+  color: var(--color-text);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   line-height: 1.7;
@@ -55,17 +55,28 @@
   clip-path: inset(0 round 13px);
 }
 
-/* Fixed dark panel in both themes: these colours are read on #1f1d1a. */
+/* Syntax colours, each ≥ 4.5:1 on the theme's --color-surface. */
+.photo {
+  --code-tag: var(--color-accent);
+  --code-attribute: #00686b;
+  --code-value: #6b4f12;
+}
+
+:global(:root[data-theme='dark']) .photo {
+  --code-attribute: #5fc2c2;
+  --code-value: #e8d9b5;
+}
+
 .tag {
-  color: #e0896a;
+  color: var(--code-tag);
 }
 
 .attribute {
-  color: #5fc2c2;
+  color: var(--code-attribute);
 }
 
 .value {
-  color: #e8d9b5;
+  color: var(--code-value);
 }
 
 @media (prefers-reduced-motion: reduce) {
