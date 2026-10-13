@@ -33,8 +33,8 @@ A photo uploaded from the home editor, cleaned and resized by Pillow, stored as 
 - [x] Task 4: Photo on the home page at the chosen place (alt text, fixed size, both themes, 390 px)
 
 ### Checkpoint C: complete
-- [ ] Human: a real phone photo uploaded and checked
-- [ ] Code review
+- [x] Human: a real phone photo uploaded and checked
+- [x] Code review
 - [ ] Merge into `develop` after approval
 
 ## Risks and Mitigations
