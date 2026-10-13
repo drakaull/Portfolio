@@ -289,7 +289,7 @@ export function SkillEditorPage() {
               className={editorStyles.secondary}
               onClick={() => setDeleteState('idle')}
             >
-              {t('admin.cv.cancel')}
+              {t('admin.cancel')}
             </button>
           </div>
         )}

@@ -157,3 +157,13 @@ async def test_stored_photo_is_readable_by_other_processes(
     await upload(admin_client, jpeg_from_a_phone())
 
     assert stat.S_IMODE((storage_dir / "photo.webp").stat().st_mode) == 0o644
+
+
+async def test_only_versioned_addresses_are_cached_for_long(admin_client: AsyncClient) -> None:
+    await upload(admin_client, jpeg_from_a_phone())
+
+    versioned = await admin_client.get("/api/photo", params={"v": "123"})
+    unversioned = await admin_client.get("/api/photo", params={"preview": "0"})
+
+    assert "max-age=31536000" in versioned.headers["cache-control"]
+    assert unversioned.headers["cache-control"] == "no-cache"  # the admin preview stays fresh

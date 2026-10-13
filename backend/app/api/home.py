@@ -60,13 +60,15 @@ async def get_cv() -> FileResponse:
 
 
 @router.get("/photo", response_class=FileResponse)
-async def get_photo() -> FileResponse:
+async def get_photo(v: str | None = None) -> FileResponse:
     path = photo_file()
     if path is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Photo not found")
-    # The URL carries a version (?v=…): a new photo gets a new URL, so caching is safe.
+    # A versioned address (?v=…, from photo_url) changes with the photo: safe to cache for long.
+    # Any other address (e.g. the admin preview) must be checked again each time.
+    cache = "public, max-age=31536000, immutable" if v else "no-cache"
     return FileResponse(
         path,
         media_type="image/webp",
-        headers={"X-Content-Type-Options": "nosniff", "Cache-Control": "public, max-age=31536000"},
+        headers={"X-Content-Type-Options": "nosniff", "Cache-Control": cache},
     )

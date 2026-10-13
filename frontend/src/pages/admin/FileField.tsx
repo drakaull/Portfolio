@@ -49,7 +49,7 @@ export function FileField({
   const errors: Record<Exclude<FileResult, 'ok'>, TranslationKey> = {
     tooLarge: texts.tooLarge,
     wrongType: texts.wrongType,
-    expired: 'admin.cv.expired',
+    expired: 'admin.file.expired',
     error: 'admin.error',
   }
 
@@ -104,17 +104,17 @@ export function FileField({
       {confirmingRemoval && (
         <div className={styles.confirm} role="alertdialog" aria-labelledby={`${id}-remove-message`}>
           <p id={`${id}-remove-message`}>{t(texts.confirmRemove)}</p>
-          <Button onClick={handleRemove}>{t('admin.cv.confirm')}</Button>
+          <Button onClick={handleRemove}>{t('admin.file.confirmRemove')}</Button>
           <button
             type="button"
             className={styles.secondary}
             onClick={() => setConfirmingRemoval(false)}
           >
-            {t('admin.cv.cancel')}
+            {t('admin.cancel')}
           </button>
         </div>
       )}
-      {busy && <p role="status">{t('admin.cv.working')}</p>}
+      {busy && <p role="status">{t('admin.file.sending')}</p>}
       {feedback && (
         <p
           role={feedback.kind}
