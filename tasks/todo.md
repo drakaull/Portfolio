@@ -6,4 +6,4 @@ Plan: [plan.md](plan.md)
 - [x] Checkpoint A: ruff + pytest green, migration up/down
 - [x] Task 2: public `object-position`
 - [x] Task 3: admin framing tool (drag, keyboard, preview, Save)
-- [ ] Checkpoint B: visual check · review · merge approval
+- [x] Checkpoint B: visual check · review · merge approval
