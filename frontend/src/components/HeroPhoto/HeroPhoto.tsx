@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { PhotoFocus } from '../../api/useHomeContent.ts'
 import styles from './HeroPhoto.module.css'
 
 // Same size as the code panel, so the wipe swaps one for the other.
@@ -12,7 +13,7 @@ const SHOWN_ALT = 'homepage_portfolio.webp'
  * from the left, over the photo. The code is decorative: screen readers only get the real alt
  * text, never the file-like one shown in the code.
  */
-export function HeroPhoto({ src, alt }: { src: string; alt: string }) {
+export function HeroPhoto({ src, alt, focus }: { src: string; alt: string; focus: PhotoFocus }) {
   const [showCode, setShowCode] = useState(false)
   // The version in the address is noise for a reader: shown shortened.
   const shownSrc = src.replace(/\?v=.*$/, '?v=…')
@@ -27,7 +28,14 @@ export function HeroPhoto({ src, alt }: { src: string; alt: string }) {
         if (!window.matchMedia?.('(hover: hover)').matches) setShowCode((shown) => !shown)
       }}
     >
-      <img src={src} alt={alt} width={WIDTH} height={HEIGHT} />
+      <img
+        src={src}
+        alt={alt}
+        width={WIDTH}
+        height={HEIGHT}
+        // The framing chosen in the admin: this point of the photo stays in view.
+        style={{ objectPosition: `${focus.x}% ${focus.y}%` }}
+      />
       <pre className={styles.code} aria-hidden="true">
         <code>
           <span className={styles.tag}>{'<img'}</span>

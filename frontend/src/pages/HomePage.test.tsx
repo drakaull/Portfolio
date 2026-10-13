@@ -13,6 +13,7 @@ const CONTENT: Record<string, HomeContent> = {
     github_url: 'https://github.com/someone',
     cv_url: '/api/cv',
     photo_url: null,
+    photo_focus: { x: 50, y: 50 },
   },
   fr: {
     headline: 'Développeur fullstack',
@@ -21,6 +22,7 @@ const CONTENT: Record<string, HomeContent> = {
     github_url: 'https://github.com/someone',
     cv_url: '/api/cv',
     photo_url: null,
+    photo_focus: { x: 50, y: 50 },
   },
 }
 
@@ -170,6 +172,14 @@ describe('home page', () => {
         '/>',
       ].join('\n'),
     )
+  })
+
+  test('keeps in view the part of the photo chosen in the admin', async () => {
+    mockApi({ fr: { photo_url: '/api/photo?v=123', photo_focus: { x: 30, y: 15 } } })
+    renderApp('/fr')
+
+    const photo = await screen.findByRole('img', { name: 'Photo de Léonard Fontaine' })
+    expect(photo.style.objectPosition).toBe('30% 15%')
   })
 
   test('a tap shows the code on touch screens', async () => {

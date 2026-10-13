@@ -1,12 +1,10 @@
 import type { Lang } from '../i18n/useTranslation.ts'
+import type { PhotoFocus } from './useHomeContent.ts'
 
 export type Translated = Record<Lang, string>
 
 /** Languages translated from French, the writing language. */
 export type TargetLang = Exclude<Lang, 'fr'>
-
-/** The point of the photo (in % of its width and height) kept in view by its frame. */
-export type PhotoFocus = { x: number; y: number }
 
 export type HomeContentForm = {
   headline: Translated
