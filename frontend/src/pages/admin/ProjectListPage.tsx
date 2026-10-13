@@ -215,7 +215,7 @@ export function ProjectListPage() {
                         className={editorStyles.secondary}
                         onClick={() => setConfirmingDelete(null)}
                       >
-                        {t('admin.cv.cancel')}
+                        {t('admin.cancel')}
                       </button>
                     </span>
                   ) : (

@@ -29,6 +29,7 @@ async def test_admin_reads_both_languages(admin_client: AsyncClient) -> None:
         "linkedin_url": "https://www.linkedin.com/in/l%C3%A9onard-fontaine-80902437b/",
         "github_url": "https://github.com/drakaull",
         "has_cv": False,
+        "photo_url": None,
     }
 
 
@@ -53,6 +54,7 @@ async def test_saved_content_is_public_immediately(
             "nl": "[nl] Je crée des **applications web**.",
         },
         "has_cv": False,
+        "photo_url": None,
         "auto_translated": ["en", "nl"],
         "translation_failed": False,
     }

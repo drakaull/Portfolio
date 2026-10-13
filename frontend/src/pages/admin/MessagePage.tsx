@@ -107,7 +107,7 @@ export function MessagePage() {
             className={editorStyles.secondary}
             onClick={() => setConfirmingDelete(false)}
           >
-            {t('admin.cv.cancel')}
+            {t('admin.cancel')}
           </button>
         </div>
       )}

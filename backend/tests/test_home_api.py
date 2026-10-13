@@ -29,6 +29,7 @@ async def test_home_returns_content_in_requested_language(
         "linkedin_url": "https://www.linkedin.com/in/l%C3%A9onard-fontaine-80902437b/",
         "github_url": "https://github.com/drakaull",
         "cv_url": None,
+        "photo_url": None,
     }
 
 

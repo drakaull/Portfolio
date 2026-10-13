@@ -14,7 +14,7 @@ import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation, type Lang } from '../../i18n/useTranslation.ts'
 import adminStyles from './Admin.module.css'
 import { SessionExpiredAlert, UnsavedChangesDialog } from './EditorParts.tsx'
-import { CvField } from './CvField.tsx'
+import { CvField, PhotoField } from './FileField.tsx'
 import styles from './Editor.module.css'
 import { TranslationTabs } from './TranslationTabs.tsx'
 import { useUnsavedChanges } from './useUnsavedChanges.ts'
@@ -42,6 +42,7 @@ export function HomeEditorPage() {
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [invalid, setInvalid] = useState<HomeField[]>([])
   const [hasCv, setHasCv] = useState(false)
+  const [hasPhoto, setHasPhoto] = useState(false)
   // Bumped on each save: remounts the translation tabs, which clears their messages.
   const [saves, setSaves] = useState(0)
   const [saveNotice, setSaveNotice] = useState<SaveNotice | null>(null)
@@ -52,6 +53,7 @@ export function HomeEditorPage() {
         setSaved(toForm(content))
         setForm(toForm(content))
         setHasCv(content.has_cv)
+        setHasPhoto(content.photo_url !== null)
       })
       .catch(() => setLoadFailed(true))
   }, [])
@@ -205,7 +207,8 @@ export function HomeEditorPage() {
           {fieldError('github_url')}
         </div>
 
-        <CvField hasCv={hasCv} onChange={setHasCv} />
+        <PhotoField present={hasPhoto} onChange={setHasPhoto} />
+        <CvField present={hasCv} onChange={setHasCv} />
 
         <div className={styles.actions}>
           <Button type="submit" disabled={!dirty || saveState === 'saving'}>

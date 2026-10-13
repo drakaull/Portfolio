@@ -12,7 +12,10 @@ export type HomeContentForm = {
   github_url: string
 }
 
-export type AdminHomeContent = HomeContentForm & { has_cv: boolean }
+export type AdminHomeContent = HomeContentForm & {
+  has_cv: boolean
+  photo_url: string | null // versioned public URL
+}
 
 /** Top-level form fields the server can reject. */
 export type HomeField = keyof HomeContentForm
@@ -83,29 +86,35 @@ export async function translateFromFrench(
   }
 }
 
-export const CV_MAX_BYTES = 5 * 1024 * 1024
+/** Both stored files (CV, photo) are limited to 5 MB by the server. */
+export const UPLOAD_MAX_BYTES = 5 * 1024 * 1024
 
-export type CvResult = 'ok' | 'tooLarge' | 'notPdf' | 'expired' | 'error'
+export type FileResult = 'ok' | 'tooLarge' | 'wrongType' | 'expired' | 'error'
 
-const CV_STATUSES: Record<number, CvResult> = { 401: 'expired', 413: 'tooLarge', 415: 'notPdf' }
+const FILE_STATUSES: Record<number, FileResult> = {
+  401: 'expired',
+  413: 'tooLarge',
+  415: 'wrongType',
+}
 
-export async function uploadCv(file: File): Promise<CvResult> {
-  // Convenience only: the server re-checks size, type and PDF signature.
-  if (file.size > CV_MAX_BYTES) return 'tooLarge'
+/** Uploads to `/api/admin/cv` or `/api/admin/photo`; applied at once by the server. */
+export async function uploadFile(url: string, file: File): Promise<FileResult> {
+  // Convenience only: the server re-checks size and content.
+  if (file.size > UPLOAD_MAX_BYTES) return 'tooLarge'
   const body = new FormData()
   body.append('file', file)
   try {
-    const response = await fetch('/api/admin/cv', { method: 'PUT', body })
-    return response.ok ? 'ok' : (CV_STATUSES[response.status] ?? 'error')
+    const response = await fetch(url, { method: 'PUT', body })
+    return response.ok ? 'ok' : (FILE_STATUSES[response.status] ?? 'error')
   } catch {
     return 'error'
   }
 }
 
-export async function deleteCv(): Promise<CvResult> {
+export async function deleteFile(url: string): Promise<FileResult> {
   try {
-    const response = await fetch('/api/admin/cv', { method: 'DELETE' })
-    return response.ok ? 'ok' : (CV_STATUSES[response.status] ?? 'error')
+    const response = await fetch(url, { method: 'DELETE' })
+    return response.ok ? 'ok' : (FILE_STATUSES[response.status] ?? 'error')
   } catch {
     return 'error'
   }

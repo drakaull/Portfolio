@@ -8,7 +8,7 @@ from app.api.dependencies import get_home_repository
 from app.domain.home import HomeContent
 from app.domain.language import Lang, localize
 from app.infra.repositories.home import HomeContentRepository
-from app.infra.storage import cv_file
+from app.infra.storage import cv_file, photo_file, photo_url
 
 router = APIRouter(tags=["home"])
 
@@ -19,6 +19,7 @@ class HomeContentOut(BaseModel):
     linkedin_url: str
     github_url: str
     cv_url: str | None
+    photo_url: str | None  # versioned: changes when the photo is replaced
 
     @classmethod
     def from_domain(cls, content: HomeContent, lang: Lang, cv_url: str | None) -> "HomeContentOut":
@@ -28,6 +29,7 @@ class HomeContentOut(BaseModel):
             linkedin_url=content.linkedin_url,
             github_url=content.github_url,
             cv_url=cv_url,
+            photo_url=photo_url(),
         )
 
 
@@ -54,4 +56,19 @@ async def get_cv() -> FileResponse:
         content_disposition_type="inline",
         # Served from the site's own origin: forbid scripts and type sniffing on this response.
         headers={"Content-Security-Policy": "sandbox", "X-Content-Type-Options": "nosniff"},
+    )
+
+
+@router.get("/photo", response_class=FileResponse)
+async def get_photo(v: str | None = None) -> FileResponse:
+    path = photo_file()
+    if path is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Photo not found")
+    # A versioned address (?v=…, from photo_url) changes with the photo: safe to cache for long.
+    # Any other address (e.g. the admin preview) must be checked again each time.
+    cache = "public, max-age=31536000, immutable" if v else "no-cache"
+    return FileResponse(
+        path,
+        media_type="image/webp",
+        headers={"X-Content-Type-Options": "nosniff", "Cache-Control": cache},
     )

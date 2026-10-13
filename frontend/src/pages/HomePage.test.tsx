@@ -12,6 +12,7 @@ const CONTENT: Record<string, HomeContent> = {
     linkedin_url: 'https://www.linkedin.com/in/someone',
     github_url: 'https://github.com/someone',
     cv_url: '/api/cv',
+    photo_url: null,
   },
   fr: {
     headline: 'Développeur fullstack',
@@ -19,6 +20,7 @@ const CONTENT: Record<string, HomeContent> = {
     linkedin_url: 'https://www.linkedin.com/in/someone',
     github_url: 'https://github.com/someone',
     cv_url: '/api/cv',
+    photo_url: null,
   },
 }
 
@@ -147,6 +149,57 @@ describe('home page', () => {
     await screen.findByText('Fullstack developer')
 
     expect(screen.queryByRole('link', { name: /View my CV/ })).toBeNull()
+  })
+
+  test('shows the photo with its alt text, and the HTML of the image behind it', async () => {
+    mockApi({ fr: { photo_url: '/api/photo?v=123' } })
+    renderApp('/fr')
+
+    const photo = await screen.findByRole('img', { name: 'Photo de Léonard Fontaine' })
+    expect(photo.getAttribute('src')).toBe('/api/photo?v=123')
+    expect([photo.getAttribute('width'), photo.getAttribute('height')]).toEqual(['168', '168'])
+    const code = photo.parentElement!.querySelector('pre')!
+    expect(code.getAttribute('aria-hidden')).toBe('true') // decorative: the alt text is enough
+    expect(code.textContent).toBe(
+      [
+        '<img',
+        '  src="/api/photo?v=…"',
+        '  alt="homepage_portfolio.webp"', // reads like code; the real alt stays descriptive
+        '  width="168"',
+        '  height="168"',
+        '/>',
+      ].join('\n'),
+    )
+  })
+
+  test('a tap shows the code on touch screens', async () => {
+    mockApi({ fr: { photo_url: '/api/photo?v=123' } })
+    renderApp('/fr')
+    const figure = (await screen.findByRole('img', { name: /Léonard Fontaine/ })).parentElement!
+
+    fireEvent.click(figure)
+    expect(figure.hasAttribute('data-code')).toBe(true)
+    fireEvent.click(figure)
+    expect(figure.hasAttribute('data-code')).toBe(false)
+  })
+
+  test('with a mouse, a click does not pin the code', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === '(hover: hover)' }))
+    mockApi({ fr: { photo_url: '/api/photo?v=123' } })
+    renderApp('/fr')
+    const figure = (await screen.findByRole('img', { name: /Léonard Fontaine/ })).parentElement!
+
+    fireEvent.click(figure)
+
+    expect(figure.hasAttribute('data-code')).toBe(false)
+  })
+
+  test('without a photo the page is unchanged', async () => {
+    mockApi()
+    renderApp('/en')
+    await screen.findByText('Fullstack developer')
+
+    expect(screen.queryByRole('img', { name: /Léonard Fontaine/ })).toBeNull()
   })
 
   test('shows an error message when the API fails', async () => {

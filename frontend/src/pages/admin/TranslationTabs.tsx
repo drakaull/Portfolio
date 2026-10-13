@@ -108,7 +108,7 @@ export function TranslationTabs({ textLang, onSelect, fields, onTranslated }: Pr
               <p id="replace-translation-message">{t('admin.home.confirmReplace')}</p>
               <Button onClick={() => void run(textLang)}>{t('admin.home.replace')}</Button>
               <button type="button" className={styles.secondary} onClick={() => setState('idle')}>
-                {t('admin.cv.cancel')}
+                {t('admin.cancel')}
               </button>
             </div>
           )}
