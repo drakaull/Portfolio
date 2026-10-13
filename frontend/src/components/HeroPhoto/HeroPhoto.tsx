@@ -16,11 +16,14 @@ export function HeroPhoto({ src, alt }: { src: string; alt: string }) {
   const shownSrc = src.replace(/\?v=.*$/, '?v=…')
 
   return (
-    // A tap toggles the code where there is no hover; with a mouse, hovering is enough.
+    // A tap toggles the code where nothing can hover (touch screens). With a mouse, a click must
+    // not pin it: hovering alone shows it, and it hides when the pointer leaves.
     <figure
       className={styles.photo}
       data-code={showCode || undefined}
-      onClick={() => setShowCode((shown) => !shown)}
+      onClick={() => {
+        if (!window.matchMedia?.('(hover: hover)').matches) setShowCode((shown) => !shown)
+      }}
     >
       <img src={src} alt={alt} width={SIZE} height={SIZE} />
       <pre className={styles.code} aria-hidden="true">

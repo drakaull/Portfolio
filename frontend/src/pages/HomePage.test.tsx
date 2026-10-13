@@ -183,6 +183,17 @@ describe('home page', () => {
     expect(figure.hasAttribute('data-code')).toBe(false)
   })
 
+  test('with a mouse, a click does not pin the code', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === '(hover: hover)' }))
+    mockApi({ fr: { photo_url: '/api/photo?v=123' } })
+    renderApp('/fr')
+    const figure = (await screen.findByRole('img', { name: /Léonard Fontaine/ })).parentElement!
+
+    fireEvent.click(figure)
+
+    expect(figure.hasAttribute('data-code')).toBe(false)
+  })
+
   test('without a photo the page is unchanged', async () => {
     mockApi()
     renderApp('/en')
