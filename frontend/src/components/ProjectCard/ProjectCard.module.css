@@ -1,4 +1,5 @@
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -12,6 +13,20 @@
 
 .card:hover {
   border-color: var(--color-text-muted);
+}
+
+/* The GitHub link's hit area covers the card (the card is its positioned parent). */
+.stretched a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* The website link stays clickable on its own, above the stretched area. */
+.above {
+  position: relative;
+  z-index: 1;
 }
 
 .top {
