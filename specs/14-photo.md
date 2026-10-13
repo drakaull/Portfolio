@@ -1,6 +1,6 @@
 # Spec: Feature 14 — Home photo
 
-Status: **DRAFT** (waiting for Léonard's approval)
+Status: **APPROVED**
 
 ## Objective
 
@@ -19,7 +19,7 @@ A **Photo** block in the home editor, next to the CV block and working the same 
 ```
 Photo
   [preview]   No photo online.
-  Upload a photo (JPEG, PNG or WebP, 10 MB max)   [Choose a file]
+  Upload a photo (JPEG, PNG or WebP, 5 MB max)   [Choose a file]
   [Remove the photo]   (with confirmation)
 ```
 
@@ -29,10 +29,10 @@ The upload is saved at once (like the CV), independently of the texts' Save butt
 
 | Step | Rule |
 |---|---|
-| Accepted input | JPEG, PNG, WebP — recognised by their content, not by the declared type or name; up to 10 MB; up to 40 megapixels (a "decompression bomb" is refused) |
+| Accepted input | JPEG, PNG, WebP — recognised by their content, not by the declared type or name; up to 5 MB (the request size limit stays 6 MB for every route); up to 40 megapixels (a "decompression bomb" is refused) |
 | Orientation | applied from the EXIF data, then all metadata dropped |
 | Size | longest side 1,200 px max (never enlarged) |
-| Output | WebP, quality ~82, RGB, no metadata; replaces the previous photo atomically |
+| Output | WebP, quality ~82, RGB (transparency kept for a PNG that has some), no metadata; replaces the previous photo atomically |
 | Errors | not an image / unsupported format → 415; too large → 413 |
 
 Stored as `storage/photo.webp` (fixed name, never from the request), next to the CV.
@@ -62,6 +62,6 @@ Stored as `storage/photo.webp` (fixed name, never from the request), next to the
 3. Invalid uploads are refused with a clear message.
 4. All checks pass; screenshots of the chosen placement in both themes, desktop and 390 px.
 
-## Open questions
+## Decisions (round 2)
 
-1. Upload limit **10 MB** (recent phone photos are often 3–8 MB) — this needs the request size limit raised from 6 MB for this route only. OK?
+- Upload limit **5 MB**; the 6 MB request limit is unchanged (a heavier photo is exported smaller first).
