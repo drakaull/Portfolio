@@ -13,7 +13,18 @@ from app.domain.home import (
 )
 from app.domain.language import Lang, with_every_lang
 from app.infra.repositories.home import HomeContentRepository
-from app.infra.storage import CvTooLargeError, NotAPdfError, cv_file, delete_cv, save_cv
+from app.infra.storage import (
+    CvTooLargeError,
+    NotAnImageError,
+    NotAPdfError,
+    PhotoTooLargeError,
+    cv_file,
+    delete_cv,
+    delete_photo,
+    photo_url,
+    save_cv,
+    save_photo,
+)
 from app.infra.translation import Translator, fill_missing
 
 router = admin_router()
@@ -53,6 +64,7 @@ class AdminHomeContentOut(BaseModel):
     linkedin_url: str
     github_url: str
     has_cv: bool
+    photo_url: str | None
 
     @classmethod
     def from_domain(cls, content: HomeContent) -> "AdminHomeContentOut":
@@ -62,6 +74,7 @@ class AdminHomeContentOut(BaseModel):
             linkedin_url=content.linkedin_url,
             github_url=content.github_url,
             has_cv=cv_file() is not None,
+            photo_url=photo_url(),
         )
 
 
@@ -125,3 +138,23 @@ async def upload_cv(file: UploadFile) -> None:
 @router.delete("/cv", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_cv() -> None:
     delete_cv()
+
+
+@router.put("/photo", status_code=status.HTTP_204_NO_CONTENT)
+async def upload_photo(file: UploadFile) -> None:
+    # The declared type is not trusted: the content is checked while processing.
+    try:
+        await save_photo(file.read)
+    except NotAnImageError as error:
+        raise HTTPException(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="The photo must be a JPEG, PNG or WebP"
+        ) from error
+    except PhotoTooLargeError as error:
+        raise HTTPException(
+            status.HTTP_413_CONTENT_TOO_LARGE, detail="The photo must be 5 MB and 40 Mpx or less"
+        ) from error
+
+
+@router.delete("/photo", status_code=status.HTTP_204_NO_CONTENT)
+async def remove_photo() -> None:
+    delete_photo()

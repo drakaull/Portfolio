@@ -17,10 +17,10 @@ A photo uploaded from the home editor, cleaned and resized by Pillow, stored as 
 ## Task List
 
 ### Phase 1: Backend
-- [ ] Task 1: Pillow, `save_photo` / `photo_file` / `delete_photo`, admin `PUT` / `DELETE /api/admin/photo`, public `GET /api/photo`, `photo_version` in the home content
+- [x] Task 1: Pillow, `save_photo` / `photo_file` / `delete_photo`, admin `PUT` / `DELETE /api/admin/photo`, public `GET /api/photo`, `photo_version` in the home content
 
 ### Checkpoint A
-- [ ] ruff + pytest green (metadata stripped, orientation, resize, refusals, session)
+- [x] ruff + pytest green (metadata stripped, orientation, resize, refusals, session)
 
 ### Phase 2: Admin and placement
 - [ ] Task 2: Photo block in the home editor (upload / replace / remove, preview)
