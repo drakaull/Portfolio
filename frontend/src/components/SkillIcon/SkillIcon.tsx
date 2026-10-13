@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 import type { SkillIconData } from '../../api/skills.ts'
-import { contrast } from '../../lib/contrast.ts'
+import { readableOn } from '../../lib/contrast.ts'
 import styles from './SkillIcon.module.css'
 
 // Page backgrounds of both themes (--color-bg in global.css): keep in sync.
@@ -11,7 +11,8 @@ const MIN_CONTRAST = 3
 
 /**
  * A stored Simple Icons logo, in the text colour; its brand colour shows while the parent is
- * hovered, only on the themes where that colour stays readable. Decorative: the name is the text.
+ * hovered, darkened or lightened where it would be too pale on the theme's background.
+ * Decorative: the name is the text.
  */
 export function SkillIcon({ icon }: { icon: SkillIconData }) {
   return (
@@ -19,9 +20,12 @@ export function SkillIcon({ icon }: { icon: SkillIconData }) {
       className={styles.icon}
       viewBox="0 0 24 24"
       aria-hidden="true"
-      style={{ '--brand': `#${icon.hex}` } as CSSProperties}
-      data-brand-light={contrast(icon.hex, LIGHT_BACKGROUND) >= MIN_CONTRAST || undefined}
-      data-brand-dark={contrast(icon.hex, DARK_BACKGROUND) >= MIN_CONTRAST || undefined}
+      style={
+        {
+          '--brand-light': `#${readableOn(icon.hex, LIGHT_BACKGROUND, MIN_CONTRAST)}`,
+          '--brand-dark': `#${readableOn(icon.hex, DARK_BACKGROUND, MIN_CONTRAST)}`,
+        } as CSSProperties
+      }
     >
       {/* Only ever an attribute value: React escapes it, and the server checks its characters. */}
       <path d={icon.path} />
