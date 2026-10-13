@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import styles from './HeroPhoto.module.css'
 
-const SIZE = 168
+// Same size as the code panel, so the wipe swaps one for the other.
+const WIDTH = 240
+const HEIGHT = 156
 // Shown in the code instead of the alt text, to read like code; the real alt stays descriptive.
 const SHOWN_ALT = 'homepage_portfolio.webp'
 
@@ -25,7 +27,7 @@ export function HeroPhoto({ src, alt }: { src: string; alt: string }) {
         if (!window.matchMedia?.('(hover: hover)').matches) setShowCode((shown) => !shown)
       }}
     >
-      <img src={src} alt={alt} width={SIZE} height={SIZE} />
+      <img src={src} alt={alt} width={WIDTH} height={HEIGHT} />
       <pre className={styles.code} aria-hidden="true">
         <code>
           <span className={styles.tag}>{'<img'}</span>
@@ -37,10 +39,10 @@ export function HeroPhoto({ src, alt }: { src: string; alt: string }) {
           <span className={styles.value}>"{SHOWN_ALT}"</span>
           {'\n  '}
           <span className={styles.attribute}>width</span>=
-          <span className={styles.value}>"{SIZE}"</span>
+          <span className={styles.value}>"{WIDTH}"</span>
           {'\n  '}
           <span className={styles.attribute}>height</span>=
-          <span className={styles.value}>"{SIZE}"</span>
+          <span className={styles.value}>"{HEIGHT}"</span>
           {'\n'}
           <span className={styles.tag}>{'/>'}</span>
         </code>

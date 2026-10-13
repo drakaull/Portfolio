@@ -157,7 +157,7 @@ describe('home page', () => {
 
     const photo = await screen.findByRole('img', { name: 'Photo de Léonard Fontaine' })
     expect(photo.getAttribute('src')).toBe('/api/photo?v=123')
-    expect([photo.getAttribute('width'), photo.getAttribute('height')]).toEqual(['168', '168'])
+    expect([photo.getAttribute('width'), photo.getAttribute('height')]).toEqual(['240', '156'])
     const code = photo.parentElement!.querySelector('pre')!
     expect(code.getAttribute('aria-hidden')).toBe('true') // decorative: the alt text is enough
     expect(code.textContent).toBe(
@@ -165,8 +165,8 @@ describe('home page', () => {
         '<img',
         '  src="/api/photo?v=…"',
         '  alt="homepage_portfolio.webp"', // reads like code; the real alt stays descriptive
-        '  width="168"',
-        '  height="168"',
+        '  width="240"',
+        '  height="156"',
         '/>',
       ].join('\n'),
     )
