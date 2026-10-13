@@ -18,6 +18,7 @@ Items collected during code and security reviews. **Required** items must be don
 - [ ] **Fill missing translations** once the content is in the database (and after adding a language): `uv run python -m app.cli translate-missing` (needs `DEEPL_API_KEY`; never overwrites written text). Until then the Dutch and English sites show French for untranslated content.
 - [ ] **Dependency audit**: `npm audit` (frontend) and a Python audit (e.g. `uvx pip-audit`) with no unresolved critical/high finding.
 - [ ] **Unknown URLs return HTTP 404** from the server for the SPA's not-found page (or `noindex`), so search engines do not index soft 404s.
+- [ ] **Icons at the site root**: `/favicon.svg`, `/favicon.ico`, `/apple-touch-icon.png`, `/icon-192.png`, `/icon-512.png`, `/maskable-512.png` and `/site.webmanifest` (served as `application/manifest+json`) all answer 200 on the live site, and the CSP (`img-src`, `manifest-src`) allows them from `'self'`.
 
 ## Recommended
 
