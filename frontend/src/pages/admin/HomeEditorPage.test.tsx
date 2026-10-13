@@ -13,6 +13,7 @@ const CONTENT: AdminHomeContent = {
   intro: { en: '', fr: 'Je crée des **applications web**.', nl: '' },
   linkedin_url: 'https://www.linkedin.com/in/someone',
   github_url: 'https://github.com/someone',
+  photo_focus: { x: 50, y: 50 },
   has_cv: false,
   photo_url: null,
 }
@@ -84,6 +85,7 @@ describe('home editor', () => {
       intro: CONTENT.intro,
       linkedin_url: CONTENT.linkedin_url,
       github_url: CONTENT.github_url,
+      photo_focus: CONTENT.photo_focus, // sent back as loaded
     })
     expect((saveButton() as HTMLButtonElement).disabled).toBe(true) // nothing left to save
   })

@@ -11,6 +11,7 @@ VALID = {
     "intro": {"en": "", "fr": "Je crée des **applications web**."},
     "linkedin_url": "https://www.linkedin.com/in/someone",
     "github_url": "https://github.com/someone",
+    "photo_focus": {"x": 30, "y": 20},
 }
 
 
@@ -30,6 +31,7 @@ async def test_admin_reads_both_languages(admin_client: AsyncClient) -> None:
         "github_url": "https://github.com/drakaull",
         "has_cv": False,
         "photo_url": None,
+        "photo_focus": {"x": 50, "y": 50},  # centred by default
     }
 
 
@@ -127,6 +129,9 @@ async def test_surrounding_spaces_are_trimmed(admin_client: AsyncClient) -> None
         (with_changes(github_url="javascript:alert(1)"), "github_url"),
         (with_changes(github_url="https://" + "x" * 250), "github_url"),
         (with_changes(has_cv=True), "has_cv"),
+        (with_changes(photo_focus={"x": -1, "y": 50}), "x"),
+        (with_changes(photo_focus={"x": 50, "y": 101}), "y"),
+        ({k: v for k, v in VALID.items() if k != "photo_focus"}, "photo_focus"),
     ],
 )
 async def test_invalid_content_is_refused(
@@ -140,3 +145,11 @@ async def test_invalid_content_is_refused(
     public = (await admin_client.get("/api/home", params={"lang": "en"})).json()
     assert public["headline"] == "Fullstack developer"
     assert public["github_url"] == "https://github.com/drakaull"
+
+
+async def test_photo_framing_is_saved_and_public(admin_client: AsyncClient) -> None:
+    await admin_client.put("/api/admin/home", json=VALID)
+
+    admin = (await admin_client.get("/api/admin/home")).json()
+    public = (await admin_client.get("/api/home", params={"lang": "fr"})).json()
+    assert admin["photo_focus"] == public["photo_focus"] == {"x": 30, "y": 20}

@@ -30,6 +30,7 @@ async def test_home_returns_content_in_requested_language(
         "github_url": "https://github.com/drakaull",
         "cv_url": None,
         "photo_url": None,
+        "photo_focus": {"x": 50, "y": 50},
     }
 
 

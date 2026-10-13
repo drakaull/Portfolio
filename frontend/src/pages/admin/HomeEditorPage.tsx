@@ -29,8 +29,14 @@ const FIELD_ERRORS: Record<HomeField, TranslationKey> = {
 type SaveState = 'idle' | 'saving' | 'saved' | 'expired' | 'error'
 type SaveNotice = Pick<AdminHomeSaved, 'auto_translated' | 'translation_failed'>
 
-function toForm({ headline, intro, linkedin_url, github_url }: AdminHomeContent): HomeContentForm {
-  return { headline, intro, linkedin_url, github_url }
+function toForm({
+  headline,
+  intro,
+  linkedin_url,
+  github_url,
+  photo_focus,
+}: AdminHomeContent): HomeContentForm {
+  return { headline, intro, linkedin_url, github_url, photo_focus }
 }
 
 export function HomeEditorPage() {

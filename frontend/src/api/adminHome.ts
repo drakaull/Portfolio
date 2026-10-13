@@ -5,11 +5,15 @@ export type Translated = Record<Lang, string>
 /** Languages translated from French, the writing language. */
 export type TargetLang = Exclude<Lang, 'fr'>
 
+/** The point of the photo (in % of its width and height) kept in view by its frame. */
+export type PhotoFocus = { x: number; y: number }
+
 export type HomeContentForm = {
   headline: Translated
   intro: Translated // Markdown
   linkedin_url: string
   github_url: string
+  photo_focus: PhotoFocus
 }
 
 export type AdminHomeContent = HomeContentForm & {
@@ -18,7 +22,7 @@ export type AdminHomeContent = HomeContentForm & {
 }
 
 /** Top-level form fields the server can reject. */
-export type HomeField = keyof HomeContentForm
+export type HomeField = Exclude<keyof HomeContentForm, 'photo_focus'>
 
 /** What PUT returns: the stored content plus what automatic translation did on this save. */
 export type AdminHomeSaved = AdminHomeContent & {

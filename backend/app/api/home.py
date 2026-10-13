@@ -2,15 +2,26 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.api.dependencies import get_home_repository
-from app.domain.home import HomeContent
+from app.domain.home import PHOTO_FOCUS_MAX, PHOTO_FOCUS_MIN, HomeContent
 from app.domain.language import Lang, localize
 from app.infra.repositories.home import HomeContentRepository
 from app.infra.storage import cv_file, photo_file, photo_url
 
 router = APIRouter(tags=["home"])
+
+
+class PhotoFocus(BaseModel):
+    """The point of the photo (in % of its width and height) kept in view by its frame."""
+
+    x: int = Field(ge=PHOTO_FOCUS_MIN, le=PHOTO_FOCUS_MAX)
+    y: int = Field(ge=PHOTO_FOCUS_MIN, le=PHOTO_FOCUS_MAX)
+
+    @classmethod
+    def from_domain(cls, content: HomeContent) -> "PhotoFocus":
+        return cls(x=content.photo_focus_x, y=content.photo_focus_y)
 
 
 class HomeContentOut(BaseModel):
@@ -20,6 +31,7 @@ class HomeContentOut(BaseModel):
     github_url: str
     cv_url: str | None
     photo_url: str | None  # versioned: changes when the photo is replaced
+    photo_focus: PhotoFocus
 
     @classmethod
     def from_domain(cls, content: HomeContent, lang: Lang, cv_url: str | None) -> "HomeContentOut":
@@ -30,6 +42,7 @@ class HomeContentOut(BaseModel):
             github_url=content.github_url,
             cv_url=cv_url,
             photo_url=photo_url(),
+            photo_focus=PhotoFocus.from_domain(content),
         )
 
 

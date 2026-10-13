@@ -32,6 +32,8 @@ class HomeContentModel(Base):
         # Translated JSON fields must always contain the two base languages.
         CheckConstraint("headline ? 'en' AND headline ? 'fr'", name="headline_languages"),
         CheckConstraint("intro ? 'en' AND intro ? 'fr'", name="intro_languages"),
+        CheckConstraint("photo_focus_x BETWEEN 0 AND 100", name="photo_focus_x_range"),
+        CheckConstraint("photo_focus_y BETWEEN 0 AND 100", name="photo_focus_y_range"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False, default=1)
@@ -39,6 +41,8 @@ class HomeContentModel(Base):
     intro: Mapped[dict[str, str]] = mapped_column(JSONB)
     linkedin_url: Mapped[str] = mapped_column(String(255))
     github_url: Mapped[str] = mapped_column(String(255))
+    photo_focus_x: Mapped[int] = mapped_column(SmallInteger, server_default="50")
+    photo_focus_y: Mapped[int] = mapped_column(SmallInteger, server_default="50")
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )

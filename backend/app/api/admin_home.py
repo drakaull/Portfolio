@@ -1,12 +1,15 @@
+from dataclasses import replace
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.dependencies import admin_router, get_home_repository, get_translator
+from app.api.home import PhotoFocus
 from app.domain.home import (
     HEADLINE_MAX_LENGTH,
     INTRO_MAX_LENGTH,
+    PHOTO_FOCUS_CENTRE,
     TRANSLATED_FIELDS,
     URL_MAX_LENGTH,
     HomeContent,
@@ -56,6 +59,7 @@ class HomeContentIn(_StrictModel):
     intro: IntroIn
     linkedin_url: HttpsUrl
     github_url: HttpsUrl
+    photo_focus: PhotoFocus
 
 
 class AdminHomeContentOut(BaseModel):
@@ -65,6 +69,7 @@ class AdminHomeContentOut(BaseModel):
     github_url: str
     has_cv: bool
     photo_url: str | None
+    photo_focus: PhotoFocus
 
     @classmethod
     def from_domain(cls, content: HomeContent) -> "AdminHomeContentOut":
@@ -75,6 +80,7 @@ class AdminHomeContentOut(BaseModel):
             github_url=content.github_url,
             has_cv=cv_file() is not None,
             photo_url=photo_url(),
+            photo_focus=PhotoFocus.from_domain(content),
         )
 
 
@@ -109,6 +115,8 @@ async def save_home_content(
         intro=texts["intro"],
         linkedin_url=body.linkedin_url,
         github_url=body.github_url,
+        photo_focus_x=body.photo_focus.x,
+        photo_focus_y=body.photo_focus.y,
     )
     await repository.save(content)
     await repository.commit()
@@ -141,7 +149,7 @@ async def remove_cv() -> None:
 
 
 @router.put("/photo", status_code=status.HTTP_204_NO_CONTENT)
-async def upload_photo(file: UploadFile) -> None:
+async def upload_photo(file: UploadFile, repository: Repository) -> None:
     # The declared type is not trusted: the content is checked while processing.
     try:
         await save_photo(file.read)
@@ -153,6 +161,13 @@ async def upload_photo(file: UploadFile) -> None:
         raise HTTPException(
             status.HTTP_413_CONTENT_TOO_LARGE, detail="The photo must be 5 MB and 40 Mpx or less"
         ) from error
+    # A new photo has its own subject: its framing starts from the centre.
+    content = await repository.get()
+    if content is not None:
+        await repository.save(
+            replace(content, photo_focus_x=PHOTO_FOCUS_CENTRE, photo_focus_y=PHOTO_FOCUS_CENTRE)
+        )
+        await repository.commit()
 
 
 @router.delete("/photo", status_code=status.HTTP_204_NO_CONTENT)
