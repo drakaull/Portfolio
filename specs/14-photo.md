@@ -76,3 +76,4 @@ Stored as `storage/photo.webp` (fixed name, never from the request), next to the
 - The wipe goes **from left to right**.
 - The code panel is a **layer above the photo**, as wide as the code needs (no line cut), invisible until hover / tap; the photo keeps its size.
 - In the code shown, `alt` reads `homepage_portfolio.webp` (sounds like code); the image's real `alt` stays "Photo of Léonard Fontaine" (translated) for screen readers.
+- The code panel has its own border, laid exactly on the photo's ring, so the outline follows the wipe; once shown, it stays while the pointer is over the code (or the photo), and hides when the pointer leaves both.
