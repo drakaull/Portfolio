@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import type { SkillGroup } from '../api/skills.ts'
 import { mockApi } from '../test/mockApi.ts'
+import { contrast } from '../lib/contrast.ts'
 import { renderApp } from '../test/renderApp.tsx'
 
 const PYTHON = { slug: 'python', hex: '3776AB', path: 'M14.25.18l.9.2z' }
@@ -58,16 +59,15 @@ describe('skills page', () => {
     expect(screen.getByText('NoSQL').querySelector('svg')).toBeNull()
   })
 
-  test('shows the brand colour on hover only where it stays readable', async () => {
+  test('gives each theme a brand colour readable on its background', async () => {
     mockSkills(GROUPS)
     renderApp('/en/skills')
 
     const python = (await screen.findByText('Python')).querySelector('svg')!
-    expect(python.dataset.brandLight).toBe('true')
-    expect(python.dataset.brandDark).toBe('true')
+    expect(python.style.getPropertyValue('--brand-light')).toBe(`#${PYTHON.hex.toLowerCase()}`)
     const github = screen.getByText('GitHub').querySelector('svg')!
-    expect(github.dataset.brandLight).toBe('true')
-    expect(github.dataset.brandDark).toBeUndefined() // near-black on the dark theme
+    const onDark = github.style.getPropertyValue('--brand-dark').slice(1)
+    expect(contrast(onDark, '1b1a17')).toBeGreaterThanOrEqual(3) // near-black, lightened
   })
 
   test('says when there is nothing yet', async () => {

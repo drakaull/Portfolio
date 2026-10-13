@@ -6,7 +6,10 @@
   transition: color var(--duration-fast) var(--ease-out);
 }
 
-:global(:root[data-theme='light']) :hover > .icon[data-brand-light],
-:global(:root[data-theme='dark']) :hover > .icon[data-brand-dark] {
-  color: var(--brand);
+:global(:root[data-theme='light']) :hover > .icon {
+  color: var(--brand-light);
+}
+
+:global(:root[data-theme='dark']) :hover > .icon {
+  color: var(--brand-dark);
 }

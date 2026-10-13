@@ -21,13 +21,18 @@ export function ProjectCard({ project, coloured }: { project: Project; coloured:
         <span className={styles.meta}>{meta}</span>
         <span className={styles.links}>
           {project.homepage && (
-            <TextLink to={project.homepage} external>
-              {t('projects.site')} ↗{forThis}
-            </TextLink>
+            <span className={styles.above}>
+              <TextLink to={project.homepage} external>
+                {t('projects.site')} ↗{forThis}
+              </TextLink>
+            </span>
           )}
-          <TextLink to={project.url} external>
-            GitHub ↗{forThis}
-          </TextLink>
+          {/* Stretched over the whole card: one link for the keyboard, the card for the mouse. */}
+          <span className={styles.stretched}>
+            <TextLink to={project.url} external>
+              GitHub ↗{forThis}
+            </TextLink>
+          </span>
         </span>
       </div>
       <h2 className={styles.title}>{project.title}</h2>
