@@ -20,7 +20,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: inherit;
+  border-radius: var(--radius-md); /* the card's */
 }
 
 /* The website link stays clickable on its own, above the stretched area. */

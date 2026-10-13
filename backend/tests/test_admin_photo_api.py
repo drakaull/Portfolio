@@ -6,6 +6,9 @@ from pathlib import Path
 import pytest
 from httpx import AsyncClient
 from PIL import Image
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from tests.conftest import assert_committed
 
 pytestmark = pytest.mark.anyio
 
@@ -167,3 +170,18 @@ async def test_only_versioned_addresses_are_cached_for_long(admin_client: AsyncC
 
     assert "max-age=31536000" in versioned.headers["cache-control"]
     assert unversioned.headers["cache-control"] == "no-cache"  # the admin preview stays fresh
+
+
+async def test_a_new_photo_is_framed_from_the_centre(
+    admin_client: AsyncClient, session: AsyncSession
+) -> None:
+    home = (await admin_client.get("/api/admin/home")).json()
+    framed = {**home, "photo_focus": {"x": 10, "y": 90}}
+    for key in ("has_cv", "photo_url"):
+        framed.pop(key)
+    await admin_client.put("/api/admin/home", json=framed)
+
+    await upload(admin_client, jpeg_from_a_phone())
+    assert_committed(session)
+
+    assert (await admin_client.get("/api/admin/home")).json()["photo_focus"] == {"x": 50, "y": 50}

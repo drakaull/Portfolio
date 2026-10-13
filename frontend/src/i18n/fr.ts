@@ -252,6 +252,11 @@ export const fr: Record<TranslationKey, string> = {
   'admin.photo.online': 'Une photo est en ligne.',
   'admin.photo.none': 'Aucune photo en ligne.',
   'admin.photo.preview': 'Photo actuelle',
+  'admin.photo.framing': 'Cadrage de la photo',
+  'admin.photo.framingResult': "Sur l'accueil",
+  'admin.photo.framingHint':
+    "Faites glisser le cadre (ou utilisez les flèches, Maj pour aller plus vite) pour choisir ce qui apparaît sur l'accueil. Enregistrez ensuite.",
+  'admin.photo.framingNotNeeded': 'La photo a déjà la forme du cadre : rien à recadrer.',
   'admin.photo.upload': 'Envoyer une photo (JPEG, PNG ou WebP, 5 Mo max)',
   'admin.photo.replace': 'Remplacer la photo (JPEG, PNG ou WebP, 5 Mo max)',
   'admin.photo.uploaded':

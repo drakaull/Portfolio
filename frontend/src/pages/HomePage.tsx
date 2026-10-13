@@ -19,7 +19,11 @@ export function HomePage() {
       <title>{t('site.name')}</title>
       <Reveal className={styles.intro}>
         {state.status === 'ready' && state.content.photo_url && (
-          <HeroPhoto src={state.content.photo_url} alt={t('home.photoAlt')} />
+          <HeroPhoto
+            src={state.content.photo_url}
+            alt={t('home.photoAlt')}
+            focus={state.content.photo_focus}
+          />
         )}
         <Eyebrow>{t('eyebrow.home')}</Eyebrow>
         <h1 className={styles.name}>{t('site.name')}</h1>

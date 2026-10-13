@@ -244,6 +244,11 @@ export const en = {
   'admin.photo.online': 'A photo is online.',
   'admin.photo.none': 'No photo online.',
   'admin.photo.preview': 'Current photo',
+  'admin.photo.framing': 'Photo framing',
+  'admin.photo.framingResult': 'On the home page',
+  'admin.photo.framingHint':
+    'Drag the frame (or use the arrow keys, Shift to go faster) to choose what shows on the home page. Then save.',
+  'admin.photo.framingNotNeeded': "The photo already has the frame's shape: nothing to frame.",
   'admin.photo.upload': 'Upload a photo (JPEG, PNG or WebP, 5 MB max)',
   'admin.photo.replace': 'Replace the photo (JPEG, PNG or WebP, 5 MB max)',
   'admin.photo.uploaded':

@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react'
 import type { Lang } from '../i18n/useTranslation.ts'
 
+/** The point of the photo (in % of its width and height) kept in view by its frame. */
+export type PhotoFocus = { x: number; y: number }
+
+/** Where a new photo's framing starts (the server does the same). */
+export const PHOTO_FOCUS_CENTRE: PhotoFocus = { x: 50, y: 50 }
+
 export type HomeContent = {
   headline: string
   intro: string // Markdown
@@ -8,6 +14,7 @@ export type HomeContent = {
   github_url: string
   cv_url: string | null
   photo_url: string | null // versioned: changes when the photo is replaced
+  photo_focus: PhotoFocus
 }
 
 type Result = { lang: Lang; content: HomeContent } | { lang: Lang; error: true }

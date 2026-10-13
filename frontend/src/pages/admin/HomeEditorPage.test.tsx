@@ -13,6 +13,7 @@ const CONTENT: AdminHomeContent = {
   intro: { en: '', fr: 'Je crée des **applications web**.', nl: '' },
   linkedin_url: 'https://www.linkedin.com/in/someone',
   github_url: 'https://github.com/someone',
+  photo_focus: { x: 50, y: 50 },
   has_cv: false,
   photo_url: null,
 }
@@ -84,6 +85,7 @@ describe('home editor', () => {
       intro: CONTENT.intro,
       linkedin_url: CONTENT.linkedin_url,
       github_url: CONTENT.github_url,
+      photo_focus: CONTENT.photo_focus, // sent back as loaded
     })
     expect((saveButton() as HTMLButtonElement).disabled).toBe(true) // nothing left to save
   })
@@ -404,5 +406,97 @@ describe('photo', () => {
         ([url, init]) => url === '/api/admin/photo' && init?.method === 'DELETE',
       ),
     ).toBe(true)
+  })
+})
+
+describe('photo framing', () => {
+  function mockFramingApi(photo_focus = { x: 50, y: 50 }) {
+    return mockApi({
+      'GET /api/admin/me': signedIn,
+      'GET /api/admin/home': () =>
+        Response.json({ ...CONTENT, photo_url: '/api/photo?v=1', photo_focus }),
+      'PUT /api/admin/home': (init) => savedAsSent(JSON.parse(String(init?.body))),
+      'PUT /api/admin/photo': () => new Response(null, { status: 204 }),
+    })
+  }
+
+  /** jsdom loads no image: give the photo its natural size by hand. */
+  async function photoLoaded(width: number, height: number) {
+    const photo = await screen.findByRole('img', { name: 'Current photo' })
+    Object.defineProperty(photo, 'naturalWidth', { value: width, configurable: true })
+    Object.defineProperty(photo, 'naturalHeight', { value: height, configurable: true })
+    fireEvent.load(photo)
+  }
+
+  const frame = () => screen.getByRole('slider', { name: 'Photo framing' })
+
+  test('a wide photo is framed left to right, a tall one top to bottom', async () => {
+    mockFramingApi()
+    renderApp('/en/admin/home')
+
+    await photoLoaded(1200, 600)
+    expect(frame().getAttribute('aria-orientation')).toBe('horizontal')
+    expect(parseFloat(frame().style.width)).toBeCloseTo((240 / 156 / 2) * 100) // what cover keeps
+    expect(frame().style.height).toBe('100%')
+  })
+
+  test('a tall photo moves top to bottom', async () => {
+    mockFramingApi()
+    renderApp('/en/admin/home')
+
+    await photoLoaded(600, 900)
+    expect(frame().getAttribute('aria-orientation')).toBe('vertical')
+  })
+
+  test('a photo with the frame shape has nothing to frame', async () => {
+    mockFramingApi()
+    renderApp('/en/admin/home')
+
+    await photoLoaded(240, 156)
+    expect(screen.queryByRole('slider')).toBeNull()
+    expect(screen.getByText(/already has the frame's shape/)).toBeDefined()
+  })
+
+  test('arrows move the frame, Shift faster, never past the edges', async () => {
+    mockFramingApi({ x: 5, y: 50 })
+    renderApp('/en/admin/home')
+    await photoLoaded(1200, 600)
+
+    fireEvent.keyDown(frame(), { key: 'ArrowRight' })
+    expect(frame().getAttribute('aria-valuenow')).toBe('6')
+    fireEvent.keyDown(frame(), { key: 'ArrowLeft', shiftKey: true })
+    expect(frame().getAttribute('aria-valuenow')).toBe('0')
+    fireEvent.keyDown(frame(), { key: 'End' })
+    expect(frame().getAttribute('aria-valuenow')).toBe('100')
+    expect(frame().getAttribute('aria-valuetext')).toBe('100 %')
+  })
+
+  test('a moved frame is a change, saved with the texts', async () => {
+    const fetchMock = mockFramingApi()
+    renderApp('/en/admin/home')
+    await photoLoaded(1200, 600)
+    expect((saveButton() as HTMLButtonElement).disabled).toBe(true)
+
+    fireEvent.keyDown(frame(), { key: 'ArrowLeft', shiftKey: true })
+    fireEvent.click(saveButton())
+
+    expect(await screen.findByText('Saved.')).toBeDefined()
+    const [, init] = fetchMock.mock.calls.find(([, init]) => init?.method === 'PUT')!
+    expect(JSON.parse(String(init?.body)).photo_focus).toEqual({ x: 40, y: 50 })
+  })
+
+  test('a new photo starts centred, without being an unsaved change', async () => {
+    mockFramingApi({ x: 10, y: 50 })
+    renderApp('/en/admin/home')
+    const input = await screen.findByLabelText(/Replace the photo/)
+
+    fireEvent.change(input, {
+      target: { files: [new File(['x'], 'me.jpg', { type: 'image/jpeg' })] },
+    })
+    await screen.findByText(/Photo uploaded/)
+    await photoLoaded(1200, 600)
+
+    expect(frame().getAttribute('aria-valuenow')).toBe('50')
+    expect((saveButton() as HTMLButtonElement).disabled).toBe(true)
   })
 })

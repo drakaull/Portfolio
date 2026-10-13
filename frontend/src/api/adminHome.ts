@@ -1,4 +1,5 @@
 import type { Lang } from '../i18n/useTranslation.ts'
+import type { PhotoFocus } from './useHomeContent.ts'
 
 export type Translated = Record<Lang, string>
 
@@ -10,6 +11,7 @@ export type HomeContentForm = {
   intro: Translated // Markdown
   linkedin_url: string
   github_url: string
+  photo_focus: PhotoFocus
 }
 
 export type AdminHomeContent = HomeContentForm & {
@@ -18,7 +20,7 @@ export type AdminHomeContent = HomeContentForm & {
 }
 
 /** Top-level form fields the server can reject. */
-export type HomeField = keyof HomeContentForm
+export type HomeField = Exclude<keyof HomeContentForm, 'photo_focus'>
 
 /** What PUT returns: the stored content plus what automatic translation did on this save. */
 export type AdminHomeSaved = AdminHomeContent & {

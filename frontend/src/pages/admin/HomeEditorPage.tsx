@@ -8,6 +8,7 @@ import {
   type HomeContentForm,
   type HomeField,
 } from '../../api/adminHome.ts'
+import { PHOTO_FOCUS_CENTRE } from '../../api/useHomeContent.ts'
 import { Button } from '../../components/Button/Button.tsx'
 import { MarkdownText } from '../../components/MarkdownText/MarkdownText.tsx'
 import type { TranslationKey } from '../../i18n/en.ts'
@@ -16,6 +17,7 @@ import adminStyles from './Admin.module.css'
 import { SessionExpiredAlert, UnsavedChangesDialog } from './EditorParts.tsx'
 import { CvField, PhotoField } from './FileField.tsx'
 import styles from './Editor.module.css'
+import { PhotoFraming } from './PhotoFraming.tsx'
 import { TranslationTabs } from './TranslationTabs.tsx'
 import { useUnsavedChanges } from './useUnsavedChanges.ts'
 
@@ -29,8 +31,14 @@ const FIELD_ERRORS: Record<HomeField, TranslationKey> = {
 type SaveState = 'idle' | 'saving' | 'saved' | 'expired' | 'error'
 type SaveNotice = Pick<AdminHomeSaved, 'auto_translated' | 'translation_failed'>
 
-function toForm({ headline, intro, linkedin_url, github_url }: AdminHomeContent): HomeContentForm {
-  return { headline, intro, linkedin_url, github_url }
+function toForm({
+  headline,
+  intro,
+  linkedin_url,
+  github_url,
+  photo_focus,
+}: AdminHomeContent): HomeContentForm {
+  return { headline, intro, linkedin_url, github_url, photo_focus }
 }
 
 export function HomeEditorPage() {
@@ -43,6 +51,8 @@ export function HomeEditorPage() {
   const [invalid, setInvalid] = useState<HomeField[]>([])
   const [hasCv, setHasCv] = useState(false)
   const [hasPhoto, setHasPhoto] = useState(false)
+  // Bumped on each upload, so the framing tool never shows a cached older photo.
+  const [photoVersion, setPhotoVersion] = useState(0)
   // Bumped on each save: remounts the translation tabs, which clears their messages.
   const [saves, setSaves] = useState(0)
   const [saveNotice, setSaveNotice] = useState<SaveNotice | null>(null)
@@ -207,7 +217,25 @@ export function HomeEditorPage() {
           {fieldError('github_url')}
         </div>
 
-        <PhotoField present={hasPhoto} onChange={setHasPhoto} />
+        <PhotoField
+          present={hasPhoto}
+          onChange={(present) => {
+            setHasPhoto(present)
+            if (!present) return
+            setPhotoVersion((count) => count + 1)
+            // The server frames a new photo from the centre: follow it, without making it a change.
+            const centred = (current: HomeContentForm | null) =>
+              current && { ...current, photo_focus: PHOTO_FOCUS_CENTRE }
+            setSaved(centred)
+            setForm(centred)
+          }}
+        >
+          <PhotoFraming
+            src={`/api/photo?preview=${photoVersion}`}
+            focus={form.photo_focus}
+            onChange={(photo_focus) => update({ photo_focus })}
+          />
+        </PhotoField>
         <CvField present={hasCv} onChange={setHasCv} />
 
         <div className={styles.actions}>

@@ -32,6 +32,7 @@ export function FileField({
   present,
   onChange,
   preview,
+  children,
 }: {
   id: string
   url: string // admin endpoint: PUT uploads, DELETE removes
@@ -40,6 +41,7 @@ export function FileField({
   present: boolean
   onChange: (present: boolean) => void
   preview?: ReactNode // shown while a file is online
+  children?: ReactNode // shown under the status while a file is online
 }) {
   const { t } = useTranslation()
   const [busy, setBusy] = useState(false)
@@ -87,6 +89,7 @@ export function FileField({
       <p className={styles.hint}>
         {present ? t(texts.online) : t(texts.none)} {present && preview}
       </p>
+      {present && children}
       <label className={adminStyles.field}>
         {present ? t(texts.replace) : t(texts.upload)}
         <input type="file" accept={accept} onChange={handleFile} disabled={busy} />
@@ -173,30 +176,19 @@ export function CvField(props: { present: boolean; onChange: (present: boolean) 
   )
 }
 
-/** `version` changes on every upload, so the preview never shows a cached older photo. */
-export function PhotoField(props: { present: boolean; onChange: (present: boolean) => void }) {
-  const { t } = useTranslation()
-  const [version, setVersion] = useState(0)
+/** The photo's framing tool (or anything else) goes in `children`, shown while a photo is online. */
+export function PhotoField(props: {
+  present: boolean
+  onChange: (present: boolean) => void
+  children?: ReactNode
+}) {
   return (
     <FileField
       id="photo"
       url="/api/admin/photo"
       accept="image/jpeg,image/png,image/webp"
       texts={PHOTO_TEXTS}
-      preview={
-        <img
-          className={styles.photoPreview}
-          src={`/api/photo?preview=${version}`}
-          alt={t('admin.photo.preview')}
-          width={96}
-          height={96}
-        />
-      }
-      present={props.present}
-      onChange={(present) => {
-        setVersion((count) => count + 1)
-        props.onChange(present)
-      }}
+      {...props}
     />
   )
 }

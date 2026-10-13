@@ -17,6 +17,8 @@ class HomeContentRepository:
             intro=row.intro,
             linkedin_url=row.linkedin_url,
             github_url=row.github_url,
+            photo_focus_x=row.photo_focus_x,
+            photo_focus_y=row.photo_focus_y,
         )
 
     async def save(self, content: HomeContent) -> None:
@@ -25,6 +27,8 @@ class HomeContentRepository:
         row.intro = dict(content.intro)
         row.linkedin_url = content.linkedin_url
         row.github_url = content.github_url
+        row.photo_focus_x = content.photo_focus_x
+        row.photo_focus_y = content.photo_focus_y
         self._session.add(row)
         await self._session.flush()
 
