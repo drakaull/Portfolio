@@ -1,19 +1,15 @@
-# Plan: Feature 15 — Photo framing
+# Plan: Feature 16 — Loading skeletons and interface polish
 
-Spec: [specs/15-photo-framing.md](../specs/15-photo-framing.md) · Branch: `feature/photo-size` (after the 240 × 156 size)
+Spec: [specs/16-loading-and-polish.md](../specs/16-loading-and-polish.md) · Branch: `feature/loading-polish`
 
 ## Tasks
 
-1. **Backend** — `photo_focus_x/y` columns (0–100, default 50, check constraint, migration); domain + repository; `PUT /api/admin/home` takes `photo_focus`, admin and public reads return it; a new photo upload resets it to 50 / 50. Tests.
-2. **Public** — the home photo gets `object-position` from `photo_focus`. Tests.
-3. **Admin framing tool** — `PhotoFraming` in the Photo block: whole photo + draggable frame (pointer), arrows / Shift + arrows, screen-reader position and hint, live 240 × 156 preview; part of the home editor form (dirty, Save sends `photo_focus`). i18n FR/EN/NL. Tests.
+1. **Skeleton base** — `Skeleton` component (blocks, pulse, reduced motion), `useDelayed(300)` hook, status text kept. Projects, Skills, Experience and Experience detail use it. Tests.
+2. **Home skeleton** — photo frame, text lines, actions, three recent-path cards. Tests.
+3. **Audit CSS** — points 1 (reduced motion), 4 (press feedback), 5 (high contrast), 6 (shorter cascade), 7 (title tracking).
+4. **Theme cross-fade** (point 2) and **photo framing grab offset** (point 3). Tests.
 
 ## Checkpoints
 
-- **A** (after 1): ruff + pytest green, migration up/down.
-- **B** (after 3): real photo dragged in the admin, result on the home page, light/dark, desktop and 390 px · review · merge approval (with `feature/user-feedback` first).
-
-## Risks
-
-- Drag on touch screens: pointer events + `touch-action: none` on the frame only, so the page still scrolls elsewhere.
-- The frame's size depends on the photo's natural size: read once the image has loaded.
+- **A** (after 2): skeletons screenshotted next to the loaded pages (slow API simulated), light/dark, desktop/390 px.
+- **B** (after 4): audit points checked in the browser (reduced motion, high contrast emulated) · review · merge approval.
