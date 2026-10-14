@@ -3,8 +3,16 @@
 # Settings and secrets come from ./.env (copy .env.example), which never goes into git.
 name: portfolio-site # distinct from the dev stack (docker-compose.yml at the root)
 
+# Container logs are rotated: without a limit they would slowly fill the small server's disk.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "3"
+
 services:
   caddy:
+    logging: *logging
     build:
       context: ..
       dockerfile: frontend/Dockerfile
@@ -29,6 +37,7 @@ services:
       - web
 
   backend:
+    logging: *logging
     build: ../backend
     restart: unless-stopped
     env_file: .env
@@ -52,6 +61,7 @@ services:
       - data
 
   db:
+    logging: *logging
     image: postgres:17.10-trixie
     restart: unless-stopped
     environment:

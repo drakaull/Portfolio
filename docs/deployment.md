@@ -303,6 +303,11 @@ quitter), remplis :
 - `CONTACT_EMAIL`, `SMTP_*` : les informations de l'offre e-mail (étape 3) ;
 - vérifie les adresses (`SITE_ADDRESS`, `SITE_URL`, `REDIRECT_ADDRESSES`) et `ACME_EMAIL`.
 
+> Les sauvegardes (étape 9) ne contiennent **pas** `.env`, exprès : elles ne doivent jamais
+> transporter de secrets. Garde donc les valeurs de `.env` (clé DeepL, accès SMTP) dans ton
+> gestionnaire de mots de passe : si le serveur devait être réinstallé, tu en aurais besoin. Le mot
+> de passe de la base peut, lui, être régénéré.
+
 ### 7.3 Démarrer
 
 ```bash
