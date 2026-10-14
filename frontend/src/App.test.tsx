@@ -256,4 +256,9 @@ describe('not found page', () => {
     renderApp(path)
     expect(heading().textContent).toBe(title)
   })
+
+  test('asks search engines not to index it', () => {
+    renderApp('/en/nope')
+    expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('noindex')
+  })
 })

@@ -7,6 +7,8 @@ export function NotFoundPage() {
 
   return (
     <PageHeader eyebrow="~/portfolio/404" title={t('notFound.title')}>
+      {/* The server answers 200 for every page of the app: keep unknown URLs out of search engines. */}
+      <meta name="robots" content="noindex" />
       <p>
         <TextLink to={`/${lang}`}>{t('notFound.back')}</TextLink>
       </p>
