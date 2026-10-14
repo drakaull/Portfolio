@@ -45,7 +45,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://portfolio:${POSTGRES_PASSWORD}@db:5432/portfolio
       STORAGE_DIR: /app/storage
       # Trust X-Forwarded-For only from the private "web" network, where only Caddy talks to it.
-      FORWARDED_ALLOW_IPS: 172.30.10.0/24
+      FORWARDED_ALLOW_IPS: 172.30.10.0/24,fd30:10::/64
     volumes:
       - storage:/app/storage # CV and photo
     depends_on:
@@ -80,9 +80,13 @@ services:
 
 networks:
   web:
+    # IPv6 too: otherwise Docker relays IPv6 visitors through docker-proxy, which hides their
+    # address behind the network gateway (every visitor would look like 172.30.10.1).
+    enable_ipv6: true
     ipam:
       config:
         - subnet: 172.30.10.0/24
+        - subnet: fd30:10::/64
   # No route to the Internet: the database talks to the backend only.
   data:
     internal: true
