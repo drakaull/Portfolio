@@ -62,16 +62,18 @@ Les réglages et secrets sont dans **`deploy/.env` sur le serveur uniquement** (
 **SSH** te permet de piloter le serveur à distance. Au lieu d'un mot de passe, on utilise une
 **paire de clés** :
 
-- la **clé privée** (`id_ed25519`) reste sur ton PC — c'est elle qui prouve que c'est toi, ne la
+- la **clé privée** (`id_ed25519_portfolio`) reste sur ton PC — c'est elle qui prouve que c'est toi, ne la
   donne jamais à personne ;
-- la **clé publique** (`id_ed25519.pub`) se dépose sur le serveur — elle peut être montrée sans
+- la **clé publique** (`id_ed25519_portfolio.pub`) se dépose sur le serveur — elle peut être montrée sans
   risque.
 
+Une clé **dédiée au portfolio**, dans son propre fichier (une clé par usage : on peut en révoquer
+une sans toucher aux autres, par exemple celle de GitHub) :
+
 ```powershell
-PS> ssh-keygen -t ed25519 -C "leonard-portfolio"
+PS> ssh-keygen -t ed25519 -C "leonard-portfolio" -f $env:USERPROFILE\.ssh\id_ed25519_portfolio
 ```
 
-- « Enter file » : appuie sur Entrée (emplacement par défaut `C:\Users\leona\.ssh\id_ed25519`).
 - « Enter passphrase » : choisis une **phrase de passe** (elle chiffre la clé privée : si ton PC
   était volé, la clé seule ne suffirait pas). Note-la dans ton gestionnaire de mots de passe.
 
@@ -87,13 +89,13 @@ PS> Start-Service ssh-agent
 Puis dans un PowerShell normal :
 
 ```powershell
-PS> ssh-add $env:USERPROFILE\.ssh\id_ed25519
+PS> ssh-add $env:USERPROFILE\.ssh\id_ed25519_portfolio
 ```
 
 Affiche ta clé **publique** (c'est elle qu'OVH demandera) :
 
 ```powershell
-PS> Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub
+PS> Get-Content $env:USERPROFILE\.ssh\id_ed25519_portfolio.pub
 ```
 
 ---
@@ -211,7 +213,7 @@ Pour taper `ssh portfolio` au lieu de `ssh leonard@<IP>`, crée (ou complète) l
 Host portfolio
   HostName <IP>
   User leonard
-  IdentityFile ~/.ssh/id_ed25519
+  IdentityFile ~/.ssh/id_ed25519_portfolio
 ```
 
 Ce raccourci sert aussi à la sauvegarde automatique (étape 9).
@@ -386,7 +388,7 @@ qu'elle tourne : ouvre `Documents\Sauvegardes portfolio\pull-backups.log` (une l
 jour), ou le **Planificateur de tâches** Windows → « Portfolio - backups ».
 
 > La tâche utilise la clé confiée à l'agent SSH (étape 2) : si un jour le journal dit
-> `FAILED: … Permission denied`, relance `ssh-add $env:USERPROFILE\.ssh\id_ed25519`.
+> `FAILED: … Permission denied`, relance `ssh-add $env:USERPROFILE\.ssh\id_ed25519_portfolio`.
 
 ### 9.3 Faire un test de restauration (une fois)
 
