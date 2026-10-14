@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 export type Theme = 'light' | 'dark'
 
-// The initial theme is already on <html data-theme>, set by the inline script in index.html.
+// The initial theme is already on <html data-theme>, set by public/theme-init.js.
 function currentTheme(): Theme {
   return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
 }

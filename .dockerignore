@@ -1,0 +1,11 @@
+# Build context = repository root (frontend image): send only what the images need.
+**/node_modules
+**/dist
+**/.venv
+**/.env
+backend/storage
+.git
+.claude
+.playwright
+.playwright-cli
+graphify-out

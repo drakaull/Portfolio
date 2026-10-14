@@ -12,16 +12,9 @@
     <!-- Mobile browser bar in the page background colour of each theme (--color-bg). -->
     <meta name="theme-color" content="#f7f4ec" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#1b1a17" media="(prefers-color-scheme: dark)" />
-    <script>
-      // Apply the theme before the first paint to avoid a flash of the wrong theme.
-      try {
-        const stored = localStorage.getItem('theme')
-        const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches
-        document.documentElement.dataset.theme = stored || (prefersDark ? 'dark' : 'light')
-      } catch {
-        document.documentElement.dataset.theme = 'light'
-      }
-    </script>
+    <!-- Before the first paint, so the page never flashes the wrong theme. A file, not an inline
+         script, so the Content-Security-Policy allows no inline script at all. -->
+    <script src="/theme-init.js"></script>
   </head>
   <body>
     <div id="root"></div>

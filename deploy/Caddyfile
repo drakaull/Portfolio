@@ -1,0 +1,53 @@
+# Caddy: the only service reachable from the Internet. It gets and renews the HTTPS certificates
+# by itself, serves the built site, forwards /api to the backend and adds the security headers.
+# The addresses come from deploy/.env (SITE_ADDRESS, SITE_URL, REDIRECT_ADDRESSES, ACME_EMAIL).
+
+{
+	# Let's Encrypt writes here about certificates that are about to expire.
+	email {$ACME_EMAIL}
+}
+
+# Every other name (.be, www.) goes permanently to the one address of the site.
+{$REDIRECT_ADDRESSES} {
+	redir {$SITE_URL}{uri} permanent
+}
+
+{$SITE_ADDRESS} {
+	encode zstd gzip
+
+	# Bigger requests are refused before reaching the app (the CV and the photo are 5 MB at most).
+	request_body {
+		max_size 6MB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+		-Server
+	}
+
+	handle /api/* {
+		reverse_proxy backend:8000
+	}
+
+	# The React app. Its pages are all index.html (the app shows its own 404, marked noindex).
+	handle {
+		root * /srv
+		# Only the site's own files: no inline script, no third-party resource, no framing. (Fonts also
+		# allow data: — Vite inlines the smallest font files into the CSS.)
+		header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+
+		# Built files have a content hash in their name: they never change, cache them for a year.
+		@hashed path /assets/*
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+		# Everything else is checked again on each visit, so a new release shows at once.
+		@unhashed not path /assets/*
+		header @unhashed Cache-Control "no-cache"
+
+		try_files {path} /index.html
+		file_server
+	}
+}
