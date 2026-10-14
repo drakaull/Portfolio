@@ -6,5 +6,5 @@ Plan: [plan.md](plan.md)
 - [x] Task 2: home skeleton
 - [ ] Checkpoint A: skeleton screenshots
 - [x] Task 3: audit CSS (1, 4, 5, 6, 7)
-- [ ] Task 4: theme cross-fade (2) + framing grab offset (3)
+- [x] Task 4: theme cross-fade (2) + framing grab offset (3)
 - [ ] Checkpoint B: browser check · review · merge approval
