@@ -78,6 +78,11 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.menuButton:active {
+  transform: scale(0.96);
 }
 
 .menuButton[aria-expanded='true'] {

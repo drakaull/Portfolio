@@ -8,11 +8,18 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
-  transition: border-color var(--duration-base) var(--ease-out);
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .card:hover {
   border-color: var(--color-text-muted);
+}
+
+/* The whole card is the GitHub link: it gives way under the press. */
+.card:active {
+  transform: scale(0.99);
 }
 
 /* The GitHub link's hit area covers the card (the card is its positioned parent). */
