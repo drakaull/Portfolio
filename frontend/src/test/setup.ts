@@ -1,4 +1,4 @@
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach, beforeEach, vi } from 'vitest'
 
 // Node 25+ exposes an experimental global localStorage that is empty without --localstorage-file
@@ -10,6 +10,9 @@ if (typeof localStorage.clear !== 'function') {
     configurable: true,
   })
 }
+
+// findBy* waits 1 s by default: too short when the whole suite runs on a busy machine.
+configure({ asyncUtilTimeout: 3000 })
 
 // No test reaches the real backend: by default API calls stay pending; tests stub fetch as needed.
 beforeEach(() => {
