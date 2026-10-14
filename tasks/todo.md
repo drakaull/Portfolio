@@ -4,8 +4,8 @@ Plan: [plan.md](plan.md)
 
 - [x] Task 1: backend image
 - [x] Task 2: web image + Caddyfile + noindex
-- [ ] Task 3: production compose + .env.example
-- [ ] Checkpoint A: production stack on localhost
+- [x] Task 3: production compose + .env.example
+- [x] Checkpoint A: production stack on localhost
 - [ ] Task 4: backups + restore test
 - [ ] Task 5: runbook + checklist
 - [ ] Checkpoint B: review · merge approval
