@@ -2,7 +2,7 @@
 
 Plan: [plan.md](plan.md)
 
-- [ ] Task 1: skeleton base + Projects, Skills, Experience, detail
+- [x] Task 1: skeleton base + Projects, Skills, Experience, detail
 - [ ] Task 2: home skeleton
 - [ ] Checkpoint A: skeleton screenshots
 - [ ] Task 3: audit CSS (1, 4, 5, 6, 7)
