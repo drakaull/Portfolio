@@ -111,6 +111,12 @@ a {
   outline-offset: 2px;
 }
 
+/* Theme change (useTheme): the old and new pages cross-fade. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+}
+
 /* Reduced motion: no smooth scrolling. Moving animations (Reveal, the photo's code panel, the
    skeleton pulse) have their own gentler version; small colour and underline transitions stay. */
 @media (prefers-reduced-motion: reduce) {

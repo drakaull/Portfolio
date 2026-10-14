@@ -12,7 +12,13 @@ export function useTheme() {
 
   function toggle() {
     const next: Theme = theme === 'dark' ? 'light' : 'dark'
-    document.documentElement.dataset.theme = next
+    const apply = () => {
+      document.documentElement.dataset.theme = next
+    }
+    // Cross-fade the whole page instead of a sudden jump in brightness; browsers without view
+    // transitions switch at once.
+    if (document.startViewTransition) document.startViewTransition(apply)
+    else apply()
     try {
       localStorage.setItem('theme', next)
     } catch {

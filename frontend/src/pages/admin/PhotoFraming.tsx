@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent, type PointerEvent } from 'react'
+import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import type { PhotoFocus } from '../../api/useHomeContent.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
 import { HERO_PHOTO_HEIGHT, HERO_PHOTO_WIDTH } from '../../lib/heroPhoto.ts'
@@ -38,16 +38,32 @@ export function PhotoFraming({
     if (axis) onChange({ ...focus, [axis]: clamp(value) })
   }
 
-  // The frame follows the pointer, centred on it, from the first press.
-  function follow(event: PointerEvent<HTMLDivElement>) {
-    if (!axis) return
+  // Where the frame was grabbed, as a share of the photo from the frame's start.
+  const grab = useRef(0)
+
+  /** The pointer along the moving axis, as a share (0–1) of the photo; null if unmeasurable. */
+  function pointerAt(event: PointerEvent<HTMLDivElement>) {
     const box = event.currentTarget.getBoundingClientRect()
-    const [position, length, size] =
-      axis === 'x'
-        ? [(event.clientX - box.left) / box.width, box.width, frameWidth]
-        : [(event.clientY - box.top) / box.height, box.height, frameHeight]
-    if (length === 0) return
-    move(((position - size / 2) / (1 - size)) * 100)
+    const [offset, length] =
+      axis === 'x' ? [event.clientX - box.left, box.width] : [event.clientY - box.top, box.height]
+    return length > 0 ? offset / length : null
+  }
+
+  // Pressed on the frame, it keeps that point under the pointer (no jump); pressed elsewhere on
+  // the photo, it comes there, centred.
+  function press(event: PointerEvent<HTMLDivElement>) {
+    const position = pointerAt(event)
+    if (!axis || position === null) return
+    const [start, size] = axis === 'x' ? [left / 100, frameWidth] : [top / 100, frameHeight]
+    grab.current = position >= start && position <= start + size ? position - start : size / 2
+    follow(event)
+  }
+
+  function follow(event: PointerEvent<HTMLDivElement>) {
+    const position = pointerAt(event)
+    if (!axis || position === null) return
+    const size = axis === 'x' ? frameWidth : frameHeight
+    move(((position - grab.current) / (1 - size)) * 100)
   }
 
   function handleKey(event: KeyboardEvent<HTMLDivElement>) {
@@ -74,7 +90,7 @@ export function PhotoFraming({
         onPointerDown={(event) => {
           if (event.button !== 0) return // a right or middle click must not move the frame
           event.currentTarget.setPointerCapture(event.pointerId)
-          follow(event)
+          press(event)
         }}
         onPointerMove={(event) => {
           if (event.currentTarget.hasPointerCapture(event.pointerId)) follow(event)
