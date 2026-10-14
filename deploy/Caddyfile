@@ -36,8 +36,9 @@
 	# The React app. Its pages are all index.html (the app shows its own 404, marked noindex).
 	handle {
 		root * /srv
-		# Only the site's own files: no inline script, no third-party resource, no framing.
-		header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		# Only the site's own files: no inline script, no third-party resource, no framing. (Fonts also
+		# allow data: — Vite inlines the smallest font files into the CSS.)
+		header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 
 		# Built files have a content hash in their name: they never change, cache them for a year.
 		@hashed path /assets/*
