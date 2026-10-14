@@ -10,6 +10,7 @@ This site is the personal portfolio of **Léonard Fontaine**, in Belgium. He dec
 - **No cookies** are placed on your device.
 - **No audience measurement**, no trackers, no advertising.
 - **No third-party service** is loaded in your browser: fonts and images are served by the site itself.
+- **No visit logs**: the server records neither the pages you view nor your IP address.
 - Your theme choice (light or dark) is kept **in your browser only** and is never sent to the site.
 
 ## Data from the contact form
@@ -18,10 +19,14 @@ When you write through the form, the site stores your **name**, your **email add
 
 - **Why?** Only to read your message and reply to you.
 - **On what basis?** The legitimate interest in answering people who write (Article 6(1)(f) GDPR) or, for example for a job offer, the steps taken before a possible contract (Article 6(1)(b)).
-- **Who can see it?** Léonard Fontaine only. A copy of your message is emailed to him, to a Gmail (Google) mailbox. The site's hosting provider and the email sending service process this data technically on his behalf: *[names to be added when the site goes live]*.
+- **Who can see it?** Léonard Fontaine only. A copy of your message is emailed to him, to his address on the site's domain. The site, its database and this mailbox are hosted by **OVHcloud** (OVH SAS, France), in data centres located **in France**; OVHcloud processes this data technically, on his behalf.
 - **For how long?** Messages are **deleted automatically after 12 months**, or earlier on request.
 
 To prevent abuse, your IP address is used **temporarily, in memory**, to limit the number of messages sent within an hour. It is **never stored**.
+
+## Signing in to the administration
+
+Attempts to sign in to the site's administration area, reserved for Léonard Fontaine, are logged with their **IP address**, date and the username entered, to detect and block attacks (legitimate interest, article 6(1)(f) GDPR). These logs are **erased automatically every month**.
 
 ## Your rights
 
