@@ -6,6 +6,7 @@ import { Eyebrow } from '../components/Eyebrow/Eyebrow.tsx'
 import { HeroPhoto } from '../components/HeroPhoto/HeroPhoto.tsx'
 import { MarkdownText } from '../components/MarkdownText/MarkdownText.tsx'
 import { Reveal } from '../components/Reveal/Reveal.tsx'
+import { Bone, BoneCard, Loading } from '../components/Skeleton/Skeleton.tsx'
 import { TextLink } from '../components/TextLink/TextLink.tsx'
 import { useTranslation } from '../i18n/useTranslation.ts'
 import styles from './HomePage.module.css'
@@ -18,6 +19,11 @@ export function HomePage() {
     <section className={styles.hero}>
       <title>{t('site.name')}</title>
       <Reveal className={styles.intro}>
+        {state.status === 'loading' && (
+          <Loading>
+            <Bone width="15rem" height="9.75rem" radius="12px" />
+          </Loading>
+        )}
         {state.status === 'ready' && state.content.photo_url && (
           <HeroPhoto
             src={state.content.photo_url}
@@ -28,9 +34,19 @@ export function HomePage() {
         <Eyebrow>{t('eyebrow.home')}</Eyebrow>
         <h1 className={styles.name}>{t('site.name')}</h1>
         {state.status === 'loading' && (
-          <p className={styles.status} role="status">
-            {t('home.loading')}
-          </p>
+          <Loading label={t('home.loading')} className={styles.intro}>
+            <Bone width="14rem" height="1.4rem" />
+            <div className={styles.text}>
+              <Bone />
+              <Bone />
+              <Bone width="60%" />
+            </div>
+            <div className={styles.actions}>
+              <Bone width="7.5rem" height="2.6rem" radius="var(--radius-md)" />
+              <Bone width="4.5rem" />
+              <Bone width="4rem" />
+            </div>
+          </Loading>
         )}
         {state.status === 'error' && (
           <p className={styles.status} role="alert">
@@ -72,11 +88,28 @@ function HomeDetails({ content }: { content: HomeContent }) {
 
 const RECENT_COUNT = 3
 
-/** Latest entries of the timeline; nothing at all while loading, on error or when empty. */
+/** Latest entries of the timeline; their shape while loading; nothing on error or when empty. */
 function RecentPath() {
   const { t, lang } = useTranslation()
   const state = useExperiences(lang)
 
+  if (state.status === 'loading') {
+    // The intro's Loading already tells screen readers: no second status here.
+    return (
+      <Loading className={styles.recent}>
+        <Bone width="6rem" height="0.75rem" />
+        <div className={styles.recentList}>
+          {[1, 2, 3].map((key) => (
+            <BoneCard key={key}>
+              <Bone width="30%" height="0.875rem" />
+              <Bone width="65%" />
+              <Bone width="40%" />
+            </BoneCard>
+          ))}
+        </div>
+      </Loading>
+    )
+  }
   if (state.status !== 'ready' || state.data.length === 0) return null
   return (
     <aside className={styles.recent} aria-labelledby="recent-path-title">

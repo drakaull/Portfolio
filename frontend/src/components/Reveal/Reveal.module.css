@@ -1,31 +1,44 @@
 /* Ends on the visible state: if animations are off or fail, content is simply shown. */
 .reveal > * {
-  animation: rise var(--duration-slow) var(--ease-out) both;
+  animation: rise var(--duration-base) var(--ease-out) both;
 }
 
 .reveal > :nth-child(2) {
-  animation-delay: 80ms;
+  animation-delay: 50ms;
 }
 
 .reveal > :nth-child(3) {
-  animation-delay: 160ms;
+  animation-delay: 100ms;
 }
 
 .reveal > :nth-child(4) {
-  animation-delay: 240ms;
+  animation-delay: 150ms;
 }
 
 .reveal > :nth-child(5) {
-  animation-delay: 320ms;
+  animation-delay: 200ms;
 }
 
 .reveal > :nth-child(n + 6) {
-  animation-delay: 400ms;
+  animation-delay: 250ms;
 }
 
 @keyframes rise {
   from {
     opacity: 0;
     transform: translateY(14px);
+  }
+}
+
+/* Reduced motion: content fades in where it stands, without rising. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal > * {
+    animation-name: fade;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
   }
 }

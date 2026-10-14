@@ -111,17 +111,27 @@ a {
   outline-offset: 2px;
 }
 
-/* Honour the system setting: no animation or transition anywhere. */
+/* Theme change (useTheme): the old and new pages cross-fade. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+}
+
+/* Reduced motion: no smooth scrolling. Moving animations (Reveal, the photo's code panel, the
+   skeleton pulse) have their own gentler version; small colour and underline transitions stay. */
 @media (prefers-reduced-motion: reduce) {
   :root {
     scroll-behavior: auto;
   }
+}
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+/* High contrast asked by the system: borders clearly visible (≥ 3:1 on the backgrounds). */
+@media (prefers-contrast: more) {
+  :root {
+    --color-border: #857d6f;
+  }
+
+  :root[data-theme='dark'] {
+    --color-border: #76705f;
   }
 }

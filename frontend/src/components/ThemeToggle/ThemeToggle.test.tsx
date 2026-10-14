@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
-import { beforeEach, expect, test } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 import { ThemeToggle } from './ThemeToggle.tsx'
 
 function renderToggle() {
@@ -34,4 +34,17 @@ test('toggles the theme and remembers the choice', () => {
   expect(document.documentElement.dataset.theme).toBe('light')
   expect(localStorage.getItem('theme')).toBe('light')
   expect(button.getAttribute('aria-pressed')).toBe('false')
+})
+
+test('cross-fades the change where the browser can', () => {
+  const startViewTransition = vi.fn((update: () => void) => update())
+  Object.assign(document, { startViewTransition })
+  try {
+    fireEvent.click(renderToggle())
+
+    expect(startViewTransition).toHaveBeenCalledOnce()
+    expect(document.documentElement.dataset.theme).toBe('dark')
+  } finally {
+    Reflect.deleteProperty(document, 'startViewTransition')
+  }
 })

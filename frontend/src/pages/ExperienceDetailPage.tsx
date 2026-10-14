@@ -3,6 +3,7 @@ import { useExperience } from '../api/experiences.ts'
 import { Badge } from '../components/Badge/Badge.tsx'
 import { MarkdownText } from '../components/MarkdownText/MarkdownText.tsx'
 import { PageHeader } from '../components/PageHeader/PageHeader.tsx'
+import { Bone, Loading } from '../components/Skeleton/Skeleton.tsx'
 import { TextLink } from '../components/TextLink/TextLink.tsx'
 import { useTranslation } from '../i18n/useTranslation.ts'
 import { formatYears } from '../lib/years.ts'
@@ -15,7 +16,20 @@ export function ExperienceDetailPage() {
   const state = useExperience(slug, lang)
 
   if (state.status === 'notFound') return <NotFoundPage />
-  if (state.status === 'loading') return <p role="status">{t('experience.loading')}</p>
+  if (state.status === 'loading') {
+    return (
+      <Loading label={t('experience.loading')} className={styles.loading}>
+        <Bone width="16rem" height="0.875rem" />
+        <Bone width="45%" height="1.75rem" />
+        <Bone width="35%" />
+        <div className={styles.description}>
+          <Bone />
+          <Bone />
+          <Bone width="70%" />
+        </div>
+      </Loading>
+    )
+  }
   if (state.status === 'error') return <p role="alert">{t('experience.error')}</p>
 
   const entry = state.data

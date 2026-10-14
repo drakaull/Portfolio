@@ -500,3 +500,40 @@ describe('photo framing', () => {
     expect((saveButton() as HTMLButtonElement).disabled).toBe(true)
   })
 })
+
+describe('dragging the photo frame', () => {
+  /** A 300 × 150 px photo on screen (jsdom has no layout), with pointer capture available. */
+  async function wideStage() {
+    mockApi({
+      'GET /api/admin/me': signedIn,
+      'GET /api/admin/home': () =>
+        Response.json({ ...CONTENT, photo_url: '/api/photo?v=1', photo_focus: { x: 50, y: 50 } }),
+    })
+    renderApp('/en/admin/home')
+    const photo = await screen.findByRole('img', { name: 'Current photo' })
+    Object.defineProperty(photo, 'naturalWidth', { value: 1200 })
+    Object.defineProperty(photo, 'naturalHeight', { value: 600 })
+    fireEvent.load(photo)
+    const stage = photo.parentElement!
+    stage.getBoundingClientRect = () => ({ left: 0, top: 0, width: 300, height: 150 }) as DOMRect
+    Object.assign(stage, { setPointerCapture: () => {}, hasPointerCapture: () => true })
+    return stage
+  }
+  const value = () => screen.getByRole('slider').getAttribute('aria-valuenow')
+
+  test('grabbed near its edge, the frame does not jump', async () => {
+    const stage = await wideStage() // the frame covers 34.6–265.4 px
+
+    fireEvent.pointerDown(stage, { button: 0, pointerId: 1, clientX: 40 })
+    expect(value()).toBe('50')
+    fireEvent.pointerMove(stage, { pointerId: 1, clientX: 70 })
+    expect(value()).toBe('93') // frame start 34.6 → 64.4 px: moved by the 30 px dragged
+  })
+
+  test('pressed outside the frame, it comes there, centred', async () => {
+    const stage = await wideStage()
+
+    fireEvent.pointerDown(stage, { button: 0, pointerId: 1, clientX: 290 })
+    expect(value()).toBe('100')
+  })
+})

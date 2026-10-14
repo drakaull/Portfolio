@@ -13,6 +13,7 @@
   background: transparent;
   color: var(--color-text);
   cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
 .button:hover,
@@ -86,4 +87,9 @@
   .chevron {
     display: none;
   }
+}
+
+/* Feedback the moment it is pressed, not only on release. */
+.button:active {
+  transform: scale(0.96);
 }

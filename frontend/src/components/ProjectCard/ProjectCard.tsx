@@ -1,6 +1,7 @@
 import type { Project } from '../../api/projects.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
 import { LanguageDonut } from '../LanguageDonut/LanguageDonut.tsx'
+import { Bone, BoneRow } from '../Skeleton/Skeleton.tsx'
 import { TextLink } from '../TextLink/TextLink.tsx'
 import styles from './ProjectCard.module.css'
 
@@ -51,5 +52,29 @@ export function ProjectCard({ project, coloured }: { project: Project; coloured:
         </p>
       </div>
     </article>
+  )
+}
+
+/** The shape of a card while projects load (see Loading). */
+export function ProjectCardSkeleton() {
+  return (
+    <div className={styles.card}>
+      <Bone width="35%" height="0.75rem" />
+      <Bone width="55%" height="1.5rem" />
+      <Bone />
+      <Bone />
+      <Bone width="70%" />
+      <div className={styles.footer}>
+        <BoneRow>
+          <Bone width="4rem" height="4rem" round />
+          <span className={styles.legendSkeleton}>
+            <Bone width="6rem" height="0.75rem" />
+            <Bone width="4.5rem" height="0.75rem" />
+            <Bone width="5rem" height="0.75rem" />
+          </span>
+        </BoneRow>
+        <Bone width="5rem" height="0.875rem" />
+      </div>
+    </div>
   )
 }

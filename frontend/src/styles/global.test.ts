@@ -6,11 +6,20 @@ import { expect, test } from 'vitest'
 // Tests run from frontend/ (jsdom gives import.meta.url an http: scheme, so no relative URL).
 const css = readFileSync('src/styles/global.css', 'utf8')
 
-test('reduced motion disables animations and transitions everywhere', () => {
+test('reduced motion turns off smooth scrolling, and moving entrances only fade', () => {
   const rule = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'))
+  const reveal = readFileSync('src/components/Reveal/Reveal.module.css', 'utf8')
+  const revealRule = reveal.slice(reveal.indexOf('@media (prefers-reduced-motion: reduce)'))
 
-  expect(rule).toContain('animation-duration: 0.01ms !important')
-  expect(rule).toContain('transition-duration: 0.01ms !important')
+  expect(rule).toContain('scroll-behavior: auto')
+  expect(revealRule).toContain('animation-name: fade')
+})
+
+test('high contrast makes borders at least 3:1 in both themes', () => {
+  const rule = css.slice(css.indexOf('@media (prefers-contrast: more)'))
+
+  expect(rule).toMatch(/:root \{\s*--color-border: #857d6f/)
+  expect(rule).toMatch(/data-theme='dark'\] \{\s*--color-border: #76705f/)
 })
 
 test('both themes define every color token', () => {

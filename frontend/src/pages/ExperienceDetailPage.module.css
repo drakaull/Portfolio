@@ -51,3 +51,16 @@
 .back {
   margin-top: var(--space-7);
 }
+
+/* Skeleton: header lines (spaced like PageHeader), then the text. */
+.loading {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-6);
+}
+
+.loading .description {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
