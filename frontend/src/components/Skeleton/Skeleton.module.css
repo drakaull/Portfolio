@@ -1,0 +1,44 @@
+/* Bones pulse slowly together; with reduced motion they stay still. */
+.skeleton .bone {
+  animation: pulse 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  to {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton .bone {
+    animation: none;
+  }
+}
+
+.bone {
+  display: block;
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  background: var(--color-border);
+}
+
+.round {
+  flex: none;
+  border-radius: 50%;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}

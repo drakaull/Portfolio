@@ -1,6 +1,7 @@
 import { useProjects } from '../api/projects.ts'
 import { PageHeader } from '../components/PageHeader/PageHeader.tsx'
-import { ProjectCard } from '../components/ProjectCard/ProjectCard.tsx'
+import { ProjectCard, ProjectCardSkeleton } from '../components/ProjectCard/ProjectCard.tsx'
+import { Loading } from '../components/Skeleton/Skeleton.tsx'
 import { useTranslation } from '../i18n/useTranslation.ts'
 import { colouredLanguages } from '../lib/languages.ts'
 import styles from './ProjectsPage.module.css'
@@ -13,7 +14,13 @@ export function ProjectsPage() {
   return (
     <>
       <PageHeader eyebrow={t('eyebrow.projects')} title={t('projects.title')} />
-      {state.status === 'loading' && <p role="status">{t('projects.loading')}</p>}
+      {state.status === 'loading' && (
+        <Loading label={t('projects.loading')} className={styles.grid}>
+          {[1, 2, 3, 4].map((key) => (
+            <ProjectCardSkeleton key={key} />
+          ))}
+        </Loading>
+      )}
       {(state.status === 'error' || state.status === 'notFound') && (
         <p role="alert">{t('projects.error')}</p>
       )}

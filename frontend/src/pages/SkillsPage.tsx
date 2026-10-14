@@ -1,5 +1,6 @@
 import { useSkills } from '../api/skills.ts'
 import { PageHeader } from '../components/PageHeader/PageHeader.tsx'
+import { Bone, Loading } from '../components/Skeleton/Skeleton.tsx'
 import { SkillIcon } from '../components/SkillIcon/SkillIcon.tsx'
 import { useTranslation } from '../i18n/useTranslation.ts'
 import styles from './SkillsPage.module.css'
@@ -11,7 +12,23 @@ export function SkillsPage() {
   return (
     <>
       <PageHeader eyebrow={t('eyebrow.skills')} title={t('skills.title')} />
-      {state.status === 'loading' && <p role="status">{t('skills.loading')}</p>}
+      {state.status === 'loading' && (
+        <Loading label={t('skills.loading')} className={styles.groups}>
+          {[1, 2, 3].map((group) => (
+            <div key={group}>
+              <Bone width="7rem" height="0.75rem" />
+              <ul className={styles.list}>
+                {[5, 4, 6, 4].map((letters, chip) => (
+                  <li key={chip} className={styles.chip}>
+                    <Bone width="1.125rem" height="1.125rem" round />
+                    <Bone width={`${letters}ch`} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </Loading>
+      )}
       {(state.status === 'error' || state.status === 'notFound') && (
         <p role="alert">{t('skills.error')}</p>
       )}

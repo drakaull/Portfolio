@@ -1,6 +1,7 @@
 import { useExperiences } from '../api/experiences.ts'
 import { PageHeader } from '../components/PageHeader/PageHeader.tsx'
-import { Timeline } from '../components/Timeline/Timeline.tsx'
+import { Loading } from '../components/Skeleton/Skeleton.tsx'
+import { Timeline, TimelineSkeleton } from '../components/Timeline/Timeline.tsx'
 import { useTranslation } from '../i18n/useTranslation.ts'
 
 export function ExperiencePage() {
@@ -10,7 +11,11 @@ export function ExperiencePage() {
   return (
     <>
       <PageHeader eyebrow={t('eyebrow.experience')} title={t('experience.title')} />
-      {state.status === 'loading' && <p role="status">{t('experience.loading')}</p>}
+      {state.status === 'loading' && (
+        <Loading label={t('experience.loading')}>
+          <TimelineSkeleton />
+        </Loading>
+      )}
       {(state.status === 'error' || state.status === 'notFound') && (
         <p role="alert">{t('experience.error')}</p>
       )}
