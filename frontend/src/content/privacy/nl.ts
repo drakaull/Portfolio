@@ -10,6 +10,7 @@ Deze site is het persoonlijke portfolio van **Léonard Fontaine**, in België. H
 - Er worden **geen cookies** op je toestel geplaatst.
 - **Geen bezoekersmetingen**, geen trackers, geen reclame.
 - **Geen externe diensten** worden in je browser geladen: lettertypes en afbeeldingen komen van de site zelf.
+- **Geen logboek van bezoeken**: de server registreert niet welke pagina's je bekijkt, en ook niet je IP-adres.
 - Je themakeuze (licht of donker) wordt **alleen in je browser** bewaard en nooit naar de site gestuurd.
 
 ## Gegevens uit het contactformulier
@@ -18,10 +19,14 @@ Als je via het formulier schrijft, bewaart de site je **naam**, je **e-mailadres
 
 - **Waarom?** Alleen om je bericht te lezen en je te antwoorden.
 - **Op welke grondslag?** Het gerechtvaardigd belang om mensen die schrijven te antwoorden (artikel 6.1.f AVG) of, bijvoorbeeld bij een jobaanbod, de stappen vóór een mogelijke overeenkomst (artikel 6.1.b).
-- **Wie heeft toegang?** Alleen Léonard Fontaine. Een kopie van je bericht wordt hem per e-mail gestuurd, naar een Gmail-mailbox (Google). De hostingprovider van de site en de dienst die de e-mails verstuurt, verwerken deze gegevens technisch in zijn naam: *[namen aan te vullen bij de lancering]*.
+- **Wie heeft toegang?** Alleen Léonard Fontaine. Een kopie van je bericht wordt hem per e-mail gestuurd, naar zijn adres op het domein van de site. De site, de database en deze mailbox worden gehost door **OVHcloud** (OVH SAS, Frankrijk), in datacenters **in Frankrijk**; OVHcloud verwerkt deze gegevens technisch, in zijn naam.
 - **Hoe lang?** Berichten worden **na 12 maanden automatisch verwijderd**, of eerder op eenvoudig verzoek.
 
 Om misbruik te voorkomen wordt je IP-adres **tijdelijk, in het geheugen** gebruikt om het aantal berichten per uur te beperken. Het wordt **nooit opgeslagen**.
+
+## Aanmelden bij de beheeromgeving
+
+Pogingen om je aan te melden bij de beheeromgeving van de site, die voorbehouden is aan Léonard Fontaine, worden gelogd met hun **IP-adres**, datum en de ingevoerde gebruikersnaam, om aanvallen op te sporen en te blokkeren (gerechtvaardigd belang, artikel 6, lid 1, f AVG). Deze logboeken worden **elke maand automatisch gewist**.
 
 ## Je rechten
 

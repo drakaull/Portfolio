@@ -128,12 +128,30 @@ PS> Get-Content $env:USERPROFILE\.ssh\id_ed25519_portfolio.pub
 
 ### 4.1 Se connecter
 
+L'utilisateur du serveur est **`ubuntu`** (indiqué dans l'e-mail de livraison d'OVH).
+
 ```powershell
-PS> ssh ubuntu@<IP>
+PS> ssh -i $env:USERPROFILE\.ssh\id_ed25519_portfolio ubuntu@<IP>
 ```
 
 La première fois, SSH demande de confirmer l'empreinte du serveur : réponds `yes`. Tu es maintenant
-**sur le serveur** (l'invite change).
+**sur le serveur** (l'invite devient `ubuntu@vps-…:~$`).
+
+**Si le serveur demande un mot de passe** (`ubuntu@<IP>'s password:`), c'est que ta clé n'a pas été
+déposée à la commande. Fais `Ctrl+C`, puis :
+
+1. Ouvre le lien de l'e-mail de livraison d'OVH pour **générer le mot de passe** (enregistre-le dans
+   ton gestionnaire de mots de passe).
+2. Connecte-toi une fois avec : Ubuntu t'oblige à **changer ce mot de passe** dès la première
+   connexion. Le nouveau est celui de `sudo` : garde-le précieusement.
+3. Dépose ta clé publique sur le serveur (le mot de passe est demandé une dernière fois) :
+
+```powershell
+PS> Get-Content $env:USERPROFILE\.ssh\id_ed25519_portfolio.pub | ssh ubuntu@<IP> "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+```
+
+4. Reconnecte-toi avec la commande du début : plus aucun mot de passe du serveur ne doit être
+   demandé.
 
 ### 4.2 Mettre le système à jour
 
@@ -142,30 +160,21 @@ $ sudo apt update && sudo apt full-upgrade -y
 $ sudo reboot
 ```
 
-`sudo` = « exécuter en administrateur ». Le serveur redémarre ; reconnecte-toi après une minute.
+`sudo` = « exécuter en administrateur » (il demande le mot de passe de `ubuntu`). Si un écran
+demande quels services redémarrer, Entrée garde le choix par défaut. Le serveur redémarre ;
+reconnecte-toi après une minute.
 
-### 4.3 Ton propre utilisateur
+> L'accueil peut proposer une nouvelle version d'Ubuntu (« New release … available ») : **ne lance
+> pas** `do-release-upgrade`. On reste sur la version installée, supportée plusieurs années.
 
-On travaille avec un compte à ton nom plutôt qu'avec le compte générique :
+### 4.3 L'utilisateur
 
-```bash
-$ sudo adduser leonard              # choisis un mot de passe (il servira pour sudo, pas pour SSH)
-$ sudo usermod -aG sudo leonard     # leonard peut utiliser sudo
-$ sudo mkdir -p /home/leonard/.ssh
-$ sudo cp ~/.ssh/authorized_keys /home/leonard/.ssh/   # ta clé publique, déjà déposée par OVH
-$ sudo chown -R leonard:leonard /home/leonard/.ssh
-$ sudo chmod 700 /home/leonard/.ssh && sudo chmod 600 /home/leonard/.ssh/authorized_keys
-```
-
-**Dans un nouveau PowerShell** (garde l'ancienne session ouverte au cas où), vérifie :
-
-```powershell
-PS> ssh leonard@<IP>
-```
+On garde l'utilisateur **`ubuntu`** : il a ta clé et un mot de passe pour `sudo`. Un deuxième
+utilisateur n'apporterait pas de sécurité en plus, seulement un mot de passe de plus à gérer.
 
 ### 4.4 Fermer la porte aux mots de passe
 
-Une fois que `ssh leonard@<IP>` marche, on interdit les connexions par mot de passe et en `root` :
+Une fois que la connexion par clé marche, on interdit les connexions par mot de passe et en `root` :
 
 ```bash
 $ sudo tee /etc/ssh/sshd_config.d/10-hardening.conf <<'EOF'
@@ -174,10 +183,12 @@ KbdInteractiveAuthentication no
 PermitRootLogin no
 EOF
 $ sudo sshd -t && sudo systemctl restart ssh
+$ sudo sshd -T | grep -E "passwordauthentication|kbdinteractive|permitrootlogin"   # trois fois « no »
 ```
 
 `sshd -t` vérifie la configuration avant de redémarrer (une erreur pourrait te couper l'accès).
-Teste à nouveau `ssh leonard@<IP>` depuis un nouveau PowerShell **avant** de fermer l'ancienne
+Le fichier commence par `10-` pour passer avant celui d'OVH (`50-cloud-init.conf`) : SSH garde la
+première valeur lue. Teste à nouveau la connexion depuis un nouveau PowerShell **avant** de fermer l'ancienne
 session.
 
 ### 4.5 Le pare-feu
@@ -201,18 +212,40 @@ $ sudo ufw status
 
 ```bash
 $ sudo apt install -y unattended-upgrades
-$ sudo dpkg-reconfigure --priority=low unattended-upgrades    # réponds « Oui »
+$ sudo dpkg-reconfigure -f noninteractive unattended-upgrades
+$ cat /etc/apt/apt.conf.d/20auto-upgrades     # deux lignes qui finissent par "1"
+```
+
+Le serveur ne redémarre pas tout seul. Quand l'accueil SSH affiche `*** System restart required ***`,
+fais `sudo reboot` au moment qui t'arrange (le site est coupé une minute).
+
+### 4.6 bis Une mémoire de secours (swap)
+
+Sans mémoire de secours, Linux arrête brutalement un programme quand la mémoire manque. Un fichier
+« swap » de 2 Go sert de tampon (utilisé seulement en dernier recours) :
+
+```bash
+$ sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
+$ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+$ echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf && sudo sysctl -p /etc/sysctl.d/99-swappiness.conf
+$ free -h      # « Swap: 2.0Gi »
 ```
 
 ### 4.7 Un raccourci sur ton PC
 
-Pour taper `ssh portfolio` au lieu de `ssh leonard@<IP>`, crée (ou complète) le fichier
-`C:\Users\leona\.ssh\config` :
+Pour taper `ssh portfolio` au lieu de la longue commande, ajoute le serveur au fichier
+`C:\Users\leona\.ssh\config` (depuis PowerShell, sans toucher au reste du fichier) :
+
+```powershell
+PS> Add-Content -Path $env:USERPROFILE\.ssh\config -Value "`nHost portfolio`n  HostName <IP>`n  User ubuntu`n  IdentityFile ~/.ssh/id_ed25519_portfolio`n"
+```
+
+Ce qui ajoute :
 
 ```
 Host portfolio
   HostName <IP>
-  User leonard
+  User ubuntu
   IdentityFile ~/.ssh/id_ed25519_portfolio
 ```
 
@@ -231,7 +264,7 @@ $ sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyri
 $ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | sudo tee /etc/apt/sources.list.d/docker.list
 $ sudo apt update
 $ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-$ sudo usermod -aG docker leonard      # utiliser docker sans sudo
+$ sudo usermod -aG docker ubuntu       # utiliser docker sans sudo
 ```
 
 Déconnecte-toi (`exit`) puis reconnecte-toi (`ssh portfolio`) pour que le groupe soit pris en
@@ -284,7 +317,7 @@ certificats dès son démarrage, et Let's Encrypt limite le nombre d'essais rat�
 $ cd ~
 $ git clone https://github.com/drakaull/Portfolio.git portfolio
 $ cd portfolio
-$ git checkout main
+$ git checkout main      # avant la première release : develop
 ```
 
 ### 7.2 Les réglages et secrets
@@ -352,7 +385,7 @@ $ docker compose exec backend python -m app.cli translate-missing
 
 ```bash
 $ sudo mkdir -p /var/backups/portfolio
-$ sudo chown leonard:leonard /var/backups/portfolio
+$ sudo chown ubuntu:ubuntu /var/backups/portfolio
 $ ~/portfolio/deploy/backup.sh          # un premier essai à la main
 $ ls -lh /var/backups/portfolio
 $ crontab -e                            # choisis nano si on te le demande
@@ -361,8 +394,13 @@ $ crontab -e                            # choisis nano si on te le demande
 Ajoute cette ligne à la fin, enregistre et quitte (sauvegarde chaque nuit à 3 h 30) :
 
 ```
-30 3 * * * /home/leonard/portfolio/deploy/backup.sh >> /home/leonard/backup.log 2>&1
+30 3 * * * /home/ubuntu/portfolio/deploy/backup.sh >> /home/ubuntu/backup.log 2>&1
+0 4 1 * * cd /home/ubuntu/portfolio/deploy && docker compose up -d --force-recreate backend >> /home/ubuntu/backup.log 2>&1
 ```
+
+La deuxième ligne, le 1er de chaque mois à 4 h, recrée le conteneur du backend : ça **efface ses
+journaux**, dont ceux des tentatives de connexion à l'admin (avec leur IP), comme l'annonce la page
+Vie privée. Le site est coupé quelques secondes.
 
 Le serveur garde les **14** dernières sauvegardes ; les plus anciennes sont supprimées.
 
@@ -406,8 +444,9 @@ juste après la mise en ligne.
 - [ ] Les icônes et le manifest répondent (onglet, ajout à l'écran d'accueil d'un téléphone).
 - [ ] Le formulaire de contact : un message de test arrive dans ta boîte (pas en spam).
 - [ ] Connexion admin ; le message de test apparaît dans « Messages ».
-- [ ] L'IP réelle des visiteurs : `docker compose logs backend | tail` doit montrer des adresses
-      variées, pas toujours la même (sinon les limites anti-abus bloqueraient tout le monde).
+- [ ] L'IP réelle des visiteurs : après une tentative de connexion **ratée** à l'admin,
+      `docker compose logs backend | grep "login failed"` doit montrer **ton** adresse IP, pas une
+      adresse en `172.30.…` (sinon les limites anti-abus bloqueraient tout le monde d'un coup).
 - [ ] Les sauvegardes : une archive dans `/var/backups/portfolio`, une copie sur ton PC, un test
       de restauration réussi.
 - [ ] La page Vie privée nomme OVHcloud et DeepL, et ne mentionne plus Gmail.

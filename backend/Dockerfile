@@ -32,4 +32,6 @@ EXPOSE 8000
 # One process: the login and contact rate limiters live in memory.
 # --proxy-headers: the visitor's IP comes from Caddy's X-Forwarded-For, trusted only from the
 # addresses in FORWARDED_ALLOW_IPS (the private Docker network, set in deploy/compose.yaml).
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--no-server-header"]
+# --no-access-log: no log line per request, so visitors' IP addresses are never written anywhere
+# (privacy page). Admin sign-in attempts are still logged by the app, and erased monthly.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--no-server-header", "--no-access-log"]
