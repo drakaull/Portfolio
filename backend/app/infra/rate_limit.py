@@ -1,9 +1,27 @@
+import ipaddress
 import time
 from collections import defaultdict, deque
 
 
+def client_key(address: str) -> str:
+    """What the limits count by: an IPv4 address, or the /64 block of an IPv6 address.
+
+    An IPv6 subscriber gets a whole /64 and can pick a new address in it at will (privacy
+    extensions do it on their own): counting single addresses would let anyone dodge the limits.
+    """
+    try:
+        ip = ipaddress.ip_address(address)
+    except ValueError:
+        return address  # e.g. "unknown" when there is no client address
+    if ip.version == 6:
+        if ip.ipv4_mapped:  # ::ffff:1.2.3.4 is an IPv4 client
+            return str(ip.ipv4_mapped)
+        return str(ipaddress.ip_network(f"{ip}/64", strict=False))
+    return str(ip)
+
+
 class LoginRateLimiter:
-    """Counts failed logins per client IP over a sliding window.
+    """Counts failed logins per client (see client_key) over a sliding window.
 
     shortcut: counters live in this process's memory, so they reset on restart and are not shared
     between processes; move them to the database if the backend ever runs several workers.
@@ -23,14 +41,16 @@ class LoginRateLimiter:
             return deque()
         return failures
 
-    def is_blocked(self, key: str, now: float | None = None) -> bool:
+    def is_blocked(self, address: str, now: float | None = None) -> bool:
+        key = client_key(address)
         return len(self._recent(key, time.monotonic() if now is None else now)) >= self.max_failures
 
-    def record_failure(self, key: str, now: float | None = None) -> None:
-        self._failures[key].append(time.monotonic() if now is None else now)
+    def record_failure(self, address: str, now: float | None = None) -> None:
+        self._failures[client_key(address)].append(time.monotonic() if now is None else now)
 
-    def forgive(self, key: str) -> None:
+    def forgive(self, address: str) -> None:
         """Cancel the most recent recorded attempt (it turned out to be a successful login)."""
+        key = client_key(address)
         if self._failures.get(key):
             self._failures[key].pop()
 
