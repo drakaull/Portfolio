@@ -1,6 +1,9 @@
-/* Ends on the visible state: if animations are off or fail, content is simply shown. */
+/* Ends on the visible state: if animations are off or fail, content is simply shown.
+   `backwards` (not `both`): once finished the animation lets go of the element; otherwise Firefox
+   may keep painting it where the animation left it after a re-render. It moves with `translate`,
+   so it never fights a component's own `transform` (e.g. the cards' hover lift). */
 .reveal > * {
-  animation: rise var(--duration-base) var(--ease-out) both;
+  animation: rise var(--duration-base) var(--ease-out) backwards;
 }
 
 .reveal > :nth-child(2) {
@@ -26,7 +29,7 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    translate: 0 14px;
   }
 }
 
