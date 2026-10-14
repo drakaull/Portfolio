@@ -6,7 +6,7 @@ Ticked items are built into the production stack (`deploy/`, the Dockerfiles). H
 
 ## Required
 
-- [ ] **Real client IP behind the reverse proxy** (security audit L1). Run uvicorn with `--proxy-headers --forwarded-allow-ips=<proxy IP>` and make the proxy set `X-Forwarded-For`. Otherwise every visitor shares one IP: ten failed logins by anyone block the admin too, and the contact form's limit (5 messages per hour per IP) becomes 5 per hour for the whole site. Key IPv6 clients on their `/64` prefix in `app/infra/rate_limit.py`.
+- [x] **Real client IP behind the reverse proxy** (security audit L1). Run uvicorn with `--proxy-headers --forwarded-allow-ips=<proxy IP>` and make the proxy set `X-Forwarded-For`. Otherwise every visitor shares one IP: ten failed logins by anyone block the admin too, and the contact form's limit (5 messages per hour per IP) becomes 5 per hour for the whole site. Key IPv6 clients on their `/64` prefix in `app/infra/rate_limit.py`.
 - [x] **Single backend process**, or move the login rate limiter to the database (`shortcut:` in `app/infra/rate_limit.py`).
 - [ ] **HTTPS everywhere**; the admin cookie is `Secure` and is refused over plain HTTP outside `localhost`.
 - [ ] **Security headers** on every response: `Content-Security-Policy` (allow the inline theme script in `frontend/index.html` by hash; restrict `img-src` so Markdown images in admin texts cannot load third-party trackers), `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` (or CSP `frame-ancestors 'none'`), `Referrer-Policy`.
