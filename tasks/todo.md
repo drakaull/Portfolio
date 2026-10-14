@@ -2,7 +2,7 @@
 
 Plan: [plan.md](plan.md)
 
-- [ ] Task 1: backend image
+- [x] Task 1: backend image
 - [ ] Task 2: web image + Caddyfile + noindex
 - [ ] Task 3: production compose + .env.example
 - [ ] Checkpoint A: production stack on localhost
