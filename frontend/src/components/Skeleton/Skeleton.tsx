@@ -13,7 +13,7 @@ export function Loading({
   className,
   children,
 }: {
-  label: string
+  label?: string // omitted when another Loading on the page already announces it
   className?: string // the page's own layout (grid, gaps), so the shape matches the content
   children: ReactNode
 }) {
@@ -25,9 +25,11 @@ export function Loading({
 
   return (
     <>
-      <p role="status" className="visually-hidden">
-        {label}
-      </p>
+      {label && (
+        <p role="status" className="visually-hidden">
+          {label}
+        </p>
+      )}
       {shown && (
         <div className={[styles.skeleton, className].filter(Boolean).join(' ')} aria-hidden="true">
           {children}
@@ -42,12 +44,14 @@ export function Bone({
   width = '100%',
   height = '1em',
   round = false,
+  radius,
 }: {
   width?: string
   height?: string
   round?: boolean
+  radius?: string // to match the corners of what it stands for
 }) {
-  const style: CSSProperties = { width, height }
+  const style: CSSProperties = { width, height, borderRadius: radius }
   return <span className={round ? `${styles.bone} ${styles.round}` : styles.bone} style={style} />
 }
 

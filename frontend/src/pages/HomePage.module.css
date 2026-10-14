@@ -88,3 +88,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Skeleton: the lines of a block of text, spaced like the text. */
+.text:has(> span) {
+  display: grid;
+  gap: var(--space-3);
+}

@@ -41,6 +41,7 @@ export function TimelineSkeleton() {
             <Bone width="50%" height="1.1rem" />
             <Bone width="30%" />
             <Bone width="85%" />
+            <Bone width="40%" height="0.75rem" />
           </BoneCard>
         </li>
       ))}

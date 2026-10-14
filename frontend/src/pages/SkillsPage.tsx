@@ -16,7 +16,9 @@ export function SkillsPage() {
         <Loading label={t('skills.loading')} className={styles.groups}>
           {[1, 2, 3].map((group) => (
             <div key={group}>
-              <Bone width="7rem" height="0.75rem" />
+              <div className={styles.category}>
+                <Bone width="7rem" height="0.875rem" />
+              </div>
               <ul className={styles.list}>
                 {[5, 4, 6, 4].map((letters, chip) => (
                   <li key={chip} className={styles.chip}>

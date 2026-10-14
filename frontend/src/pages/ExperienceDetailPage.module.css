@@ -52,15 +52,15 @@
   margin-top: var(--space-7);
 }
 
-/* Skeleton: header lines, then the text, spaced like the page. */
+/* Skeleton: header lines (spaced like PageHeader), then the text. */
 .loading {
   display: grid;
-  gap: var(--space-4);
-  padding-top: var(--space-2);
+  gap: var(--space-3);
+  padding-top: var(--space-6);
 }
 
 .loading .description {
   display: grid;
   gap: var(--space-3);
-  margin-top: var(--space-4);
+  margin-top: var(--space-6);
 }

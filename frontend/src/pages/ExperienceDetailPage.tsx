@@ -19,6 +19,7 @@ export function ExperienceDetailPage() {
   if (state.status === 'loading') {
     return (
       <Loading label={t('experience.loading')} className={styles.loading}>
+        <Bone width="16rem" height="0.875rem" />
         <Bone width="45%" height="1.75rem" />
         <Bone width="35%" />
         <div className={styles.description}>

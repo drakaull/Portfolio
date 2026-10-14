@@ -62,12 +62,18 @@ export function ProjectCardSkeleton() {
       <Bone width="35%" height="0.75rem" />
       <Bone width="55%" height="1.5rem" />
       <Bone />
-      <Bone width="80%" />
+      <Bone />
+      <Bone width="70%" />
       <div className={styles.footer}>
         <BoneRow>
           <Bone width="4rem" height="4rem" round />
-          <Bone width="6rem" height="0.75rem" />
+          <span className={styles.legendSkeleton}>
+            <Bone width="6rem" height="0.75rem" />
+            <Bone width="4.5rem" height="0.75rem" />
+            <Bone width="5rem" height="0.75rem" />
+          </span>
         </BoneRow>
+        <Bone width="5rem" height="0.875rem" />
       </div>
     </div>
   )
