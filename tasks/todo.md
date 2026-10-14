@@ -8,4 +8,4 @@ Plan: [plan.md](plan.md)
 - [x] Checkpoint A: production stack on localhost
 - [x] Task 4: backups + restore test
 - [x] Task 5: runbook + checklist
-- [ ] Checkpoint B: review · merge approval
+- [x] Checkpoint B: review · merge approval
