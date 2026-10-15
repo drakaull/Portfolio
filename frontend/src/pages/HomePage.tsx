@@ -18,7 +18,9 @@ export function HomePage() {
   return (
     <section className={styles.hero}>
       <title>{t('site.name')}</title>
-      <Reveal className={styles.intro}>
+      {/* Its own grid area: top of the right column on wide screens (the text then starts at the
+          top of the left one), first on narrow ones. */}
+      <Reveal className={styles.photo}>
         {state.status === 'loading' && (
           <Loading>
             <Bone width="15rem" height="9.75rem" radius="12px" />
@@ -31,6 +33,8 @@ export function HomePage() {
             focus={state.content.photo_focus}
           />
         )}
+      </Reveal>
+      <Reveal className={styles.intro}>
         <Eyebrow>{t('eyebrow.home')}</Eyebrow>
         <h1 className={styles.name}>{t('site.name')}</h1>
         {state.status === 'loading' && (
