@@ -5,8 +5,6 @@ import { formatYears } from '../../lib/years.ts'
 import { Badge } from '../Badge/Badge.tsx'
 import styles from './ExperienceCard.module.css'
 
-const MAX_TECHNOLOGIES = 4
-
 /**
  * The whole card is one link to the detail page; `compact` drops summary and technologies,
  * `showYears={false}` lets a timeline show the years beside the card instead.
@@ -37,7 +35,7 @@ export function ExperienceCard({
       {!compact && <span className={styles.summary}>{entry.summary}</span>}
       {!compact && entry.technologies.length > 0 && (
         <span className={styles.technologies}>
-          {entry.technologies.slice(0, MAX_TECHNOLOGIES).join(' · ')}
+          {entry.technologies.join(' · ')}
         </span>
       )}
     </Link>
