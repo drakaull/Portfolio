@@ -19,14 +19,20 @@ Als je via het formulier schrijft, bewaart de site je **naam**, je **e-mailadres
 
 - **Waarom?** Alleen om je bericht te lezen en je te antwoorden.
 - **Op welke grondslag?** Het gerechtvaardigd belang om mensen die schrijven te antwoorden (artikel 6.1.f AVG) of, bijvoorbeeld bij een jobaanbod, de stappen vóór een mogelijke overeenkomst (artikel 6.1.b).
-- **Wie heeft toegang?** Alleen Léonard Fontaine. Een kopie van je bericht wordt hem per e-mail gestuurd, naar zijn adres op het domein van de site. De site, de database en deze mailbox worden gehost door **OVHcloud** (OVH SAS, Frankrijk), in datacenters **in Frankrijk**; OVHcloud verwerkt deze gegevens technisch, in zijn naam.
-- **Hoe lang?** Berichten worden **na 12 maanden automatisch verwijderd**, of eerder op eenvoudig verzoek.
+- **Wie heeft toegang?** Alleen Léonard Fontaine. Een kopie van je bericht wordt hem per e-mail gestuurd, naar zijn adres op het domein van de site. De site, de database en deze mailbox worden gehost door **OVHcloud** (OVH SAS, Frankrijk), in datacenters **in Frankrijk**; OVHcloud verwerkt deze gegevens technisch, in zijn naam. Een kopie wordt ook doorgestuurd naar zijn **Gmail**-mailbox (Google): Google kan deze gegevens buiten de Europese Unie verwerken, met name in de Verenigde Staten, in het kader van het "Data Privacy Framework" tussen de EU en de VS.
+- **Hoe lang?** Berichten worden **na 12 maanden automatisch verwijderd**, of eerder op eenvoudig verzoek. Ze verdwijnen ook uit de **back-ups**, uiterlijk **14 dagen** na hun verwijdering.
 
 Om misbruik te voorkomen wordt je IP-adres **tijdelijk, in het geheugen** gebruikt om het aantal berichten per uur te beperken. Het wordt **nooit opgeslagen**.
 
 ## Aanmelden bij de beheeromgeving
 
 Pogingen om je aan te melden bij de beheeromgeving van de site, die voorbehouden is aan Léonard Fontaine, worden gelogd met hun **IP-adres**, datum en de ingevoerde gebruikersnaam, om aanvallen op te sporen en te blokkeren (gerechtvaardigd belang, artikel 6, lid 1, f AVG). Deze logboeken worden **elke maand automatisch gewist**.
+
+## Wettelijke vermeldingen
+
+- **Uitgever:** Léonard Fontaine, België.
+- **Contact:** contact@leonard-fontaine.com, of het [contactformulier](/nl/contact).
+- **Hosting:** OVH SAS, 2 rue Kellermann, 59100 Roubaix, Frankrijk.
 
 ## Je rechten
 
