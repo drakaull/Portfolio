@@ -19,14 +19,20 @@ When you write through the form, the site stores your **name**, your **email add
 
 - **Why?** Only to read your message and reply to you.
 - **On what basis?** The legitimate interest in answering people who write (Article 6(1)(f) GDPR) or, for example for a job offer, the steps taken before a possible contract (Article 6(1)(b)).
-- **Who can see it?** Léonard Fontaine only. A copy of your message is emailed to him, to his address on the site's domain. The site, its database and this mailbox are hosted by **OVHcloud** (OVH SAS, France), in data centres located **in France**; OVHcloud processes this data technically, on his behalf.
-- **For how long?** Messages are **deleted automatically after 12 months**, or earlier on request.
+- **Who can see it?** Léonard Fontaine only. A copy of your message is emailed to him, to his address on the site's domain. The site, its database and this mailbox are hosted by **OVHcloud** (OVH SAS, France), in data centres located **in France**; OVHcloud processes this data technically, on his behalf. A copy is also forwarded to his **Gmail** (Google) mailbox: Google may process this data outside the European Union, notably in the United States, under the EU–US "Data Privacy Framework".
+- **For how long?** Messages are **deleted automatically after 12 months**, or earlier on request. They also disappear from the **backups** at most **14 days** after being deleted.
 
 To prevent abuse, your IP address is used **temporarily, in memory**, to limit the number of messages sent within an hour. It is **never stored**.
 
 ## Signing in to the administration
 
 Attempts to sign in to the site's administration area, reserved for Léonard Fontaine, are logged with their **IP address**, date and the username entered, to detect and block attacks (legitimate interest, article 6(1)(f) GDPR). These logs are **erased automatically every month**.
+
+## Legal notice
+
+- **Publisher:** Léonard Fontaine, Belgium.
+- **Contact:** contact@leonard-fontaine.com, or the [contact form](/en/contact).
+- **Hosting:** OVH SAS, 2 rue Kellermann, 59100 Roubaix, France.
 
 ## Your rights
 

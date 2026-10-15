@@ -35,10 +35,14 @@ describe('privacy page', () => {
     )
   })
 
-  test('never shows an email address', () => {
-    mockApi({})
-    renderApp('/fr/privacy')
+  test.each(['fr', 'en', 'nl'])(
+    'shows only the public contact address, never the inbox behind it (%s)',
+    (lang) => {
+      mockApi({})
+      renderApp(`/${lang}/privacy`)
 
-    expect(screen.getByRole('main').textContent).not.toMatch(/@/)
-  })
+      const addresses = screen.getByRole('main').textContent?.match(/[\w.+-]+@[\w.-]+/g)
+      expect(addresses).toEqual(['contact@leonard-fontaine.com']) // legal notice; Gmail stays hidden
+    },
+  )
 })

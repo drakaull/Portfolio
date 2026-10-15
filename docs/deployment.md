@@ -512,6 +512,12 @@ Le script demande de taper `yes` pour confirmer. Vérifie ensuite le site et l'a
 | Après une modification de `.env` | `docker compose up -d` (les conteneurs concernés redémarrent avec les nouveaux réglages). |
 | Je n'arrive plus à me connecter en SSH | Console de secours dans l'espace client OVH (« KVM ») : elle donne accès au serveur sans SSH. |
 
+**En cas de fuite de données** (serveur piraté, sauvegarde perdue ou volée, base exposée) : le RGPD
+impose de prévenir l'**Autorité de protection des données** dans les **72 heures**
+([www.autoriteprotectiondonnees.be](https://www.autoriteprotectiondonnees.be), rubrique « Fuite de
+données »), et les personnes concernées si le risque est élevé. Commence par couper l'accès
+(`docker compose down`), change les mots de passe (admin, base, SMTP), puis note ce qui s'est passé.
+
 Commandes utiles :
 
 ```bash
