@@ -28,9 +28,11 @@
   transform: translateY(0) scale(0.98);
 }
 
+/* Disabled means "nothing to do now" (e.g. nothing to save), not "busy": the label says when it
+   is saving. */
 .button:disabled {
   opacity: 0.6;
-  cursor: progress;
+  cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
