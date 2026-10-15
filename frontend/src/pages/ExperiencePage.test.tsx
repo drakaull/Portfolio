@@ -35,8 +35,8 @@ describe('experience timeline', () => {
       '/fr/experience/helha-computer-science',
     ])
     expect(within(cards[0]).getByText('Job étudiant')).toBeDefined()
-    // At most 4 technologies on a card.
-    expect(within(cards[0]).getByText('Amazon S3 · Python · NoSQL · Docker')).toBeDefined()
+    // Every technology, in the order written in the admin.
+    expect(within(cards[0]).getByText('Amazon S3 · Python · NoSQL · Docker · FastAPI')).toBeDefined()
     expect(within(cards[1]).getByText('Formation')).toBeDefined()
   })
 
