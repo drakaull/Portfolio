@@ -19,14 +19,20 @@ Quand vous écrivez via le formulaire, le site enregistre votre **nom**, votre *
 
 - **Pourquoi ?** Uniquement pour lire votre message et vous répondre.
 - **Sur quelle base ?** L'intérêt légitime à répondre aux personnes qui écrivent (article 6.1.f du RGPD) ou, s'il s'agit par exemple d'une offre d'emploi, les démarches préalables à un éventuel contrat (article 6.1.b).
-- **Qui y a accès ?** Léonard Fontaine seul. Une copie de votre message lui est envoyée par e-mail, sur son adresse au nom du site. Le site, sa base de données et cette messagerie sont hébergés par **OVHcloud** (OVH SAS, France), dans des centres de données situés **en France** ; OVHcloud traite ces données techniquement, pour son compte.
-- **Combien de temps ?** Les messages sont **supprimés automatiquement après 12 mois**, ou plus tôt sur simple demande.
+- **Qui y a accès ?** Léonard Fontaine seul. Une copie de votre message lui est envoyée par e-mail, sur son adresse au nom du site. Le site, sa base de données et cette messagerie sont hébergés par **OVHcloud** (OVH SAS, France), dans des centres de données situés **en France** ; OVHcloud traite ces données techniquement, pour son compte. Une copie est aussi transférée vers sa boîte **Gmail** (Google) : Google peut traiter ces données hors de l'Union européenne, notamment aux États-Unis, dans le cadre du « Data Privacy Framework » UE–États-Unis.
+- **Combien de temps ?** Les messages sont **supprimés automatiquement après 12 mois**, ou plus tôt sur simple demande. Ils disparaissent aussi des **sauvegardes** au plus tard **14 jours** après leur suppression.
 
 Pour éviter les abus, votre adresse IP est utilisée **temporairement, en mémoire**, pour limiter le nombre de messages envoyés en une heure. Elle n'est **jamais enregistrée**.
 
 ## La connexion à l'administration
 
 Les tentatives de connexion à l'espace d'administration du site, réservé à Léonard Fontaine, sont journalisées avec leur **adresse IP**, leur date et le nom d'utilisateur saisi, pour détecter et bloquer les attaques (intérêt légitime, article 6.1.f du RGPD). Ces journaux sont **effacés automatiquement chaque mois**.
+
+## Mentions légales
+
+- **Éditeur :** Léonard Fontaine, Belgique.
+- **Contact :** contact@leonard-fontaine.com, ou le [formulaire de contact](/fr/contact).
+- **Hébergement :** OVH SAS, 2 rue Kellermann, 59100 Roubaix, France.
 
 ## Vos droits
 
