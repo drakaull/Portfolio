@@ -8,7 +8,9 @@
   --color-border: #ddd5c4;
   --color-accent: #9b4527;
   --color-on-accent: #fbf8f2;
-  --color-grid: rgb(34 32 27 / 0.045);
+  /* One graph-paper cell, repeated by body. An SVG and not CSS gradients: Firefox drops some
+     1px gradient lines at fractional zoom (90 %, 110 %…), which turned squares into rectangles. */
+  --grid-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M0 .5H24M.5 0V24' stroke='%2322201b' stroke-opacity='.045'/%3E%3C/svg%3E");
 
   /* Type: Google Sans for text, Bricolage only for the name, JetBrains Mono for labels and dates */
   --font-sans: 'Google Sans Variable', 'Segoe UI', system-ui, sans-serif;
@@ -62,7 +64,7 @@
   --color-border: #36332d;
   --color-accent: #e3967a;
   --color-on-accent: #1b1a17;
-  --color-grid: rgb(236 231 220 / 0.035);
+  --grid-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M0 .5H24M.5 0V24' stroke='%23ece7dc' stroke-opacity='.035'/%3E%3C/svg%3E");
 
   color-scheme: dark;
 }
@@ -75,11 +77,9 @@
 
 body {
   margin: 0;
-  /* Faint graph paper: two 1px line gradients repeated every --grid-size. */
+  /* Faint graph paper: one cell (--grid-tile) repeated every --grid-size. */
   background:
-    linear-gradient(var(--color-grid) 1px, transparent 1px) 0 0 / var(--grid-size) var(--grid-size),
-    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px) 0 0 / var(--grid-size)
-      var(--grid-size),
+    var(--grid-tile) 0 0 / var(--grid-size) var(--grid-size),
     var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
