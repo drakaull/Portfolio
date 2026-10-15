@@ -32,6 +32,12 @@ def cv_file() -> Path | None:
     return path if path.is_file() else None
 
 
+def cv_url() -> str | None:
+    """Public URL of the CV, versioned so a replaced CV is never hidden by a cache."""
+    path = cv_file()
+    return None if path is None else f"/api/cv?v={path.stat().st_mtime_ns}"
+
+
 async def save_cv(read: Callable[[int], Awaitable[bytes]]) -> None:
     """Store the uploaded CV, reading it chunk by chunk with `read(size)`.
 

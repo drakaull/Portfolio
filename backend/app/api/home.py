@@ -8,7 +8,7 @@ from app.api.dependencies import get_home_repository
 from app.domain.home import PHOTO_FOCUS_MAX, PHOTO_FOCUS_MIN, HomeContent
 from app.domain.language import Lang, localize
 from app.infra.repositories.home import HomeContentRepository
-from app.infra.storage import cv_file, photo_file, photo_url
+from app.infra.storage import cv_file, cv_url, photo_file, photo_url
 
 router = APIRouter(tags=["home"])
 
@@ -55,11 +55,17 @@ async def get_home(
     content = await repository.get()
     if content is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Home content not found")
-    return HomeContentOut.from_domain(content, lang, cv_url="/api/cv" if cv_file() else None)
+    return HomeContentOut.from_domain(content, lang, cv_url=cv_url())
+
+
+def _cache_control(version: str | None) -> str:
+    """A versioned address (?v=…, from cv_url / photo_url) changes with its file: safe to cache for
+    long. Any other one (e.g. the admin's links) must be checked again each time."""
+    return "public, max-age=31536000, immutable" if version else "no-cache"
 
 
 @router.get("/cv", response_class=FileResponse)
-async def get_cv() -> FileResponse:
+async def get_cv(v: str | None = None) -> FileResponse:
     path = cv_file()
     if path is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="CV not found")
@@ -70,7 +76,11 @@ async def get_cv() -> FileResponse:
         filename="Leonard_Fontaine_CV.pdf",
         content_disposition_type="inline",
         # Served from the site's own origin: forbid scripts and type sniffing on this response.
-        headers={"Content-Security-Policy": "sandbox", "X-Content-Type-Options": "nosniff"},
+        headers={
+            "Content-Security-Policy": "sandbox",
+            "X-Content-Type-Options": "nosniff",
+            "Cache-Control": _cache_control(v),
+        },
     )
 
 
@@ -79,11 +89,8 @@ async def get_photo(v: str | None = None) -> FileResponse:
     path = photo_file()
     if path is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Photo not found")
-    # A versioned address (?v=…, from photo_url) changes with the photo: safe to cache for long.
-    # Any other address (e.g. the admin preview) must be checked again each time.
-    cache = "public, max-age=31536000, immutable" if v else "no-cache"
     return FileResponse(
         path,
         media_type="image/webp",
-        headers={"X-Content-Type-Options": "nosniff", "Cache-Control": cache},
+        headers={"X-Content-Type-Options": "nosniff", "Cache-Control": _cache_control(v)},
     )
