@@ -1,0 +1,38 @@
+.item {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+}
+
+.item + .item {
+  border-top: 1px solid var(--color-border);
+}
+
+.years {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.main {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.organization {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 767px) {
+  .item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-1) var(--space-3);
+  }
+
+  .years {
+    grid-column: 1 / -1;
+  }
+}

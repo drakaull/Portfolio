@@ -1,0 +1,159 @@
+.editor {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+  /* A fieldset is at least as wide as its content by default, which overflows phones. */
+  min-width: 0;
+  margin: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}
+
+.panel legend {
+  padding-inline: 0.25rem;
+  font-weight: 700;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tab {
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tab[aria-selected='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.introRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.introRow textarea {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 400;
+  resize: vertical;
+}
+
+.preview {
+  padding: 0.75rem 1rem;
+  border: 1px dashed var(--color-border);
+  border-radius: 0.375rem;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.previewLabel {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+}
+
+.confirm p {
+  flex-basis: 100%;
+  margin: 0;
+  font-weight: 500;
+}
+
+.secondary {
+  /* Natural width inside the grid panels (like Button). */
+  justify-self: start;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .introRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.translate {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+
+/* Bottom row of an editor: save on the left, delete on the right. */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.danger {
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.danger:hover {
+  background: var(--color-surface);
+}

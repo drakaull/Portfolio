@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- "LF" monogram: upright L, F slanted 15° like the / of a path (~/portfolio). Drawn as shapes,
+       with thick stems, so it stays crisp at 16 px without any font. -->
+  <rect width="256" height="256" rx="56" fill="#9b4527"/>
+  <path fill="#fbf8f2" d="M34 61.86H71.46V154.69H104.03V192.14H34ZM148.71 61.86H222L211.96 99.31H176.13L173.73 108.27H192.46L182.43 145.73H163.7L151.26 192.14H113.8Z"/>
+</svg>

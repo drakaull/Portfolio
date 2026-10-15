@@ -1,0 +1,15 @@
+/* Accent underline that slides in from the left on hover and keyboard focus. */
+.link {
+  padding-bottom: 2px;
+  background: linear-gradient(var(--color-accent), var(--color-accent)) left bottom / 0 2px
+    no-repeat;
+  color: var(--color-text);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-size var(--duration-base) var(--ease-out);
+}
+
+.link:hover,
+.link:focus-visible {
+  background-size: 100% 2px;
+}

@@ -1,0 +1,25 @@
+from sqlalchemy import MetaData
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase
+
+from app.infra.config import settings
+
+# Stable constraint names, so Alembic can find and drop them in later migrations.
+NAMING_CONVENTION = {
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s",
+}
+
+
+class Base(DeclarativeBase):
+    """Parent class of every ORM model."""
+
+    metadata = MetaData(naming_convention=NAMING_CONVENTION)
+
+
+# asyncpg waits 60 s by default to connect; fail fast when the database is unreachable.
+engine = create_async_engine(settings.database_url, pool_pre_ping=True, connect_args={"timeout": 5})
+SessionFactory = async_sessionmaker(engine, expire_on_commit=False)

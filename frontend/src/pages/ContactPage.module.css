@@ -1,0 +1,75 @@
+.form {
+  display: grid;
+  gap: var(--space-5);
+  max-width: 36rem;
+}
+
+.field {
+  display: grid;
+  gap: var(--space-2);
+  font-weight: 500;
+}
+
+.field input,
+.field textarea {
+  min-width: 0;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 400;
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible {
+  border-color: var(--color-accent);
+}
+
+.field [aria-invalid='true'] {
+  border-color: var(--color-accent);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+}
+
+.privacy {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.sent {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.sent:empty {
+  display: none;
+}
+
+.error {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+/* Off-screen rather than display:none, which some robots detect and skip. */
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

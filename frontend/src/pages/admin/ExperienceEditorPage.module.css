@@ -1,0 +1,29 @@
+.years {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 17rem));
+  /* Inputs line up even when one label wraps (narrow screens). */
+  align-items: end;
+  gap: var(--space-4);
+}
+
+.slugRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.slugRow input {
+  flex: 1;
+}
+
+.slugPrefix,
+.slugFixed {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+.slugFixed {
+  overflow-wrap: anywhere;
+}

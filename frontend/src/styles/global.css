@@ -1,0 +1,137 @@
+/* Design tokens. Components use these variables only: a redesign is a change in this file. */
+:root {
+  /* Color — direction "Papier quadrillé" (all text pairs meet WCAG AA) */
+  --color-bg: #f7f4ec;
+  --color-surface: #efe9dc;
+  --color-text: #22201b;
+  --color-text-muted: #625c51;
+  --color-border: #ddd5c4;
+  --color-accent: #9b4527;
+  --color-on-accent: #fbf8f2;
+  /* One graph-paper cell, repeated by body. An SVG and not CSS gradients: Firefox drops some
+     1px gradient lines at fractional zoom (90 %, 110 %…), which turned squares into rectangles. */
+  --grid-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M0 .5H24M.5 0V24' stroke='%2322201b' stroke-opacity='.045'/%3E%3C/svg%3E");
+
+  /* Type: Google Sans for text, Bricolage only for the name, JetBrains Mono for labels and dates */
+  --font-sans: 'Google Sans Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'Google Sans Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-display: clamp(2.5rem, 7vw, 4rem);
+
+  /* Space */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+
+  /* Shape */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --duration-fast: 180ms;
+  --duration-base: 260ms;
+  --duration-slow: 640ms;
+
+  /* Layout */
+  --navbar-height: 4rem;
+  --content-width: 64rem;
+  --gutter: 1.5rem;
+  --grid-size: 24px;
+
+  color-scheme: light;
+  /* Keep in-page anchor targets clear of the fixed navbar. */
+  scroll-padding-top: var(--navbar-height);
+  scroll-behavior: smooth;
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #1b1a17;
+  --color-surface: #25231f;
+  --color-text: #ece7dc;
+  --color-text-muted: #a59e90;
+  --color-border: #36332d;
+  --color-accent: #e3967a;
+  --color-on-accent: #1b1a17;
+  --grid-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M0 .5H24M.5 0V24' stroke='%23ece7dc' stroke-opacity='.035'/%3E%3C/svg%3E");
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  /* Faint graph paper: one cell (--grid-tile) repeated every --grid-size. */
+  background:
+    var(--grid-tile) 0 0 / var(--grid-size) var(--grid-size),
+    var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* Readable by screen readers, invisible on screen. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Theme change (useTheme): the old and new pages cross-fade. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+}
+
+/* Reduced motion: no smooth scrolling. Moving animations (Reveal, the photo's code panel, the
+   skeleton pulse) have their own gentler version; small colour and underline transitions stay. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    scroll-behavior: auto;
+  }
+}
+
+/* High contrast asked by the system: borders clearly visible (≥ 3:1 on the backgrounds). */
+@media (prefers-contrast: more) {
+  :root {
+    --color-border: #857d6f;
+  }
+
+  :root[data-theme='dark'] {
+    --color-border: #76705f;
+  }
+}

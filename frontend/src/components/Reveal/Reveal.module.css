@@ -1,0 +1,47 @@
+/* Ends on the visible state: if animations are off or fail, content is simply shown.
+   `backwards` (not `both`): once finished the animation lets go of the element; otherwise Firefox
+   may keep painting it where the animation left it after a re-render. It moves with `translate`,
+   so it never fights a component's own `transform` (e.g. the cards' hover lift). */
+.reveal > * {
+  animation: rise var(--duration-base) var(--ease-out) backwards;
+}
+
+.reveal > :nth-child(2) {
+  animation-delay: 50ms;
+}
+
+.reveal > :nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.reveal > :nth-child(4) {
+  animation-delay: 150ms;
+}
+
+.reveal > :nth-child(5) {
+  animation-delay: 200ms;
+}
+
+.reveal > :nth-child(n + 6) {
+  animation-delay: 250ms;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+
+/* Reduced motion: content fades in where it stands, without rising. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal > * {
+    animation-name: fade;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
