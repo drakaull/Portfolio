@@ -75,7 +75,6 @@
   width: 100%;
   height: auto;
   aspect-ratio: 16 / 10;
-  margin-top: var(--space-2);
   object-fit: cover;
   border-radius: var(--radius-sm);
   box-shadow: 0 0 0 1px var(--color-border);
@@ -83,8 +82,15 @@
 
 .team {
   min-height: 1lh;
-  margin: auto 0 0;
-  padding-top: var(--space-2);
+  margin: auto 0 0; /* at the bottom, even with no visual */
   color: var(--color-text-muted);
   font-size: var(--text-sm);
+}
+
+.visual {
+  margin-top: auto;
+}
+
+.visual + .team {
+  margin-top: 0; /* the visual above already takes the free space */
 }
