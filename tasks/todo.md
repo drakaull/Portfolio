@@ -8,5 +8,5 @@ Plan: [plan.md](plan.md)
 - [x] Task 3: experience logos
 - [x] Task 4: projects (languages at the top, screenshot, two variants)
 - [ ] Checkpoint B: variant chosen
-- [ ] Task 5: contact image
+- [x] Task 5: contact image
 - [ ] Checkpoint C: browsers, review, merge, release v1.1.0
