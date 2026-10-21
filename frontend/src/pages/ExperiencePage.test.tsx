@@ -42,8 +42,8 @@ describe('experience timeline', () => {
     expect(within(cards[1]).getByText('Formation')).toBeDefined()
   })
 
-  test('shows the image of an organisation that has one, framed as in the admin', async () => {
-    mockTimeline([{ ...ENTRIES[0], logo_focus: { x: 20, y: 70 } }, ENTRIES[1]])
+  test('shows the image of an organisation that has one', async () => {
+    mockTimeline()
     renderApp('/fr/experience')
 
     const timeline = await screen.findByRole('list', { name: 'Frise du parcours' })
@@ -54,7 +54,6 @@ describe('experience timeline', () => {
       ENTRIES[0].logo_url,
       '',
     ])
-    expect(image.style.objectPosition).toBe('20% 70%')
     expect(withoutImage.querySelector('img')).toBeNull()
   })
 

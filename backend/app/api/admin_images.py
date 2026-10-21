@@ -57,13 +57,9 @@ def _not_found() -> HTTPException:
 
 @router.put("/experiences/{slug}/logo", status_code=status.HTTP_204_NO_CONTENT)
 async def upload_logo(slug: Slug, file: UploadFile, experiences: Experiences) -> None:
-    entry = await experiences.get(slug)
-    if entry is None:
+    if await experiences.get(slug) is None:
         raise _not_found()
     await _store("logos", slug, file)
-    centred = replace(entry, logo_focus_x=PHOTO_FOCUS_CENTRE, logo_focus_y=PHOTO_FOCUS_CENTRE)
-    await experiences.update(centred)
-    await experiences.commit()
 
 
 @router.delete("/experiences/{slug}/logo", status_code=status.HTTP_204_NO_CONTENT)

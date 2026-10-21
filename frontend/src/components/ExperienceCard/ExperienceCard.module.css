@@ -43,9 +43,7 @@
   width: 100%;
   height: auto;
   aspect-ratio: 2 / 1;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 0 0 1px var(--color-border);
+  object-fit: contain;
 }
 
 @media (max-width: 40rem) {

@@ -65,7 +65,7 @@
   margin-top: var(--space-6);
 }
 
-/* Same 2:1 shape as on the card, so the admin's framing holds. */
+/* Shown whole, as on the card, left-aligned with the text. */
 .image {
   display: block;
   width: 100%;
@@ -73,7 +73,6 @@
   height: auto;
   aspect-ratio: 2 / 1;
   margin-bottom: var(--space-6);
-  object-fit: cover;
-  border-radius: var(--radius-md);
-  box-shadow: 0 0 0 1px var(--color-border);
+  object-fit: contain;
+  object-position: left center;
 }

@@ -48,5 +48,3 @@ class Experience:
     summary: Translated
     description: Translated  # Markdown
     technologies: tuple[str, ...]
-    logo_focus_x: int = 50  # framing of the organisation's image, in %
-    logo_focus_y: int = 50

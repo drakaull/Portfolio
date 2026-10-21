@@ -89,8 +89,6 @@ class ExperienceModel(Base):
         CheckConstraint("title ? 'fr' AND title ? 'en'", name="title_languages"),
         CheckConstraint("summary ? 'fr' AND summary ? 'en'", name="summary_languages"),
         CheckConstraint("description ? 'fr' AND description ? 'en'", name="description_languages"),
-        CheckConstraint("logo_focus_x BETWEEN 0 AND 100", name="logo_focus_x_range"),
-        CheckConstraint("logo_focus_y BETWEEN 0 AND 100", name="logo_focus_y_range"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -103,8 +101,6 @@ class ExperienceModel(Base):
     summary: Mapped[dict[str, str]] = mapped_column(JSONB)
     description: Mapped[dict[str, str]] = mapped_column(JSONB)
     technologies: Mapped[list[str]] = mapped_column(ARRAY(Text), server_default="{}")
-    logo_focus_x: Mapped[int] = mapped_column(SmallInteger, server_default="50")
-    logo_focus_y: Mapped[int] = mapped_column(SmallInteger, server_default="50")
 
 
 class SkillModel(Base):

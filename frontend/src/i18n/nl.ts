@@ -279,7 +279,6 @@ export const nl: Record<TranslationKey, string> = {
   'admin.image.remove': 'De afbeelding verwijderen',
   'admin.image.confirmRemove': 'De afbeelding van de site verwijderen?',
   'admin.logo.legend': 'Afbeelding van de organisatie',
-  'admin.logo.framingResult': 'Op de pagina Ervaring',
   'admin.screenshot.legend': 'Schermafbeelding van het project',
   'admin.screenshot.framingResult': 'Op de pagina Projecten',
   'admin.contactImage.legend': 'Afbeelding van de contactpagina',

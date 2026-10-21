@@ -15,7 +15,6 @@ const ENTRY: AdminExperience = {
   summary: { fr: 'Stockage hybride.', en: 'Hybrid storage.', nl: '' },
   description: { fr: '## Missions', en: '## Tasks', nl: '' },
   logo_url: null,
-  logo_focus: { x: 50, y: 50 },
 }
 const ENTRY_URL = '/api/admin/experiences/icare-internship-2026'
 
@@ -67,7 +66,6 @@ describe('creating an experience', () => {
       title: { fr: 'Développeur', en: '', nl: '' },
       summary: { fr: 'Je développe.', en: '', nl: '' },
       description: { fr: '', en: '', nl: '' },
-      logo_focus: { x: 50, y: 50 },
     })
   })
 
@@ -163,7 +161,6 @@ describe('editing an experience', () => {
       'description',
       'end_year',
       'kind',
-      'logo_focus',
       'organization',
       'start_year',
       'summary',
@@ -237,7 +234,7 @@ describe('organisation image', () => {
     expect(screen.queryByText('Organisation image')).toBeNull()
   })
 
-  test('uploads the image of the experience, to frame from the centre', async () => {
+  test('uploads the image of the experience and shows it', async () => {
     const fetchMock = mockApi({
       'GET /api/admin/me': signedIn,
       [`GET ${ENTRY_URL}`]: () => Response.json(ENTRY),
@@ -254,8 +251,6 @@ describe('organisation image', () => {
     expect(screen.getByRole('img', { name: 'Current image' }).getAttribute('src')).toMatch(
       /^\/api\/images\/logos\/icare-internship-2026\?preview=/,
     )
-    expect(screen.getByText('On the Experience page')).toBeDefined()
-    expect(screen.getByRole('button', { name: 'Save' }).hasAttribute('disabled')).toBe(true)
     expect(fetchMock.mock.calls.some(([url]) => url === `${ENTRY_URL}/logo`)).toBe(true)
   })
 })

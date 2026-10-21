@@ -11,8 +11,11 @@ import {
 } from '../../api/adminExperiences.ts'
 import type { Translated } from '../../api/adminHome.ts'
 import type { ExperienceKind } from '../../api/experiences.ts'
-import { PHOTO_FOCUS_CENTRE, type PhotoFocus } from '../../api/useHomeContent.ts'
 import { Button } from '../../components/Button/Button.tsx'
+import {
+  EXPERIENCE_IMAGE_HEIGHT,
+  EXPERIENCE_IMAGE_WIDTH,
+} from '../../components/ExperienceCard/ExperienceCard.tsx'
 import { MarkdownText } from '../../components/MarkdownText/MarkdownText.tsx'
 import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation, type Lang } from '../../i18n/useTranslation.ts'
@@ -22,7 +25,6 @@ import { SessionExpiredAlert, UnsavedChangesDialog } from './EditorParts.tsx'
 import styles from './ExperienceEditorPage.module.css'
 import editorStyles from './Editor.module.css'
 import { ImageField } from './FileField.tsx'
-import { PhotoFraming } from './PhotoFraming.tsx'
 import { TranslationTabs } from './TranslationTabs.tsx'
 import { useUnsavedChanges } from './useUnsavedChanges.ts'
 
@@ -50,7 +52,6 @@ type ExperienceForm = {
   start_year: string
   end_year: string
   technologies: string
-  logo_focus: PhotoFocus
 } & Record<TextField, Translated>
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'expired' | 'error'
@@ -68,13 +69,12 @@ const EMPTY_FORM: ExperienceForm = {
   title: EMPTY_TEXT,
   summary: EMPTY_TEXT,
   description: EMPTY_TEXT,
-  logo_focus: PHOTO_FOCUS_CENTRE,
 }
 
 // Fields picked one by one: a save response also carries auto_translated and translation_failed,
 // which the server refuses if they are sent back.
 function toForm(entry: AdminExperience): ExperienceForm {
-  const { slug, kind, organization, title, summary, description, logo_focus } = entry
+  const { slug, kind, organization, title, summary, description } = entry
   return {
     slug,
     kind,
@@ -85,7 +85,6 @@ function toForm(entry: AdminExperience): ExperienceForm {
     title,
     summary,
     description,
-    logo_focus,
   }
 }
 
@@ -293,30 +292,19 @@ export function ExperienceEditorPage() {
             present={hasLogo}
             onChange={(present) => {
               setHasLogo(present)
-              if (!present) return
               setLogoVersion((count) => count + 1)
-              // Framed from the centre by the server, like the photo.
-              const centred = (current: ExperienceForm | null) =>
-                current && { ...current, logo_focus: PHOTO_FOCUS_CENTRE }
-              setSaved(centred)
-              setForm(centred)
             }}
-          >
-            <PhotoFraming
-              src={`/api/images/logos/${slug}?preview=${logoVersion}`}
-              focus={form.logo_focus}
-              onChange={(logo_focus) => update({ logo_focus })}
-              width={320}
-              height={160}
-              texts={{
-                label: 'admin.framing.label',
-                preview: 'admin.image.preview',
-                result: 'admin.logo.framingResult',
-                hint: 'admin.framing.hint',
-                notNeeded: 'admin.framing.notNeeded',
-              }}
-            />
-          </ImageField>
+            preview={
+              // Shown whole in the card's frame, as on the site.
+              <img
+                className={styles.logoPreview}
+                src={`/api/images/logos/${slug}?preview=${logoVersion}`}
+                alt={t('admin.image.preview')}
+                width={EXPERIENCE_IMAGE_WIDTH}
+                height={EXPERIENCE_IMAGE_HEIGHT}
+              />
+            }
+          />
         )}
 
         <div className={styles.years}>

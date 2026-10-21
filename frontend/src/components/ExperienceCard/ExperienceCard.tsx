@@ -5,7 +5,7 @@ import { formatYears } from '../../lib/years.ts'
 import { Badge } from '../Badge/Badge.tsx'
 import styles from './ExperienceCard.module.css'
 
-// The organisation's image: 2:1, the shape framed in the admin.
+// The frame of the organisation's image; the image fits in it whole, whatever its shape.
 export const EXPERIENCE_IMAGE_WIDTH = 288
 export const EXPERIENCE_IMAGE_HEIGHT = 144
 
@@ -39,7 +39,6 @@ export function ExperienceCard({
           width={EXPERIENCE_IMAGE_WIDTH}
           height={EXPERIENCE_IMAGE_HEIGHT}
           loading="lazy"
-          style={{ objectPosition: `${entry.logo_focus.x}% ${entry.logo_focus.y}%` }}
         />
       )}
       <span className={styles.body}>

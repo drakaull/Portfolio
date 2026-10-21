@@ -28,7 +28,6 @@ async def test_list_is_localized_and_most_recent_first(client: AsyncClient) -> N
         "pour des données IoT industrielles.",
         "technologies": ["Amazon S3", "Python", "NoSQL", "Docker", "FastAPI"],
         "logo_url": None,
-        "logo_focus": {"x": 50, "y": 50},
     }
     assert english[0]["title"] == "R&D Engineer"
     assert "description" not in french[0]  # detail only

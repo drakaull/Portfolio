@@ -15,7 +15,6 @@ const DETAIL: ExperienceDetail = {
   description: 'Conception d’un stockage **hybride**.\n\n- Données IoT',
   technologies: ['Python', 'Docker'],
   logo_url: '/api/images/logos/icare-internship-2026?v=1',
-  logo_focus: { x: 50, y: 50 },
 }
 
 function mockDetail() {

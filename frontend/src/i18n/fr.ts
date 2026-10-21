@@ -280,7 +280,6 @@ export const fr: Record<TranslationKey, string> = {
   'admin.image.remove': "Retirer l'image",
   'admin.image.confirmRemove': "Retirer l'image du site ?",
   'admin.logo.legend': "Image de l'organisation",
-  'admin.logo.framingResult': 'Sur la page Parcours',
   'admin.screenshot.legend': 'Capture du projet',
   'admin.screenshot.framingResult': 'Sur la page Projets',
   'admin.contactImage.legend': 'Image de la page Contact',

@@ -12,7 +12,6 @@ export const ENTRIES: Experience[] = [
     summary: 'Stockage hybride chaud/froid.',
     technologies: ['Amazon S3', 'Python', 'NoSQL', 'Docker', 'FastAPI'],
     logo_url: '/api/images/logos/icare-student-job-2026?v=1',
-    logo_focus: { x: 50, y: 50 },
   },
   {
     slug: 'helha-computer-science',
@@ -24,6 +23,5 @@ export const ENTRIES: Experience[] = [
     summary: 'Développement d’applications.',
     technologies: [],
     logo_url: null,
-    logo_focus: { x: 50, y: 50 },
   },
 ]

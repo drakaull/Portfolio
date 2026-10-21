@@ -1,11 +1,9 @@
-from dataclasses import replace
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, Path, status
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 from app.api.dependencies import admin_router, get_experience_repository, get_translator
-from app.api.home import PhotoFocus
 from app.domain.experience import (
     DESCRIPTION_MAX_LENGTH,
     ORGANIZATION_MAX_LENGTH,
@@ -68,7 +66,6 @@ class ExperienceIn(_StrictModel):
     title: TitleIn
     summary: SummaryIn
     description: DescriptionIn = DescriptionIn()
-    logo_focus: PhotoFocus | None = None  # None: the framing stays as it is
 
     @field_validator("end_year")
     @classmethod
@@ -119,7 +116,6 @@ class AdminExperienceOut(BaseModel):
     summary: dict[str, str]
     description: dict[str, str]
     logo_url: str | None
-    logo_focus: PhotoFocus
 
     @classmethod
     def from_domain(cls, entry: Experience) -> "AdminExperienceOut":
@@ -134,7 +130,6 @@ class AdminExperienceOut(BaseModel):
             summary=with_every_lang(entry.summary),
             description=with_every_lang(entry.description),
             logo_url=image_url("logos", entry.slug),
-            logo_focus=PhotoFocus(x=entry.logo_focus_x, y=entry.logo_focus_y),
         )
 
 
@@ -144,17 +139,12 @@ class AdminExperienceSaveOut(AdminExperienceOut):
 
 
 async def _translated(
-    body: ExperienceIn, slug: str, translator: Translator, current: Experience | None = None
+    body: ExperienceIn, slug: str, translator: Translator
 ) -> tuple[Experience, list[Lang], bool]:
     texts = {field: getattr(body, field).model_dump() for field in TRANSLATED_FIELDS}
     # Saving must not fail because of DeepL: on failure the public site shows French meanwhile.
     filled, failed = await fill_missing(texts, TRANSLATED_FIELDS, translator)
-    entry = body.to_domain(slug, texts)
-    if body.logo_focus is not None:
-        entry = replace(entry, logo_focus_x=body.logo_focus.x, logo_focus_y=body.logo_focus.y)
-    elif current is not None:
-        entry = replace(entry, logo_focus_x=current.logo_focus_x, logo_focus_y=current.logo_focus_y)
-    return entry, sorted(filled), failed
+    return body.to_domain(slug, texts), sorted(filled), failed
 
 
 def _not_found() -> HTTPException:
@@ -202,10 +192,9 @@ async def update_experience(
     repository: Repository,
     translator: Annotated[Translator, Depends(get_translator)],
 ) -> AdminExperienceSaveOut:
-    current = await repository.get(slug)
-    if current is None:
+    if await repository.get(slug) is None:
         raise _not_found()
-    entry, auto_translated, failed = await _translated(body, slug, translator, current)
+    entry, auto_translated, failed = await _translated(body, slug, translator)
     await repository.update(entry)
     await repository.commit()
     return AdminExperienceSaveOut(

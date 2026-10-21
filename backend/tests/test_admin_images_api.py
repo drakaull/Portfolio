@@ -63,27 +63,6 @@ async def test_logo_of_an_unknown_experience_is_404(admin_client: AsyncClient) -
     assert (await admin_client.delete(url)).status_code == 404
 
 
-async def test_logo_framing_starts_centred_and_is_saved_with_the_entry(
-    admin_client: AsyncClient,
-) -> None:
-    url = f"/api/admin/experiences/{SLUG}"
-    entry = (await admin_client.get(url)).json()
-    body = {
-        k: entry[k] for k in ("kind", "organization", "start_year", "end_year", "title", "summary")
-    }
-    await admin_client.put(url, json={**body, "logo_focus": {"x": 10, "y": 90}})
-
-    await put(admin_client, f"{url}/logo", image_bytes("PNG"))
-    assert (await admin_client.get(url)).json()["logo_focus"] == {"x": 50, "y": 50}
-
-    await admin_client.put(url, json={**body, "logo_focus": {"x": 20, "y": 30}})
-    await admin_client.put(url, json=body)  # no framing sent: kept
-    public = (await admin_client.get(f"/api/experiences/{SLUG}", params={"lang": "fr"})).json()
-    assert public["logo_focus"] == {"x": 20, "y": 30}
-    bad = await admin_client.put(url, json={**body, "logo_focus": {"x": 0, "y": -1}})
-    assert bad.status_code == 422
-
-
 # --- project screenshots -------------------------------------------------------------------
 
 

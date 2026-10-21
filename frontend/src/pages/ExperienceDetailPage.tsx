@@ -56,7 +56,6 @@ export function ExperienceDetailPage() {
           alt=""
           width={EXPERIENCE_IMAGE_WIDTH * 2}
           height={EXPERIENCE_IMAGE_HEIGHT * 2}
-          style={{ objectPosition: `${entry.logo_focus.x}% ${entry.logo_focus.y}%` }}
         />
       )}
       <div className={styles.description}>

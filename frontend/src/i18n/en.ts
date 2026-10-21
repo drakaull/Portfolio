@@ -272,7 +272,6 @@ export const en = {
   'admin.image.remove': 'Remove the image',
   'admin.image.confirmRemove': 'Remove the image from the site?',
   'admin.logo.legend': 'Organisation image',
-  'admin.logo.framingResult': 'On the Experience page',
   'admin.screenshot.legend': 'Project screenshot',
   'admin.screenshot.framingResult': 'On the Projects page',
   'admin.contactImage.legend': 'Contact page image',

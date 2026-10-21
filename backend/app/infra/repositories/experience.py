@@ -21,8 +21,6 @@ def _copy(entry: Experience, row: ExperienceModel) -> None:
     row.summary = dict(entry.summary)
     row.description = dict(entry.description)
     row.technologies = list(entry.technologies)
-    row.logo_focus_x = entry.logo_focus_x
-    row.logo_focus_y = entry.logo_focus_y
 
 
 def _to_domain(row: ExperienceModel) -> Experience:
@@ -36,8 +34,6 @@ def _to_domain(row: ExperienceModel) -> Experience:
         summary=row.summary,
         description=row.description,
         technologies=tuple(row.technologies),
-        logo_focus_x=row.logo_focus_x,
-        logo_focus_y=row.logo_focus_y,
     )
 
 
