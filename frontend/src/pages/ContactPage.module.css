@@ -73,6 +73,7 @@
 
 .field textarea {
   height: var(--message-height); /* as in Chrome for rows="8", in every browser */
+  min-height: var(--message-height); /* taller only: the image next to it keeps the fields' rows */
   resize: vertical;
 }
 
