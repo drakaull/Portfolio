@@ -89,10 +89,11 @@ describe('projects page', () => {
 
     const card = await screen.findByRole('article')
     expect(within(card).getByText('2026')).toBeDefined()
-    expect(within(card).getByText('Projet solo')).toBeDefined()
+    expect(within(card).queryByText(/solo|Équipe/i)).toBeNull() // a team of one is not shown
     expect(card.querySelectorAll('p')).toHaveLength(1) // only the team line
     expect(within(card).queryByRole('list')).toBeNull() // no languages, no ring
     expect(within(card).queryByRole('img')).toBeNull() // no screenshot
+    expect(card.querySelector('svg')).toBeNull() // and no ring without languages
   })
 
   test('shows the languages under the title and the screenshot as framed in the admin', async () => {
@@ -107,6 +108,15 @@ describe('projects page', () => {
     const screenshot = within(card).getByRole('img', { name: 'Screenshot of Projet TTMC' })
     expect(screenshot.getAttribute('src')).toBe(image_url)
     expect(screenshot.style.objectPosition).toBe('30% 80%')
+    expect(card.querySelector('svg')).toBeNull() // the screenshot replaces the ring
+  })
+
+  test('without a screenshot, the ring of the languages takes its place', async () => {
+    mockProjects([TTMC])
+    renderApp('/fr/projects')
+
+    const card = await screen.findByRole('article')
+    expect(card.querySelector('svg[aria-hidden="true"] circle')).not.toBeNull()
   })
 
   test('says when there is nothing yet, or when loading fails', async () => {

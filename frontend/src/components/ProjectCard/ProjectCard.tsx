@@ -1,6 +1,6 @@
 import type { Project } from '../../api/projects.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
-import { LanguageList } from '../LanguageList/LanguageList.tsx'
+import { LanguageDonut, LanguageList } from '../LanguageList/LanguageList.tsx'
 import { Bone, BoneRow } from '../Skeleton/Skeleton.tsx'
 import { TextLink } from '../TextLink/TextLink.tsx'
 import styles from './ProjectCard.module.css'
@@ -41,13 +41,15 @@ export function ProjectCard({ project, coloured }: { project: Project; coloured:
         </span>
       </div>
       <h2 className={styles.title}>{project.title}</h2>
-      {project.languages.length > 0 && (
+      {/* With a screenshot, the languages go under the title; without, the ring keeps them below. */}
+      {project.image_url && project.languages.length > 0 && (
         <LanguageList languages={project.languages} coloured={coloured} />
       )}
       {project.summary && <p className={styles.summary}>{project.summary}</p>}
-      {project.image_url && (
+      {/* Pinned to the bottom with the team line, so the visuals of a row line up. */}
+      {project.image_url ? (
         <img
-          className={styles.image}
+          className={`${styles.visual} ${styles.image}`}
           src={project.image_url}
           alt={`${t('projects.screenshot')} ${project.title}`}
           width={SCREENSHOT_WIDTH}
@@ -55,10 +57,15 @@ export function ProjectCard({ project, coloured }: { project: Project; coloured:
           loading="lazy"
           style={{ objectPosition: `${project.image_focus.x}% ${project.image_focus.y}%` }}
         />
+      ) : (
+        project.languages.length > 0 && (
+          <div className={styles.visual}>
+            <LanguageDonut languages={project.languages} coloured={coloured} />
+          </div>
+        )
       )}
-      {/* Pinned to the bottom of the card, so the team lines of a row line up. */}
+      {/* Always there, so the visuals of a row line up; shown only for a team. */}
       <p className={styles.team}>
-        {project.team_size === 1 && t('projects.solo')}
         {project.team_size !== null &&
           project.team_size > 1 &&
           `${t('projects.team')} ${project.team_size}`}
