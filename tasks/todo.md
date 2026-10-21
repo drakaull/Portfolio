@@ -2,8 +2,8 @@
 
 Plan: [plan.md](plan.md)
 
-- [ ] Task 1: backend images, framing, migration
-- [ ] Checkpoint A: tests green, migration up / down
+- [x] Task 1: backend images, framing, migration
+- [x] Checkpoint A: tests green, migration up / down
 - [ ] Task 2: admin blocks (logo, screenshot, contact image)
 - [ ] Task 3: experience logos
 - [ ] Task 4: projects (languages at the top, screenshot, two variants)
