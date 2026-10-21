@@ -1,16 +1,8 @@
 /* Form on the left, the image on the right; the image goes under the form on narrow screens. */
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 36rem) minmax(0, 20rem);
-  justify-content: space-between;
-  align-items: start;
-  gap: var(--space-8);
-}
-
-@media (max-width: 52rem) {
-  .layout {
-    grid-template-columns: minmax(0, 36rem);
-  }
+  grid-template-columns: minmax(0, 36rem);
+  gap: var(--space-5) var(--space-8);
 }
 
 .form {
@@ -26,6 +18,30 @@
   object-fit: cover;
   border-radius: var(--radius-md);
   box-shadow: 0 0 0 1px var(--color-border);
+}
+
+@media (min-width: 52rem) {
+  .layout {
+    grid-template-columns: minmax(0, 36rem) minmax(0, 20rem);
+    justify-content: space-between;
+  }
+
+  /* The form's rows are the layout's (subgrid): the image spans the three fields' rows, from the
+     top of the first input (below its label) to the bottom of the message box. At most five rows:
+     three fields, the actions, then the thanks or the error. */
+  .form {
+    grid-row: 1 / span 5;
+    grid-template-rows: subgrid;
+  }
+
+  .image {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    contain: size; /* sized by the rows, never sizing them */
+    aspect-ratio: auto;
+    height: calc(100% - 1lh - var(--space-2));
+    margin-top: calc(1lh + var(--space-2)); /* the label's line and its gap */
+  }
 }
 
 .field {
