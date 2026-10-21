@@ -1,11 +1,12 @@
-# Todo: Feature 17 — Deployment, step 1
+# Todo: Feature 18 — More visual pages (v1.1)
 
 Plan: [plan.md](plan.md)
 
-- [x] Task 1: backend image
-- [x] Task 2: web image + Caddyfile + noindex
-- [x] Task 3: production compose + .env.example
-- [x] Checkpoint A: production stack on localhost
-- [x] Task 4: backups + restore test
-- [x] Task 5: runbook + checklist
-- [x] Checkpoint B: review · merge approval
+- [ ] Task 1: backend images, framing, migration
+- [ ] Checkpoint A: tests green, migration up / down
+- [ ] Task 2: admin blocks (logo, screenshot, contact image)
+- [ ] Task 3: experience logos
+- [ ] Task 4: projects (languages at the top, screenshot, two variants)
+- [ ] Checkpoint B: variant chosen
+- [ ] Task 5: contact image
+- [ ] Checkpoint C: browsers, review, merge, release v1.1.0

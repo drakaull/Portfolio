@@ -1,0 +1,59 @@
+# Spec: Feature 18 — More visual pages (v1.1)
+
+Status: **APPROVED**
+
+## Objective
+
+Make the Experience, Projects and Contact pages more visual, after a UI/UX professional's review:
+recruiters skim, and an image catches the eye where a block of text does not. Release **v1.1.0**.
+
+## Decisions already taken
+
+| Page | Image | Display |
+|---|---|---|
+| Experience | **The organisation's logo**, optional, one per experience | Small square next to the organisation name on the timeline cards and the detail page; shown **whole** (never cropped), on a neutral tile |
+| Projects | **A screenshot**, optional, one per project | Fixed **16:10** frame under the summary, cropped with the **framing tool** (as the home photo) |
+| Projects | **Languages at the top** | Under the title: the percentage list **and** the small ring kept next to it (variant to try; fallback: list only, no ring) |
+| Contact | **One image**, optional, chosen in the admin | Right column next to the form, fixed **4:5** portrait frame, framing tool; under the form on narrow screens |
+
+Every image is optional: without one, a card or page looks as today.
+
+## Admin
+
+- **Experience editor**: a "Logo" block (upload / replace / remove), like the CV and photo blocks.
+- **Project editor**: a "Screenshot" block with the framing tool.
+- **Home editor** (or a "Contact" block in it): the contact image with the framing tool.
+- Uploads apply at once, as for the photo; the framing is saved with the form (Save button).
+- An existing project keeps its screenshot across GitHub syncs; a project that disappears keeps it
+  too (it is only hidden, as today).
+
+## Processing and storage (server)
+
+Same pipeline as the home photo, generalised: JPEG / PNG / WebP recognised by content, ≤ 5 MB,
+≤ 40 Mpx, turned upright, **all metadata stripped**, saved as WebP (transparency kept for logos),
+longest side ≤ 1,200 px (logos ≤ 256 px). Files live under `storage/images/` with names built from
+ids (never from the upload). Public URLs are versioned (`?v=`), so a replaced image is never hidden
+by a cache. Deleting an experience or project deletes its image.
+
+Database: the framing point (x, y in %) of each project screenshot and of the contact image; whether
+an image exists is read from the file, as for the photo and the CV. One migration.
+
+## Public pages
+
+- Images have **width and height** set (no layout jump) and are **lazy-loaded** below the fold.
+- **Alt text** built from the content: "Logo of <organisation>", "Screenshot of <project>"; the
+  contact image is decorative (`alt=""`).
+- Light and dark themes; 390 px mobile layout; skeletons get the image areas.
+
+## Out of scope
+
+Several images per item (galleries), image captions, logos fetched automatically, a lightbox.
+
+## Tests
+
+Backend: upload / replace / delete for each kind (415, 413, metadata stripped, resized), framing
+saved, image removed with its item, URL versioning, sync keeps screenshots.
+Frontend: blocks in the three editors, framing saved, images and alt texts on the public pages,
+absent images change nothing.
+Visual: Chrome and Firefox, light and dark, desktop and 390 px; the two Projects variants shown
+side by side for the choice.

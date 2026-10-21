@@ -1,20 +1,21 @@
-# Plan: Feature 17 — Deployment, step 1 (prepare in the repository)
+# Plan: Feature 18 — More visual pages (v1.1)
 
-Spec: [specs/17-deployment.md](../specs/17-deployment.md) · Branch: `feature/deployment`
-
-Nothing is ordered during this step: everything is built and tested on Léonard's PC.
+Spec: [specs/18-visuals.md](../specs/18-visuals.md) · Branch: `feature/visuals`
 
 ## Tasks
 
-1. **Backend image** — `backend/Dockerfile` (Python + uv, locked dependencies, non-root user), `.dockerignore`; uvicorn in one process, trusting forwarded client IPs from the Docker network only.
-2. **Web image** — `frontend/Dockerfile` (Node builds the site, then Caddy serves it) and `deploy/Caddyfile`: `/api` proxy, SPA fallback, `.be` / `www` / `http` redirects, security headers with a CSP (inline theme script by hash), 6 MB body limit, long cache for hashed files. `noindex` on the not-found page.
-3. **Production stack** — `deploy/compose.yaml` (Caddy, backend, PostgreSQL; volumes; health checks; only Caddy publishes ports) and `deploy/.env.example` (every setting explained, no secret).
-   - **Checkpoint A**: the production stack runs on `localhost`; the site, admin, contact (Mailpit), uploads work; headers present; no CSP violation in Chrome and Firefox.
-4. **Backups** — `deploy/backup.sh` (nightly dump + storage, keep 14) and `deploy/pull-backups.ps1` (download, keep 8, log); restore procedure tested against the local stack.
-5. **Runbook** — `docs/deployment.md`: first install step by step, deploy an update, backups and restore, troubleshooting; deployment checklist updated.
-   - **Checkpoint B**: review · merge approval.
-
-## Dependencies to approve
-
-Docker base images, each pinned to an exact version published at least two weeks ago:
-`python` (slim), `node` (build only), `caddy`, `postgres:17` (already used locally). No new library in the app.
+1. **Backend: images** — the photo pipeline generalised to three kinds (experience logo ≤ 256 px with
+   transparency, project screenshot ≤ 1,200 px, contact image ≤ 1,200 px); upload / delete routes in
+   the admin, public versioned URLs, image deleted with its experience or project, kept across GitHub
+   syncs; framing (x, y) for screenshots and the contact image (migration). Tests.
+   - **Checkpoint A**: ruff + pytest green, migration up / down.
+2. **Admin** — "Logo" block in the experience editor; "Screenshot" block with framing in the project
+   editor; "Contact image" block with framing in the home editor (the framing tool takes the frame's
+   shape as a parameter). FR / EN / NL texts. Tests.
+3. **Experience page** — logo next to the organisation on timeline cards and the detail page.
+4. **Projects page** — languages under the title, screenshot under the summary; two variants (with
+   and without the ring).
+   - **Checkpoint B**: screenshots of both variants with real content → Léonard chooses.
+5. **Contact page** — image in the right column (under the form on narrow screens).
+   - **Checkpoint C**: Chrome and Firefox, light / dark, desktop / 390 px · review · merge approval ·
+     release v1.1.0 (server update with the migration).
