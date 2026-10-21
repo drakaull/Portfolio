@@ -13,7 +13,7 @@ recruiters skim, and an image catches the eye where a block of text does not. Re
 |---|---|---|
 | Experience | **An image of the organisation** (logo or banner), optional, one per experience | Revised after a first try (a small logo was unreadable): **2:1** area on the right side of the timeline card, the image shown **whole** and as large as fits (images have any shape, so no cropping and no framing tool); on top of the card on narrow screens; large under the title on the detail page; not on the home page's compact cards. The kind badge moves to the left, above the title |
 | Projects | **A screenshot**, optional, one per project | Fixed **16:10** frame under the summary, cropped with the **framing tool** (as the home photo) |
-| Projects | **Languages at the top** | Under the title: the percentage list **and** the small ring kept next to it (variant to try; fallback: list only, no ring) |
+| Projects | **Languages at the top** | Under the title, **on one line**: dot, name, percentage; the ring is dropped (chosen after comparing both variants) |
 | Contact | **One image**, optional, chosen in the admin | Right column next to the form, fixed **4:5** portrait frame, framing tool; under the form on narrow screens |
 
 Every image is optional: without one, a card or page looks as today.

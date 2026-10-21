@@ -1,5 +1,6 @@
 import type { Lang } from '../i18n/useTranslation.ts'
 import type { ProjectContext } from './adminProjects.ts'
+import type { PhotoFocus } from './useHomeContent.ts'
 import { useJson } from './useJson.ts'
 
 export type Project = {
@@ -14,6 +15,8 @@ export type Project = {
   created_at: string
   pushed_at: string
   stars: number
+  image_url: string | null // the screenshot, versioned
+  image_focus: PhotoFocus
 }
 
 /** Visible projects, in the order chosen in the admin. */

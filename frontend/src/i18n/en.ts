@@ -55,6 +55,7 @@ export const en = {
   'projects.languages': 'Languages',
   'projects.otherLanguages': 'Others',
   'projects.solo': 'Solo project',
+  'projects.screenshot': 'Screenshot of',
   'contact.title': 'Contact',
   'privacy.title': 'Privacy',
   'contact.name': 'Name',

@@ -57,6 +57,7 @@ export const nl: Record<TranslationKey, string> = {
   'projects.languages': 'Talen',
   'projects.otherLanguages': 'Overige',
   'projects.solo': 'Soloproject',
+  'projects.screenshot': 'Schermafbeelding van',
   'contact.title': 'Contact',
   'privacy.title': 'Privacy',
   'contact.name': 'Naam',
