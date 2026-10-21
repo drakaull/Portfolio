@@ -10,6 +10,8 @@ const TTMC: AdminProject = {
   context: null,
   team_size: null,
   visible: false,
+  image_focus: { x: 50, y: 50 },
+  image_url: null,
   missing: false,
   about_lang: 'fr',
   summary: { fr: 'Jeu de plateau', en: 'Board game', nl: '' },
@@ -64,6 +66,7 @@ describe('project editor', () => {
       context: 'school',
       team_size: 4,
       visible: true,
+      image_focus: { x: 50, y: 50 }, // sent back as loaded
     })
   })
 
@@ -122,5 +125,31 @@ describe('project editor', () => {
     renderApp('/en/admin/projects/999')
 
     expect((await screen.findByRole('alert')).textContent).toBe('This project does not exist.')
+  })
+})
+
+describe('screenshot', () => {
+  test('a new screenshot can be framed and starts centred', async () => {
+    const fetchMock = mockApi({
+      'GET /api/admin/me': signedIn,
+      'GET /api/admin/projects/1': () =>
+        Response.json({
+          ...TTMC,
+          image_url: '/api/images/projects/1?v=1',
+          image_focus: { x: 10, y: 10 },
+        }),
+      'PUT /api/admin/projects/1/image': () => new Response(null, { status: 204 }),
+    })
+    renderApp('/en/admin/projects/1')
+    expect(await screen.findByText(/An image is online/)).toBeDefined()
+
+    fireEvent.change(await screen.findByLabelText(/Replace the image/), {
+      target: { files: [new File(['fake-png'], 'shot.png', { type: 'image/png' })] },
+    })
+
+    expect(await screen.findByText(/Image uploaded/)).toBeDefined()
+    expect(screen.getByText('On the Projects page')).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Save' }).hasAttribute('disabled')).toBe(true)
+    expect(fetchMock.mock.calls.some(([url]) => url === '/api/admin/projects/1/image')).toBe(true)
   })
 })

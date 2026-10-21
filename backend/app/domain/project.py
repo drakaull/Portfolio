@@ -40,6 +40,9 @@ class Project:
     team_size: int | None
     visible: bool
     missing: bool  # gone from the public repositories at the last sync
+    # Framing of the screenshot (point kept in view, in %), like the home photo's.
+    image_focus_x: int = 50
+    image_focus_y: int = 50
 
 
 def title_from_name(name: str) -> str:

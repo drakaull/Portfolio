@@ -36,8 +36,25 @@ describe('experience timeline', () => {
     ])
     expect(within(cards[0]).getByText('Job étudiant')).toBeDefined()
     // Every technology, in the order written in the admin.
-    expect(within(cards[0]).getByText('Amazon S3 · Python · NoSQL · Docker · FastAPI')).toBeDefined()
+    expect(
+      within(cards[0]).getByText('Amazon S3 · Python · NoSQL · Docker · FastAPI'),
+    ).toBeDefined()
     expect(within(cards[1]).getByText('Formation')).toBeDefined()
+  })
+
+  test('shows the image of an organisation that has one', async () => {
+    mockTimeline()
+    renderApp('/fr/experience')
+
+    const timeline = await screen.findByRole('list', { name: 'Frise du parcours' })
+    const [withImage, withoutImage] = within(timeline).getAllByRole('link')
+    const image = withImage.querySelector('img')!
+    // Decorative: the name is written in the card, which is a link.
+    expect([image.getAttribute('src'), image.getAttribute('alt')]).toEqual([
+      ENTRIES[0].logo_url,
+      '',
+    ])
+    expect(withoutImage.querySelector('img')).toBeNull()
   })
 
   test('shows the years beside each card, most recent at the top', async () => {

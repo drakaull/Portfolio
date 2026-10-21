@@ -24,6 +24,7 @@ from app.infra.storage import (
     cv_file,
     delete_cv,
     delete_photo,
+    image_url,
     photo_url,
     save_cv,
     save_photo,
@@ -60,6 +61,7 @@ class HomeContentIn(_StrictModel):
     linkedin_url: HttpsUrl
     github_url: HttpsUrl
     photo_focus: PhotoFocus
+    contact_focus: PhotoFocus | None = None  # None: the framing stays as it is
 
 
 class AdminHomeContentOut(BaseModel):
@@ -70,6 +72,8 @@ class AdminHomeContentOut(BaseModel):
     has_cv: bool
     photo_url: str | None
     photo_focus: PhotoFocus
+    contact_image_url: str | None
+    contact_focus: PhotoFocus
 
     @classmethod
     def from_domain(cls, content: HomeContent) -> "AdminHomeContentOut":
@@ -81,6 +85,8 @@ class AdminHomeContentOut(BaseModel):
             has_cv=cv_file() is not None,
             photo_url=photo_url(),
             photo_focus=PhotoFocus.from_domain(content),
+            contact_image_url=image_url("contact", "page"),
+            contact_focus=PhotoFocus(x=content.contact_focus_x, y=content.contact_focus_y),
         )
 
 
@@ -110,6 +116,14 @@ async def save_home_content(
     # Saving must not fail because of DeepL: on failure the public site shows French meanwhile.
     auto_translated, translation_failed = await fill_missing(texts, TRANSLATED_FIELDS, translator)
 
+    current = await repository.get()
+    contact_x, contact_y = (
+        (body.contact_focus.x, body.contact_focus.y)
+        if body.contact_focus is not None
+        else (current.contact_focus_x, current.contact_focus_y)
+        if current is not None
+        else (PHOTO_FOCUS_CENTRE, PHOTO_FOCUS_CENTRE)
+    )
     content = HomeContent(
         headline=texts["headline"],
         intro=texts["intro"],
@@ -117,6 +131,8 @@ async def save_home_content(
         github_url=body.github_url,
         photo_focus_x=body.photo_focus.x,
         photo_focus_y=body.photo_focus.y,
+        contact_focus_x=contact_x,
+        contact_focus_y=contact_y,
     )
     await repository.save(content)
     await repository.commit()

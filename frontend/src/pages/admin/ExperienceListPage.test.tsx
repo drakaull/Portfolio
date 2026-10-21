@@ -17,6 +17,7 @@ const ENTRIES: AdminExperience[] = [
     title: text('Ingénieur R&D', 'R&D Engineer'),
     summary: text('Résumé'),
     description: text(''),
+    logo_url: null,
   },
   {
     slug: 'ateliers-ai',
@@ -28,6 +29,7 @@ const ENTRIES: AdminExperience[] = [
     title: text('Formation IA'), // not translated yet: French shown
     summary: text('Résumé'),
     description: text(''),
+    logo_url: null,
   },
 ]
 

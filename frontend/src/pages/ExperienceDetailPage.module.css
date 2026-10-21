@@ -64,3 +64,20 @@
   gap: var(--space-3);
   margin-top: var(--space-6);
 }
+
+/* Its own shape, as on the card, left-aligned with the text. */
+.image {
+  display: block;
+  width: auto;
+  max-width: min(100%, 20rem);
+  height: auto;
+  max-height: 10rem;
+  margin-bottom: var(--space-6);
+}
+
+/* As on the card: logos are made for a light background. */
+:global([data-theme='dark']) .image {
+  padding: var(--space-2);
+  background: #bdb4a2;
+  border-radius: var(--radius-sm);
+}

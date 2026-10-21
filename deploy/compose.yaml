@@ -47,7 +47,7 @@ services:
       # Trust X-Forwarded-For only from the private "web" network, where only Caddy talks to it.
       FORWARDED_ALLOW_IPS: 172.30.10.0/24,fd30:10::/64
     volumes:
-      - storage:/app/storage # CV and photo
+      - storage:/app/storage # CV, photo and images
     depends_on:
       db:
         condition: service_healthy

@@ -27,3 +27,11 @@
 .slugFixed {
   overflow-wrap: anywhere;
 }
+
+.logoPreview {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-top: var(--space-2);
+  object-fit: contain;
+}

@@ -19,6 +19,8 @@ class HomeContentRepository:
             github_url=row.github_url,
             photo_focus_x=row.photo_focus_x,
             photo_focus_y=row.photo_focus_y,
+            contact_focus_x=row.contact_focus_x,
+            contact_focus_y=row.contact_focus_y,
         )
 
     async def save(self, content: HomeContent) -> None:
@@ -29,6 +31,8 @@ class HomeContentRepository:
         row.github_url = content.github_url
         row.photo_focus_x = content.photo_focus_x
         row.photo_focus_y = content.photo_focus_y
+        row.contact_focus_x = content.contact_focus_x
+        row.contact_focus_y = content.contact_focus_y
         self._session.add(row)
         await self._session.flush()
 

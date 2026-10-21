@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Nightly backup of the site, run by cron on the server (see docs/deployment.md):
-# the database (pg_dump) and the uploads (CV, photo) in one dated archive.
+# the database (pg_dump) and the uploads (CV, photo, images) in one dated archive.
 # The newest KEEP archives are kept; older ones are deleted, so backups never pile up.
 # They hold contact messages (personal data): readable by their owner only.
 set -euo pipefail

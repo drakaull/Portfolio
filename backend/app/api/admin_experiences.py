@@ -23,6 +23,7 @@ from app.domain.experience import (
 )
 from app.domain.language import Lang, with_every_lang
 from app.infra.repositories.experience import ExperienceRepository
+from app.infra.storage import delete_image, image_url
 from app.infra.translation import Translator, fill_missing
 
 router = admin_router()
@@ -114,6 +115,7 @@ class AdminExperienceOut(BaseModel):
     title: dict[str, str]
     summary: dict[str, str]
     description: dict[str, str]
+    logo_url: str | None
 
     @classmethod
     def from_domain(cls, entry: Experience) -> "AdminExperienceOut":
@@ -127,6 +129,7 @@ class AdminExperienceOut(BaseModel):
             title=with_every_lang(entry.title),
             summary=with_every_lang(entry.summary),
             description=with_every_lang(entry.description),
+            logo_url=image_url("logos", entry.slug),
         )
 
 
@@ -206,3 +209,4 @@ async def delete_experience(slug: Slug, repository: Repository) -> None:
     if not await repository.delete(slug):
         raise _not_found()
     await repository.commit()
+    delete_image("logos", slug)  # after the commit: a failed delete keeps the logo

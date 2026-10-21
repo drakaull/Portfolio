@@ -11,6 +11,8 @@ function project(id: number, title: string, changes: Partial<AdminProject> = {})
     context: null,
     team_size: null,
     visible: false,
+    image_focus: { x: 50, y: 50 },
+    image_url: null,
     missing: false,
     about_lang: 'fr',
     summary: { fr: 'Jeu', en: '[en] Jeu', nl: '[nl] Jeu' },
@@ -109,6 +111,7 @@ describe('project list', () => {
       context: 'school',
       team_size: null,
       visible: true,
+      image_focus: { x: 50, y: 50 },
     })
     expect(
       (screen.getByRole('checkbox', { name: 'Visible on the site: Old repo' }) as HTMLInputElement)

@@ -50,7 +50,6 @@
   display: block;
   max-width: 100%;
   height: auto;
-  aspect-ratio: 240 / 156; /* HERO_PHOTO_WIDTH / HERO_PHOTO_HEIGHT */
   border-radius: 12px;
   object-fit: cover;
   box-shadow: 0 0 0 1px var(--color-border);

@@ -12,6 +12,10 @@ import {
 import type { Translated } from '../../api/adminHome.ts'
 import type { ExperienceKind } from '../../api/experiences.ts'
 import { Button } from '../../components/Button/Button.tsx'
+import {
+  EXPERIENCE_IMAGE_HEIGHT,
+  EXPERIENCE_IMAGE_WIDTH,
+} from '../../components/ExperienceCard/ExperienceCard.tsx'
 import { MarkdownText } from '../../components/MarkdownText/MarkdownText.tsx'
 import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation, type Lang } from '../../i18n/useTranslation.ts'
@@ -20,6 +24,7 @@ import adminStyles from './Admin.module.css'
 import { SessionExpiredAlert, UnsavedChangesDialog } from './EditorParts.tsx'
 import styles from './ExperienceEditorPage.module.css'
 import editorStyles from './Editor.module.css'
+import { ImageField } from './FileField.tsx'
 import { TranslationTabs } from './TranslationTabs.tsx'
 import { useUnsavedChanges } from './useUnsavedChanges.ts'
 
@@ -119,6 +124,8 @@ export function ExperienceEditorPage() {
   const [saves, setSaves] = useState(0)
   const [saveNotice, setSaveNotice] = useState<SaveNotice | null>(createdNotice)
   const [deleteState, setDeleteState] = useState<'idle' | 'confirm' | 'deleting' | 'error'>('idle')
+  const [hasLogo, setHasLogo] = useState(false)
+  const [logoVersion, setLogoVersion] = useState(0)
   // Set right before navigating away after a save or a delete: nothing is left to lose.
   const leaving = useRef(false)
 
@@ -136,6 +143,7 @@ export function ExperienceEditorPage() {
           setLoadState('notFound')
           return
         }
+        setHasLogo(entry.logo_url !== null)
         setSaved(toForm(entry))
         setForm(toForm(entry))
       })
@@ -274,6 +282,30 @@ export function ExperienceEditorPage() {
           />
           {fieldError('organization')}
         </div>
+
+        {/* The image is stored under the slug: only once the experience exists. */}
+        {!creating && (
+          <ImageField
+            id="experience-logo"
+            url={`/api/admin/experiences/${slug}/logo`}
+            legend="admin.logo.legend"
+            present={hasLogo}
+            onChange={(present) => {
+              setHasLogo(present)
+              setLogoVersion((count) => count + 1)
+            }}
+            preview={
+              // Shown whole in the card's frame, as on the site.
+              <img
+                className={styles.logoPreview}
+                src={`/api/images/logos/${slug}?preview=${logoVersion}`}
+                alt={t('admin.image.preview')}
+                width={EXPERIENCE_IMAGE_WIDTH}
+                height={EXPERIENCE_IMAGE_HEIGHT}
+              />
+            }
+          />
+        )}
 
         <div className={styles.years}>
           <div className={adminStyles.field}>
