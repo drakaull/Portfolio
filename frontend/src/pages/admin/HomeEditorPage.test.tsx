@@ -559,7 +559,7 @@ describe('contact image', () => {
     expect(await within(block).findByText(/Image uploaded/)).toBeDefined()
     expect(within(block).getByText('On the Contact page')).toBeDefined()
     const result = block.querySelector('img[alt=""]')! // the preview of the site
-    expect([result.getAttribute('width'), result.getAttribute('height')]).toEqual(['240', '300'])
+    expect([result.getAttribute('width'), result.getAttribute('height')]).toEqual(['240', '330'])
     expect(fetchMock.mock.calls.some(([url]) => url === '/api/admin/contact-image')).toBe(true)
   })
 })

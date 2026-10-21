@@ -18,9 +18,9 @@ const FIELD_ERRORS: Record<ContactField, TranslationKey> = {
 
 type State = 'idle' | 'sending' | 'sent' | 'tooMany' | 'error'
 
-// The image's frame: 4:5 portrait, the shape framed in the admin.
+// The image's frame: 8:11 portrait (as tall as the fields next to it), framed in the admin.
 const IMAGE_WIDTH = 320
-const IMAGE_HEIGHT = 400
+const IMAGE_HEIGHT = 440
 
 export function ContactPage() {
   const { t, lang } = useTranslation()

@@ -19,7 +19,7 @@
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 8 / 11; /* the shape it has next to the fields, framed in the admin */
   object-fit: cover;
   border-radius: var(--radius-md);
   box-shadow: 0 0 0 1px var(--color-border);

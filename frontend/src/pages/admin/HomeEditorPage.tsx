@@ -261,7 +261,7 @@ export function HomeEditorPage() {
             focus={form.contact_focus}
             onChange={(contact_focus) => update({ contact_focus })}
             width={240}
-            height={300}
+            height={330}
             texts={{
               label: 'admin.framing.label',
               preview: 'admin.image.preview',
