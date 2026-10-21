@@ -16,6 +16,8 @@ const CONTENT: AdminHomeContent = {
   photo_focus: { x: 50, y: 50 },
   has_cv: false,
   photo_url: null,
+  contact_focus: { x: 50, y: 50 },
+  contact_image_url: null,
 }
 
 const savedAsSent = (body: unknown) =>
@@ -86,6 +88,7 @@ describe('home editor', () => {
       linkedin_url: CONTENT.linkedin_url,
       github_url: CONTENT.github_url,
       photo_focus: CONTENT.photo_focus, // sent back as loaded
+      contact_focus: CONTENT.contact_focus,
     })
     expect((saveButton() as HTMLButtonElement).disabled).toBe(true) // nothing left to save
   })
@@ -535,5 +538,28 @@ describe('dragging the photo frame', () => {
 
     fireEvent.pointerDown(stage, { button: 0, pointerId: 1, clientX: 290 })
     expect(value()).toBe('100')
+  })
+})
+
+describe('contact image', () => {
+  test('uploads the contact image, framed in portrait from the centre', async () => {
+    const fetchMock = mockApi({
+      'GET /api/admin/me': signedIn,
+      'GET /api/admin/home': () => Response.json(CONTENT),
+      'PUT /api/admin/contact-image': () => new Response(null, { status: 204 }),
+    })
+    renderApp('/en/admin/home')
+    const block = (await screen.findByText('Contact page image')).closest('fieldset')!
+    expect(within(block).getByText(/No image online/)).toBeDefined()
+
+    fireEvent.change(within(block).getByLabelText(/Upload an image/), {
+      target: { files: [new File(['fake-jpeg'], 'desk.jpg', { type: 'image/jpeg' })] },
+    })
+
+    expect(await within(block).findByText(/Image uploaded/)).toBeDefined()
+    expect(within(block).getByText('On the Contact page')).toBeDefined()
+    const result = block.querySelector('img[alt=""]')! // the preview of the site
+    expect([result.getAttribute('width'), result.getAttribute('height')]).toEqual(['240', '300'])
+    expect(fetchMock.mock.calls.some(([url]) => url === '/api/admin/contact-image')).toBe(true)
   })
 })

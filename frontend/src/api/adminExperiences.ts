@@ -13,6 +13,7 @@ export type AdminExperience = {
   title: Translated
   summary: Translated
   description: Translated // Markdown
+  logo_url: string | null // versioned public URL
 }
 
 /** What a save returns: the stored entry plus what automatic translation did. */
@@ -22,14 +23,17 @@ export type AdminExperienceSaved = AdminExperience & {
 }
 
 /** What the form sends. A year that is not a number is sent as typed: the server explains why. */
-export type ExperienceBody = Omit<AdminExperience, 'slug' | 'start_year' | 'end_year'> & {
+export type ExperienceBody = Omit<
+  AdminExperience,
+  'slug' | 'start_year' | 'end_year' | 'logo_url'
+> & {
   slug?: string
   start_year: number | string
   end_year: number | string | null
 }
 
 /** Top-level fields the server can reject. */
-export type ExperienceField = keyof AdminExperience
+export type ExperienceField = Exclude<keyof AdminExperience, 'logo_url'>
 
 export type ExperienceSaveResult =
   | { status: 'saved'; entry: AdminExperienceSaved }

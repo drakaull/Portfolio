@@ -1,4 +1,5 @@
 import type { Translated } from './adminHome.ts'
+import type { PhotoFocus } from './useHomeContent.ts'
 import type { AdminResult } from './adminSkills.ts'
 
 export type ProjectContext = 'school' | 'personal' | 'professional'
@@ -11,7 +12,11 @@ export type ProjectDetails = {
   context: ProjectContext | null
   team_size: number | null
   visible: boolean
+  image_focus: PhotoFocus // framing of the screenshot
 }
+
+/** Fields the server can reject (the framing is set by dragging, never typed). */
+export type ProjectField = Exclude<keyof ProjectDetails, 'image_focus'>
 
 /** What the form sends; a team size that is not a whole number is sent as typed. */
 export type ProjectDetailsBody = Omit<ProjectDetails, 'team_size'> & {
@@ -35,6 +40,7 @@ export type AdminProject = ProjectDetails & {
     pushed_at: string
     stars: number
   }
+  image_url: string | null // the screenshot, versioned
 }
 
 export type SyncReport = {
@@ -49,11 +55,17 @@ export type SyncResult =
 
 export type DetailsResult =
   | { status: 'saved'; project: AdminProject }
-  | { status: 'invalid'; fields: (keyof ProjectDetails)[] }
+  | { status: 'invalid'; fields: ProjectField[] }
   | { status: 'missing' | 'notFound' | 'expired' | 'error' }
 
-export function detailsOf({ title, context, team_size, visible }: ProjectDetails): ProjectDetails {
-  return { title, context, team_size, visible }
+export function detailsOf({
+  title,
+  context,
+  team_size,
+  visible,
+  image_focus,
+}: ProjectDetails): ProjectDetails {
+  return { title, context, team_size, visible, image_focus }
 }
 
 /** Largest language first, e.g. "Java". */
@@ -105,7 +117,7 @@ export async function saveProjectDetails(
       const { detail } = (await response.json()) as { detail: ValidationError[] }
       return {
         status: 'invalid',
-        fields: detail.map((error) => error.loc[1] as keyof ProjectDetails),
+        fields: detail.map((error) => error.loc[1] as ProjectField),
       }
     }
     if (response.status === 409) return { status: 'missing' }

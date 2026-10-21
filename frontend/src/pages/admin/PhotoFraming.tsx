@@ -1,10 +1,28 @@
-import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
+import { useId, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import type { PhotoFocus } from '../../api/useHomeContent.ts'
+import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
 import { HERO_PHOTO_HEIGHT, HERO_PHOTO_WIDTH } from '../../lib/heroPhoto.ts'
 import styles from './PhotoFraming.module.css'
 
 const clamp = (value: number) => Math.min(100, Math.max(0, Math.round(value)))
+
+/** The texts of one framing tool. */
+export type FramingTexts = {
+  label: TranslationKey // the frame, for screen readers
+  preview: TranslationKey // alt text of the whole image
+  result: TranslationKey // above the preview of the site
+  hint: TranslationKey
+  notNeeded: TranslationKey
+}
+
+const PHOTO_TEXTS: FramingTexts = {
+  label: 'admin.photo.framing',
+  preview: 'admin.photo.preview',
+  result: 'admin.photo.framingResult',
+  hint: 'admin.photo.framingHint',
+  notNeeded: 'admin.photo.framingNotNeeded',
+}
 
 /**
  * Chooses which part of the photo the home page frame keeps (CSS object-position). The frame is
@@ -15,16 +33,23 @@ export function PhotoFraming({
   src,
   focus,
   onChange,
+  width = HERO_PHOTO_WIDTH,
+  height = HERO_PHOTO_HEIGHT,
+  texts = PHOTO_TEXTS,
 }: {
   src: string
   focus: PhotoFocus
   onChange: (focus: PhotoFocus) => void
+  width?: number // the frame on the site, in px: its shape, and the size of the preview
+  height?: number
+  texts?: FramingTexts
 }) {
   const { t } = useTranslation()
+  const hintId = useId()
   // Width / height of the photo, known once it has loaded.
   const [ratio, setRatio] = useState<number | null>(null)
 
-  const frameRatio = HERO_PHOTO_WIDTH / HERO_PHOTO_HEIGHT
+  const frameRatio = width / height
   // The frame's size, as a share (0–1) of the photo's width and height.
   const frameWidth = ratio === null ? 1 : Math.min(1, frameRatio / ratio)
   const frameHeight = ratio === null ? 1 : Math.min(1, ratio / frameRatio)
@@ -98,7 +123,7 @@ export function PhotoFraming({
       >
         <img
           src={src}
-          alt={t('admin.photo.preview')}
+          alt={t(texts.preview)}
           draggable={false}
           onLoad={(event) => {
             const image = event.currentTarget
@@ -117,31 +142,31 @@ export function PhotoFraming({
             {...(axis && {
               role: 'slider',
               tabIndex: 0,
-              'aria-label': t('admin.photo.framing'),
+              'aria-label': t(texts.label),
               'aria-orientation': axis === 'x' ? 'horizontal' : 'vertical',
               'aria-valuemin': 0,
               'aria-valuemax': 100,
               'aria-valuenow': focus[axis],
               'aria-valuetext': `${focus[axis]} %`,
-              'aria-describedby': 'photo-framing-hint',
+              'aria-describedby': hintId,
               onKeyDown: handleKey,
             })}
           />
         )}
       </div>
       <div className={styles.result}>
-        <span className={styles.label}>{t('admin.photo.framingResult')}</span>
+        <span className={styles.label}>{t(texts.result)}</span>
         <img
           src={src}
           alt=""
-          width={HERO_PHOTO_WIDTH}
-          height={HERO_PHOTO_HEIGHT}
-          style={{ objectPosition: `${focus.x}% ${focus.y}%` }}
+          width={width}
+          height={height}
+          // The frame's shape: height: auto would follow the image's own.
+          style={{ aspectRatio: `${width} / ${height}`, objectPosition: `${focus.x}% ${focus.y}%` }}
         />
       </div>
-      <p id="photo-framing-hint" className={styles.hint}>
-        {ratio !== null &&
-          (axis ? t('admin.photo.framingHint') : t('admin.photo.framingNotNeeded'))}
+      <p id={hintId} className={styles.hint}>
+        {ratio !== null && t(axis ? texts.hint : texts.notNeeded)}
       </p>
     </div>
   )

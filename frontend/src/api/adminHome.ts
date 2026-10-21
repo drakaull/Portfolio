@@ -12,15 +12,17 @@ export type HomeContentForm = {
   linkedin_url: string
   github_url: string
   photo_focus: PhotoFocus
+  contact_focus: PhotoFocus // framing of the contact page image
 }
 
 export type AdminHomeContent = HomeContentForm & {
   has_cv: boolean
   photo_url: string | null // versioned public URL
+  contact_image_url: string | null // versioned public URL
 }
 
 /** Top-level form fields the server can reject. */
-export type HomeField = Exclude<keyof HomeContentForm, 'photo_focus'>
+export type HomeField = Exclude<keyof HomeContentForm, 'photo_focus' | 'contact_focus'>
 
 /** What PUT returns: the stored content plus what automatic translation did on this save. */
 export type AdminHomeSaved = AdminHomeContent & {

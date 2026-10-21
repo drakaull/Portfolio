@@ -19,6 +19,7 @@ import { SLUG_MAX_LENGTH, slugify } from '../../lib/slug.ts'
 import adminStyles from './Admin.module.css'
 import { SessionExpiredAlert, UnsavedChangesDialog } from './EditorParts.tsx'
 import styles from './ExperienceEditorPage.module.css'
+import { ImageField } from './FileField.tsx'
 import editorStyles from './Editor.module.css'
 import { TranslationTabs } from './TranslationTabs.tsx'
 import { useUnsavedChanges } from './useUnsavedChanges.ts'
@@ -119,6 +120,8 @@ export function ExperienceEditorPage() {
   const [saves, setSaves] = useState(0)
   const [saveNotice, setSaveNotice] = useState<SaveNotice | null>(createdNotice)
   const [deleteState, setDeleteState] = useState<'idle' | 'confirm' | 'deleting' | 'error'>('idle')
+  const [hasLogo, setHasLogo] = useState(false)
+  const [logoVersion, setLogoVersion] = useState(0)
   // Set right before navigating away after a save or a delete: nothing is left to lose.
   const leaving = useRef(false)
 
@@ -136,6 +139,7 @@ export function ExperienceEditorPage() {
           setLoadState('notFound')
           return
         }
+        setHasLogo(entry.logo_url !== null)
         setSaved(toForm(entry))
         setForm(toForm(entry))
       })
@@ -274,6 +278,29 @@ export function ExperienceEditorPage() {
           />
           {fieldError('organization')}
         </div>
+
+        {/* A logo is stored under the slug: only once the experience exists. */}
+        {!creating && (
+          <ImageField
+            id="experience-logo"
+            url={`/api/admin/experiences/${slug}/logo`}
+            legend="admin.logo.legend"
+            present={hasLogo}
+            onChange={(present) => {
+              setHasLogo(present)
+              setLogoVersion((count) => count + 1)
+            }}
+            preview={
+              <img
+                className={styles.logoPreview}
+                src={`/api/images/logos/${slug}?preview=${logoVersion}`}
+                alt={t('admin.image.preview')}
+                width={64}
+                height={64}
+              />
+            }
+          />
+        )}
 
         <div className={styles.years}>
           <div className={adminStyles.field}>

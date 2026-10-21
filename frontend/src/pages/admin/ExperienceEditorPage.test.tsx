@@ -14,6 +14,7 @@ const ENTRY: AdminExperience = {
   title: { fr: 'Ingénieur R&D', en: 'R&D Engineer', nl: '' },
   summary: { fr: 'Stockage hybride.', en: 'Hybrid storage.', nl: '' },
   description: { fr: '## Missions', en: '## Tasks', nl: '' },
+  logo_url: null,
 }
 const ENTRY_URL = '/api/admin/experiences/icare-internship-2026'
 
@@ -219,5 +220,37 @@ describe('editing an experience', () => {
     renderApp('/en/admin/experiences/unknown')
 
     expect((await screen.findByRole('alert')).textContent).toBe('This experience does not exist.')
+  })
+})
+
+describe('logo', () => {
+  const logo = () => new File(['fake-png'], 'logo.png', { type: 'image/png' })
+
+  test('is offered only once the experience exists', async () => {
+    mockApi({ 'GET /api/admin/me': signedIn })
+    renderApp('/en/admin/experiences/new')
+
+    expect(await screen.findByLabelText('Title')).toBeDefined()
+    expect(screen.queryByText('Organisation logo')).toBeNull()
+  })
+
+  test('uploads the logo of the experience and shows it', async () => {
+    const fetchMock = mockApi({
+      'GET /api/admin/me': signedIn,
+      [`GET ${ENTRY_URL}`]: () => Response.json(ENTRY),
+      [`PUT ${ENTRY_URL}/logo`]: noContent,
+    })
+    renderApp('/en/admin/experiences/icare-internship-2026')
+    expect(await screen.findByText(/No image online/)).toBeDefined()
+
+    fireEvent.change(await screen.findByLabelText(/Upload an image/), {
+      target: { files: [logo()] },
+    })
+
+    expect(await screen.findByText(/Image uploaded/)).toBeDefined()
+    expect(screen.getByRole('img', { name: 'Current image' }).getAttribute('src')).toMatch(
+      /^\/api\/images\/logos\/icare-internship-2026\?preview=/,
+    )
+    expect(fetchMock.mock.calls.some(([url]) => url === `${ENTRY_URL}/logo`)).toBe(true)
   })
 })
