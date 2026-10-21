@@ -55,7 +55,6 @@ export const fr: Record<TranslationKey, string> = {
   'projects.team': 'Équipe de',
   'projects.languages': 'Langages',
   'projects.otherLanguages': 'Autres',
-  'projects.solo': 'Projet solo',
   'projects.screenshot': "Capture d'écran de",
   'contact.title': 'Contact',
   'privacy.title': 'Vie privée',

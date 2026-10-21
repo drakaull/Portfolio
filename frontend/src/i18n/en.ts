@@ -54,7 +54,6 @@ export const en = {
   'projects.team': 'Team of',
   'projects.languages': 'Languages',
   'projects.otherLanguages': 'Others',
-  'projects.solo': 'Solo project',
   'projects.screenshot': 'Screenshot of',
   'contact.title': 'Contact',
   'privacy.title': 'Privacy',
