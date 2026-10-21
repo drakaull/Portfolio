@@ -34,6 +34,8 @@ class HomeContentModel(Base):
         CheckConstraint("intro ? 'en' AND intro ? 'fr'", name="intro_languages"),
         CheckConstraint("photo_focus_x BETWEEN 0 AND 100", name="photo_focus_x_range"),
         CheckConstraint("photo_focus_y BETWEEN 0 AND 100", name="photo_focus_y_range"),
+        CheckConstraint("contact_focus_x BETWEEN 0 AND 100", name="contact_focus_x_range"),
+        CheckConstraint("contact_focus_y BETWEEN 0 AND 100", name="contact_focus_y_range"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False, default=1)
@@ -43,6 +45,8 @@ class HomeContentModel(Base):
     github_url: Mapped[str] = mapped_column(String(255))
     photo_focus_x: Mapped[int] = mapped_column(SmallInteger, server_default="50")
     photo_focus_y: Mapped[int] = mapped_column(SmallInteger, server_default="50")
+    contact_focus_x: Mapped[int] = mapped_column(SmallInteger, server_default="50")
+    contact_focus_y: Mapped[int] = mapped_column(SmallInteger, server_default="50")
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
@@ -137,6 +141,8 @@ class ProjectModel(Base):
         ),
         # A repository gone from GitHub is never shown: its link would be broken.
         CheckConstraint("NOT (visible AND missing)", name="missing_hidden"),
+        CheckConstraint("image_focus_x BETWEEN 0 AND 100", name="image_focus_x_range"),
+        CheckConstraint("image_focus_y BETWEEN 0 AND 100", name="image_focus_y_range"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -148,6 +154,8 @@ class ProjectModel(Base):
     about: Mapped[str | None] = mapped_column(Text)
     about_lang: Mapped[str | None] = mapped_column(String(5))
     summary: Mapped[dict[str, str]] = mapped_column(JSONB, server_default="{}")
+    image_focus_x: Mapped[int] = mapped_column(SmallInteger, server_default="50")
+    image_focus_y: Mapped[int] = mapped_column(SmallInteger, server_default="50")
     languages: Mapped[dict[str, int]] = mapped_column(JSONB, server_default="{}")
     topics: Mapped[list[str]] = mapped_column(ARRAY(Text), server_default="{}")
     github_created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

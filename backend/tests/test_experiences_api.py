@@ -27,6 +27,7 @@ async def test_list_is_localized_and_most_recent_first(client: AsyncClient) -> N
         "summary": "Conception et mise en place d'une solution de stockage hybride chaud/froid "
         "pour des données IoT industrielles.",
         "technologies": ["Amazon S3", "Python", "NoSQL", "Docker", "FastAPI"],
+        "logo_url": None,
     }
     assert english[0]["title"] == "R&D Engineer"
     assert "description" not in french[0]  # detail only

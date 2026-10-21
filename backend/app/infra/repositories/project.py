@@ -29,6 +29,8 @@ def _to_domain(row: ProjectModel) -> Project:
         team_size=row.team_size,
         visible=row.visible,
         missing=row.missing,
+        image_focus_x=row.image_focus_x,
+        image_focus_y=row.image_focus_y,
     )
 
 
@@ -54,6 +56,8 @@ def _copy_details(project: Project, row: ProjectModel) -> None:
     row.context = project.context
     row.team_size = project.team_size
     row.visible = project.visible
+    row.image_focus_x = project.image_focus_x
+    row.image_focus_y = project.image_focus_y
 
 
 class ProjectRepository:
