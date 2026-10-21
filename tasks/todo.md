@@ -7,6 +7,6 @@ Plan: [plan.md](plan.md)
 - [x] Task 2: admin blocks (logo, screenshot, contact image)
 - [x] Task 3: experience logos
 - [x] Task 4: projects (languages at the top, screenshot, two variants)
-- [ ] Checkpoint B: variant chosen
+- [x] Checkpoint B: variant chosen (list on one line, no ring)
 - [x] Task 5: contact image
 - [ ] Checkpoint C: browsers, review, merge, release v1.1.0
