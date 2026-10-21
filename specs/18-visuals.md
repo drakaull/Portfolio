@@ -11,7 +11,7 @@ recruiters skim, and an image catches the eye where a block of text does not. Re
 
 | Page | Image | Display |
 |---|---|---|
-| Experience | **The organisation's logo**, optional, one per experience | Small square next to the organisation name on the timeline cards and the detail page; shown **whole** (never cropped), on a neutral tile |
+| Experience | **An image of the organisation** (logo or banner), optional, one per experience | Revised after a first try (a small logo was unreadable): fixed **2:1** frame filling the right side of the timeline card, framing tool; on top of the card on narrow screens; large under the title on the detail page; not on the home page's compact cards. The kind badge moves to the left, above the title |
 | Projects | **A screenshot**, optional, one per project | Fixed **16:10** frame under the summary, cropped with the **framing tool** (as the home photo) |
 | Projects | **Languages at the top** | Under the title: the percentage list **and** the small ring kept next to it (variant to try; fallback: list only, no ring) |
 | Contact | **One image**, optional, chosen in the admin | Right column next to the form, fixed **4:5** portrait frame, framing tool; under the form on narrow screens |
@@ -20,7 +20,7 @@ Every image is optional: without one, a card or page looks as today.
 
 ## Admin
 
-- **Experience editor**: a "Logo" block (upload / replace / remove), like the CV and photo blocks.
+- **Experience editor**: an "Organisation image" block with the framing tool.
 - **Project editor**: a "Screenshot" block with the framing tool.
 - **Home editor** (or a "Contact" block in it): the contact image with the framing tool.
 - Uploads apply at once, as for the photo; the framing is saved with the form (Save button).
@@ -31,18 +31,19 @@ Every image is optional: without one, a card or page looks as today.
 
 Same pipeline as the home photo, generalised: JPEG / PNG / WebP recognised by content, ≤ 5 MB,
 ≤ 40 Mpx, turned upright, **all metadata stripped**, saved as WebP (transparency kept for logos),
-longest side ≤ 1,200 px (logos ≤ 256 px). Files live under `storage/images/` with names built from
+longest side ≤ 1,200 px. Files live under `storage/images/` with names built from
 ids (never from the upload). Public URLs are versioned (`?v=`), so a replaced image is never hidden
 by a cache. Deleting an experience or project deletes its image.
 
-Database: the framing point (x, y in %) of each project screenshot and of the contact image; whether
-an image exists is read from the file, as for the photo and the CV. One migration.
+Database: the framing point (x, y in %) of each experience image, project screenshot and of the
+contact image; whether
+an image exists is read from the file, as for the photo and the CV.
 
 ## Public pages
 
 - Images have **width and height** set (no layout jump) and are **lazy-loaded** below the fold.
-- **Alt text** built from the content: "Logo of <organisation>", "Screenshot of <project>"; the
-  contact image is decorative (`alt=""`).
+- **Alt text** built from the content: "Screenshot of <project>"; the experience image (its
+  organisation is written next to it) and the contact image are decorative (`alt=""`).
 - Light and dark themes; 390 px mobile layout; skeletons get the image areas.
 
 ## Out of scope
