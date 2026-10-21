@@ -83,3 +83,43 @@ describe('contact form', () => {
     expect(screen.getByRole('link', { name: 'privacy' }).getAttribute('href')).toBe('/nl/privacy')
   })
 })
+
+describe('contact image', () => {
+  const home = (contact_image_url: string | null) =>
+    mockApi({
+      'GET /api/home?lang=fr': () =>
+        Response.json({
+          headline: 'Développeur',
+          intro: '',
+          linkedin_url: 'https://www.linkedin.com/in/x',
+          github_url: 'https://github.com/x',
+          cv_url: null,
+          photo_url: null,
+          photo_focus: { x: 50, y: 50 },
+          contact_image_url,
+          contact_focus: { x: 40, y: 60 },
+        }),
+    })
+
+  test('shows the image chosen in the admin, decorative and framed', async () => {
+    home('/api/images/contact/page?v=1')
+    renderApp('/fr/contact')
+
+    await vi.waitFor(() => expect(document.querySelector('main img')).not.toBeNull())
+    const image = document.querySelector('main img') as HTMLImageElement
+    expect([image.getAttribute('src'), image.getAttribute('alt')]).toEqual([
+      '/api/images/contact/page?v=1',
+      '',
+    ])
+    expect(image.style.objectPosition).toBe('40% 60%')
+  })
+
+  test('the page has no image until one is chosen', async () => {
+    home(null)
+    renderApp('/fr/contact')
+
+    // The footer's LinkedIn link shows the shared content has arrived.
+    expect(await screen.findByRole('link', { name: /LinkedIn/ })).toBeDefined()
+    expect(document.querySelector('main img')).toBeNull()
+  })
+})

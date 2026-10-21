@@ -1,7 +1,31 @@
+/* Form on the left, the image on the right; the image goes under the form on narrow screens. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 36rem) minmax(0, 20rem);
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--space-8);
+}
+
+@media (max-width: 52rem) {
+  .layout {
+    grid-template-columns: minmax(0, 36rem);
+  }
+}
+
 .form {
   display: grid;
   gap: var(--space-5);
-  max-width: 36rem;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 1px var(--color-border);
 }
 
 .field {

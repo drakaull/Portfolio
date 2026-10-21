@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import { sendContactMessage, type ContactField, type ContactForm } from '../api/contact.ts'
+import { useSharedHomeContent } from '../api/homeContentContext.ts'
 import { Button } from '../components/Button/Button.tsx'
 import { PageHeader } from '../components/PageHeader/PageHeader.tsx'
 import type { TranslationKey } from '../i18n/en.ts'
@@ -17,11 +18,17 @@ const FIELD_ERRORS: Record<ContactField, TranslationKey> = {
 
 type State = 'idle' | 'sending' | 'sent' | 'tooMany' | 'error'
 
+// The image's frame: 4:5 portrait, the shape framed in the admin.
+const IMAGE_WIDTH = 320
+const IMAGE_HEIGHT = 400
+
 export function ContactPage() {
   const { t, lang } = useTranslation()
   const [form, setForm] = useState<ContactForm>(EMPTY)
   const [state, setState] = useState<State>('idle')
   const [invalid, setInvalid] = useState<ContactField[]>([])
+  const home = useSharedHomeContent()
+  const content = home.status === 'ready' ? home.content : null
 
   function update(changes: Partial<ContactForm>) {
     setForm((current) => ({ ...current, ...changes }))
@@ -68,71 +75,84 @@ export function ContactPage() {
   return (
     <>
       <PageHeader eyebrow={t('eyebrow.contact')} title={t('contact.title')} />
-      <form className={styles.form} onSubmit={handleSubmit} noValidate>
-        {field('name', (props) => (
-          <input
-            {...props}
-            autoComplete="name"
-            maxLength={100}
-            required
-            value={form.name}
-            onChange={(event) => update({ name: event.target.value })}
-          />
-        ))}
-        {field('email', (props) => (
-          <input
-            {...props}
-            type="email"
-            autoComplete="email"
-            maxLength={254}
-            required
-            value={form.email}
-            onChange={(event) => update({ email: event.target.value })}
-          />
-        ))}
-        {field('message', (props) => (
-          <textarea
-            {...props}
-            rows={8}
-            maxLength={5000}
-            required
-            value={form.message}
-            onChange={(event) => update({ message: event.target.value })}
-          />
-        ))}
+      <div className={styles.layout}>
+        <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          {field('name', (props) => (
+            <input
+              {...props}
+              autoComplete="name"
+              maxLength={100}
+              required
+              value={form.name}
+              onChange={(event) => update({ name: event.target.value })}
+            />
+          ))}
+          {field('email', (props) => (
+            <input
+              {...props}
+              type="email"
+              autoComplete="email"
+              maxLength={254}
+              required
+              value={form.email}
+              onChange={(event) => update({ email: event.target.value })}
+            />
+          ))}
+          {field('message', (props) => (
+            <textarea
+              {...props}
+              rows={8}
+              maxLength={5000}
+              required
+              value={form.message}
+              onChange={(event) => update({ message: event.target.value })}
+            />
+          ))}
 
-        {/* Trap for robots: out of sight, out of the tab order, ignored by screen readers. */}
-        <div className={styles.trap} aria-hidden="true">
-          <label htmlFor="contact-leave-empty">Leave this field empty</label>
-          <input
-            id="contact-leave-empty"
-            name="leave_empty"
-            tabIndex={-1}
-            autoComplete="off"
-            value={form.leave_empty}
-            onChange={(event) => update({ leave_empty: event.target.value })}
-          />
-        </div>
+          {/* Trap for robots: out of sight, out of the tab order, ignored by screen readers. */}
+          <div className={styles.trap} aria-hidden="true">
+            <label htmlFor="contact-leave-empty">Leave this field empty</label>
+            <input
+              id="contact-leave-empty"
+              name="leave_empty"
+              tabIndex={-1}
+              autoComplete="off"
+              value={form.leave_empty}
+              onChange={(event) => update({ leave_empty: event.target.value })}
+            />
+          </div>
 
-        <div className={styles.actions}>
-          <Button type="submit" disabled={state === 'sending'}>
-            {state === 'sending' ? t('contact.sending') : t('contact.send')}
-          </Button>
-          <p className={styles.privacy}>
-            {t('contact.privacyNote')}{' '}
-            <Link to={`/${lang}/privacy`}>{t('contact.privacyLink')}</Link>
+          <div className={styles.actions}>
+            <Button type="submit" disabled={state === 'sending'}>
+              {state === 'sending' ? t('contact.sending') : t('contact.send')}
+            </Button>
+            <p className={styles.privacy}>
+              {t('contact.privacyNote')}{' '}
+              <Link to={`/${lang}/privacy`}>{t('contact.privacyLink')}</Link>
+            </p>
+          </div>
+
+          <p role="status" className={styles.sent}>
+            {state === 'sent' && t('contact.sent')}
           </p>
-        </div>
-
-        <p role="status" className={styles.sent}>
-          {state === 'sent' && t('contact.sent')}
-        </p>
-        {(state === 'tooMany' || state === 'error') && (
-          <p role="alert" className={styles.error}>
-            {t(state === 'tooMany' ? 'contact.tooMany' : 'contact.error')}
-          </p>
+          {(state === 'tooMany' || state === 'error') && (
+            <p role="alert" className={styles.error}>
+              {t(state === 'tooMany' ? 'contact.tooMany' : 'contact.error')}
+            </p>
+          )}
+        </form>
+        {content?.contact_image_url && (
+          // Decorative: it says nothing the page does not.
+          <img
+            className={styles.image}
+            src={content.contact_image_url}
+            alt=""
+            width={IMAGE_WIDTH}
+            height={IMAGE_HEIGHT}
+            style={{ objectPosition: `${content.contact_focus.x}% ${content.contact_focus.y}%` }}
+          />
         )}
-      </form>
+      </div>
     </>
   )
 }
