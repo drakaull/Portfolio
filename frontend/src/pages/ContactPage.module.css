@@ -1,5 +1,10 @@
 /* Form on the left, the image on the right; the image goes under the form on narrow screens. */
 .layout {
+  /* Default heights of the fields (line, padding, border): the image next to them is sized from
+     them, so resizing the message box does not stretch it. */
+  --input-height: calc(1lh + 1.3rem + 2px);
+  --message-height: calc(8lh + 1.3rem + 2px);
+
   display: grid;
   grid-template-columns: minmax(0, 36rem);
   gap: var(--space-5) var(--space-8);
@@ -26,9 +31,9 @@
     justify-content: space-between;
   }
 
-  /* The form's rows are the layout's (subgrid): the image spans the three fields' rows, from the
-     top of the first input (below its label) to the bottom of the message box. At most five rows:
-     three fields, the actions, then the thanks or the error. */
+  /* The form's rows are the layout's (subgrid): the image starts in the first field's row, at the
+     top of its input (below the label), and is as tall as the three fields at their default size.
+     At most five rows: three fields, the actions, then the thanks or the error. */
   .form {
     grid-row: 1 / span 5;
     grid-template-rows: subgrid;
@@ -37,9 +42,13 @@
   .image {
     grid-column: 2;
     grid-row: 1 / 4;
-    contain: size; /* sized by the rows, never sizing them */
+    align-self: start;
+    contain: size; /* never sizes the rows */
     aspect-ratio: auto;
-    height: calc(100% - 1lh - var(--space-2));
+    height: calc(
+      2 * var(--input-height) + var(--message-height) + 2 * var(--space-5) + 2 *
+        (1lh + var(--space-2))
+    );
     margin-top: calc(1lh + var(--space-2)); /* the label's line and its gap */
   }
 }
@@ -63,6 +72,7 @@
 }
 
 .field textarea {
+  height: var(--message-height); /* as in Chrome for rows="8", in every browser */
   resize: vertical;
 }
 
