@@ -8,17 +8,21 @@ import {
   type AdminProject,
   type ProjectContext,
   type ProjectDetails,
+  type ProjectField,
 } from '../../api/adminProjects.ts'
+import { PHOTO_FOCUS_CENTRE } from '../../api/useHomeContent.ts'
 import { Button } from '../../components/Button/Button.tsx'
 import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
 import adminStyles from './Admin.module.css'
 import { SessionExpiredAlert, UnsavedChangesDialog } from './EditorParts.tsx'
 import editorStyles from './Editor.module.css'
+import { ImageField } from './FileField.tsx'
+import { PhotoFraming } from './PhotoFraming.tsx'
 import styles from './ProjectEditorPage.module.css'
 import { useUnsavedChanges } from './useUnsavedChanges.ts'
 
-type Field = keyof ProjectDetails
+type Field = ProjectField
 
 const FIELD_ERRORS: Record<Field, TranslationKey> = {
   title: 'admin.projects.invalidTitle',
@@ -45,6 +49,8 @@ export function ProjectEditorPage() {
   const [form, setForm] = useState<ProjectForm | null>(null)
   const [loadState, setLoadState] = useState<'ok' | 'notFound' | 'error'>('ok')
   const [saveState, setSaveState] = useState<SaveState>('idle')
+  const [hasImage, setHasImage] = useState(false)
+  const [imageVersion, setImageVersion] = useState(0)
   const [invalid, setInvalid] = useState<Field[]>([])
 
   useEffect(() => {
@@ -56,6 +62,7 @@ export function ProjectEditorPage() {
           return
         }
         setProject(found)
+        setHasImage(found.image_url !== null)
         setSaved(toForm(found))
         setForm(toForm(found))
       })
@@ -201,6 +208,38 @@ export function ProjectEditorPage() {
           <label htmlFor="project-visible">{t('admin.projects.visible')}</label>
           {!project.missing && fieldError('visible')}
         </div>
+
+        <ImageField
+          id="project-image"
+          url={`/api/admin/projects/${project.id}/image`}
+          legend="admin.screenshot.legend"
+          present={hasImage}
+          onChange={(present) => {
+            setHasImage(present)
+            if (!present) return
+            setImageVersion((count) => count + 1)
+            // Framed from the centre by the server, like the photo.
+            const centred = (current: ProjectForm | null) =>
+              current && { ...current, image_focus: PHOTO_FOCUS_CENTRE }
+            setSaved(centred)
+            setForm(centred)
+          }}
+        >
+          <PhotoFraming
+            src={`/api/images/projects/${project.id}?preview=${imageVersion}`}
+            focus={form.image_focus}
+            onChange={(image_focus) => update({ image_focus })}
+            width={320}
+            height={200}
+            texts={{
+              label: 'admin.framing.label',
+              preview: 'admin.image.preview',
+              result: 'admin.screenshot.framingResult',
+              hint: 'admin.framing.hint',
+              notNeeded: 'admin.framing.notNeeded',
+            }}
+          />
+        </ImageField>
 
         <div className={editorStyles.actions}>
           <Button type="submit" disabled={!dirty || saveState === 'saving'}>

@@ -21,6 +21,8 @@ const TTMC: Project = {
   created_at: '2025-03-26T15:54:14Z',
   pushed_at: '2025-05-01T10:00:00Z',
   stars: 0,
+  image_url: null,
+  image_focus: { x: 50, y: 50 },
 }
 
 const OTEAL: Project = {
@@ -90,6 +92,21 @@ describe('projects page', () => {
     expect(within(card).getByText('Projet solo')).toBeDefined()
     expect(card.querySelectorAll('p')).toHaveLength(1) // only the team line
     expect(within(card).queryByRole('list')).toBeNull() // no languages, no ring
+    expect(within(card).queryByRole('img')).toBeNull() // no screenshot
+  })
+
+  test('shows the languages under the title and the screenshot as framed in the admin', async () => {
+    const image_url = '/api/images/projects/1?v=1'
+    mockProjects([{ ...TTMC, image_url, image_focus: { x: 30, y: 80 } }], 'en')
+    renderApp('/en/projects')
+
+    const card = await screen.findByRole('article')
+    const title = within(card).getByRole('heading', { name: 'Projet TTMC' })
+    const languages = within(card).getByRole('list', { name: 'Languages' })
+    expect(title.compareDocumentPosition(languages) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    const screenshot = within(card).getByRole('img', { name: 'Screenshot of Projet TTMC' })
+    expect(screenshot.getAttribute('src')).toBe(image_url)
+    expect(screenshot.style.objectPosition).toBe('30% 80%')
   })
 
   test('says when there is nothing yet, or when loading fails', async () => {

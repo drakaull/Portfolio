@@ -14,6 +14,8 @@ const CONTENT: Record<string, HomeContent> = {
     cv_url: '/api/cv',
     photo_url: null,
     photo_focus: { x: 50, y: 50 },
+    contact_image_url: null,
+    contact_focus: { x: 50, y: 50 },
   },
   fr: {
     headline: 'Développeur fullstack',
@@ -23,6 +25,8 @@ const CONTENT: Record<string, HomeContent> = {
     cv_url: '/api/cv',
     photo_url: null,
     photo_focus: { x: 50, y: 50 },
+    contact_image_url: null,
+    contact_focus: { x: 50, y: 50 },
   },
 }
 

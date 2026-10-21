@@ -1,8 +1,10 @@
 import io
 import os
+import re
 import tempfile
 from collections.abc import Awaitable, Callable
 from pathlib import Path
+from typing import Literal
 
 import anyio
 from PIL import Image, ImageOps, UnidentifiedImageError
@@ -111,6 +113,12 @@ async def save_photo(read: Callable[[int], Awaitable[bytes]]) -> None:
     Only the processed image is kept, never the upload (phone photos often carry the GPS
     position where they were taken). Decoding runs in a worker thread.
     """
+    await _save_image_upload(_photo_path(), PHOTO_MAX_SIDE, read)
+
+
+async def _save_image_upload(
+    path: Path, max_side: int, read: Callable[[int], Awaitable[bytes]]
+) -> None:
     data = bytearray()
     while chunk := await read(_CHUNK_BYTES):
         data += chunk
@@ -118,11 +126,11 @@ async def save_photo(read: Callable[[int], Awaitable[bytes]]) -> None:
             raise PhotoTooLargeError
     if not data:
         raise NotAnImageError
-    webp = await anyio.to_thread.run_sync(_clean_photo, bytes(data))
-    _write_atomically(_photo_path(), webp)
+    webp = await anyio.to_thread.run_sync(_clean_image, bytes(data), max_side)
+    _write_atomically(path, webp)
 
 
-def _clean_photo(data: bytes) -> bytes:
+def _clean_image(data: bytes, max_side: int) -> bytes:
     try:
         # `formats`: the content decides, whatever the file is called or claims to be.
         with Image.open(io.BytesIO(data), formats=_PHOTO_FORMATS) as image:
@@ -134,7 +142,7 @@ def _clean_photo(data: bytes) -> bytes:
             clean = upright.convert("RGBA" if has_alpha else "RGB")
     except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError) as error:
         raise NotAnImageError from error
-    clean.thumbnail((PHOTO_MAX_SIDE, PHOTO_MAX_SIDE))  # never enlarges
+    clean.thumbnail((max_side, max_side))  # never enlarges
     clean.info.clear()  # nothing from the upload (EXIF, ICC, XMP) may reach the saved file
     output = io.BytesIO()
     clean.save(output, format="WEBP", quality=82, method=6, exif=b"", xmp=b"")
@@ -143,8 +151,8 @@ def _clean_photo(data: bytes) -> bytes:
 
 def _write_atomically(path: Path, data: bytes) -> None:
     """Write next to the target, then swap it in: readers never see a half-written file."""
-    settings.storage_dir.mkdir(parents=True, exist_ok=True)
-    fd, temp_name = tempfile.mkstemp(dir=settings.storage_dir, suffix=".upload")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temp_name = tempfile.mkstemp(dir=path.parent, suffix=".upload")
     try:
         with os.fdopen(fd, "wb") as temp_file:
             temp_file.write(data)
@@ -157,3 +165,38 @@ def _write_atomically(path: Path, data: bytes) -> None:
 
 def delete_photo() -> None:
     _photo_path().unlink(missing_ok=True)
+
+
+# --- Other images: experience logos, project screenshots, contact page image -------------------
+
+# Longest side kept for each kind: every image fills a card or a page column.
+IMAGE_MAX_SIDE = {"logos": PHOTO_MAX_SIDE, "projects": PHOTO_MAX_SIDE, "contact": PHOTO_MAX_SIDE}
+ImageKind = Literal["logos", "projects", "contact"]
+# Image keys are experience slugs, project ids or "page": never anything from the upload.
+_IMAGE_KEY = re.compile(r"[a-z0-9-]{1,100}")
+
+
+def _image_path(kind: ImageKind, key: str) -> Path:
+    if kind not in IMAGE_MAX_SIDE or not _IMAGE_KEY.fullmatch(key):
+        raise ValueError(f"invalid image {kind}/{key}")
+    return settings.storage_dir / "images" / kind / f"{key}.webp"
+
+
+def image_file(kind: ImageKind, key: str) -> Path | None:
+    path = _image_path(kind, key)
+    return path if path.is_file() else None
+
+
+def image_url(kind: ImageKind, key: str) -> str | None:
+    """Public URL of an image, versioned so a replaced image is never hidden by a cache."""
+    path = image_file(kind, key)
+    return None if path is None else f"/api/images/{kind}/{key}?v={path.stat().st_mtime_ns}"
+
+
+async def save_image(kind: ImageKind, key: str, read: Callable[[int], Awaitable[bytes]]) -> None:
+    """Store an uploaded image cleaned like the photo (upright, resized, WebP, no metadata)."""
+    await _save_image_upload(_image_path(kind, key), IMAGE_MAX_SIDE[kind], read)
+
+
+def delete_image(kind: ImageKind, key: str) -> None:
+    _image_path(kind, key).unlink(missing_ok=True)

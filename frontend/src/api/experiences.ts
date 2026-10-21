@@ -12,6 +12,7 @@ export type Experience = {
   end_year: number | null
   summary: string
   technologies: string[]
+  logo_url: string | null // the organisation's image, versioned
 }
 
 export type ExperienceDetail = Experience & { description: string }

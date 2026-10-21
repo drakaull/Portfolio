@@ -7,6 +7,7 @@ from app.api.dependencies import get_experience_repository
 from app.domain.experience import SLUG_MAX_LENGTH, SLUG_PATTERN, Experience, ExperienceKind
 from app.domain.language import Lang, localize
 from app.infra.repositories.experience import ExperienceRepository
+from app.infra.storage import image_url
 
 router = APIRouter(tags=["experiences"])
 
@@ -22,6 +23,7 @@ class ExperienceOut(BaseModel):
     end_year: int | None
     summary: str
     technologies: list[str]
+    logo_url: str | None  # the organisation's logo, versioned
 
     @classmethod
     def from_domain(cls, entry: Experience, lang: Lang) -> "ExperienceOut":
@@ -34,6 +36,7 @@ class ExperienceOut(BaseModel):
             end_year=entry.end_year,
             summary=localize(entry.summary, lang),
             technologies=list(entry.technologies),
+            logo_url=image_url("logos", entry.slug),
         )
 
 

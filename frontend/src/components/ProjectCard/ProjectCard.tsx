@@ -1,11 +1,15 @@
 import type { Project } from '../../api/projects.ts'
 import { useTranslation } from '../../i18n/useTranslation.ts'
-import { LanguageDonut } from '../LanguageDonut/LanguageDonut.tsx'
+import { LanguageList } from '../LanguageList/LanguageList.tsx'
 import { Bone, BoneRow } from '../Skeleton/Skeleton.tsx'
 import { TextLink } from '../TextLink/TextLink.tsx'
 import styles from './ProjectCard.module.css'
 
-/** One public project: context and year, title, translated "About", languages, team.
+// The screenshot's frame: 16:10, the shape framed in the admin.
+const SCREENSHOT_WIDTH = 320
+const SCREENSHOT_HEIGHT = 200
+
+/** One public project: context and year, title, languages, translated "About", screenshot, team.
  * `coloured`: the languages coloured on the page (see lib/languages.ts). */
 export function ProjectCard({ project, coloured }: { project: Project; coloured: string[] }) {
   const { t } = useTranslation()
@@ -37,20 +41,28 @@ export function ProjectCard({ project, coloured }: { project: Project; coloured:
         </span>
       </div>
       <h2 className={styles.title}>{project.title}</h2>
+      {project.languages.length > 0 && (
+        <LanguageList languages={project.languages} coloured={coloured} />
+      )}
       {project.summary && <p className={styles.summary}>{project.summary}</p>}
-      {/* Pinned to the bottom, so the rings of a row line up whatever the summary length. */}
-      <div className={styles.footer}>
-        {project.languages.length > 0 && (
-          <LanguageDonut languages={project.languages} coloured={coloured} />
-        )}
-        {/* Always there (empty when unknown): its height must not shift the ring. */}
-        <p className={styles.team}>
-          {project.team_size === 1 && t('projects.solo')}
-          {project.team_size !== null &&
-            project.team_size > 1 &&
-            `${t('projects.team')} ${project.team_size}`}
-        </p>
-      </div>
+      {project.image_url && (
+        <img
+          className={styles.image}
+          src={project.image_url}
+          alt={`${t('projects.screenshot')} ${project.title}`}
+          width={SCREENSHOT_WIDTH}
+          height={SCREENSHOT_HEIGHT}
+          loading="lazy"
+          style={{ objectPosition: `${project.image_focus.x}% ${project.image_focus.y}%` }}
+        />
+      )}
+      {/* Pinned to the bottom of the card, so the team lines of a row line up. */}
+      <p className={styles.team}>
+        {project.team_size === 1 && t('projects.solo')}
+        {project.team_size !== null &&
+          project.team_size > 1 &&
+          `${t('projects.team')} ${project.team_size}`}
+      </p>
     </article>
   )
 }
@@ -61,20 +73,17 @@ export function ProjectCardSkeleton() {
     <div className={styles.card}>
       <Bone width="35%" height="0.75rem" />
       <Bone width="55%" height="1.5rem" />
+      <BoneRow>
+        <Bone width="6rem" height="0.75rem" />
+        <Bone width="4.5rem" height="0.75rem" />
+        <Bone width="5rem" height="0.75rem" />
+      </BoneRow>
       <Bone />
       <Bone />
       <Bone width="70%" />
-      <div className={styles.footer}>
-        <BoneRow>
-          <Bone width="4rem" height="4rem" round />
-          <span className={styles.legendSkeleton}>
-            <Bone width="6rem" height="0.75rem" />
-            <Bone width="4.5rem" height="0.75rem" />
-            <Bone width="5rem" height="0.75rem" />
-          </span>
-        </BoneRow>
+      <span className={styles.team}>
         <Bone width="5rem" height="0.875rem" />
-      </div>
+      </span>
     </div>
   )
 }

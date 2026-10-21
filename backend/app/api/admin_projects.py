@@ -12,11 +12,13 @@ from app.api.dependencies import (
     get_project_repository,
     get_translator,
 )
+from app.api.home import PhotoFocus
 from app.domain.language import with_every_lang
 from app.domain.project import TEAM_SIZE_MAX, TITLE_MAX_LENGTH, Project, ProjectContext
 from app.infra.github import GitHubClient, GitHubUnavailable
 from app.infra.project_sync import sync_projects
 from app.infra.repositories.project import ProjectRepository
+from app.infra.storage import delete_image, image_url
 from app.infra.translation import Translator
 
 router = admin_router()
@@ -33,6 +35,7 @@ class ProjectDetailsIn(BaseModel):
     context: ProjectContext | None = None
     team_size: int | None = Field(default=None, ge=1, le=TEAM_SIZE_MAX)
     visible: bool = False
+    image_focus: PhotoFocus | None = None  # None: the framing stays as it is
 
 
 class GitHubOut(BaseModel):
@@ -58,6 +61,8 @@ class AdminProjectOut(BaseModel):
     about_lang: str | None
     summary: dict[str, str]  # every language; "" until the "About" is translated
     github: GitHubOut
+    image_url: str | None
+    image_focus: PhotoFocus
 
     @classmethod
     def from_domain(cls, project: Project) -> "AdminProjectOut":
@@ -84,6 +89,8 @@ class AdminProjectOut(BaseModel):
                 pushed_at=repository.pushed_at,
                 stars=repository.stars,
             ),
+            image_url=image_url("projects", str(project.id)),
+            image_focus=PhotoFocus(x=project.image_focus_x, y=project.image_focus_y),
         )
 
 
@@ -121,7 +128,10 @@ async def update_project(
     if body.visible and project.missing:
         # Its GitHub link would be broken: it comes back when the repository is public again.
         raise HTTPException(status.HTTP_409_CONFLICT, detail="This project is not on GitHub")
-    updated = replace(project, **body.model_dump())
+    updated = replace(project, **body.model_dump(exclude={"image_focus"}))
+    if body.image_focus is not None:
+        focus = body.image_focus
+        updated = replace(updated, image_focus_x=focus.x, image_focus_y=focus.y)
     await repository.save_details(updated)
     await repository.commit()
     return AdminProjectOut.from_domain(updated)
@@ -132,6 +142,7 @@ async def delete_project(project_id: int, repository: Repository) -> None:
     if not await repository.delete(project_id):
         raise _not_found()
     await repository.commit()
+    delete_image("projects", str(project_id))  # after the commit: a failed delete keeps it
 
 
 @router.post("/projects/{project_id}/move", status_code=status.HTTP_204_NO_CONTENT)

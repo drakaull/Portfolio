@@ -32,6 +32,8 @@ async def test_admin_reads_both_languages(admin_client: AsyncClient) -> None:
         "has_cv": False,
         "photo_url": None,
         "photo_focus": {"x": 50, "y": 50},  # centred by default
+        "contact_image_url": None,
+        "contact_focus": {"x": 50, "y": 50},
     }
 
 
@@ -57,6 +59,8 @@ async def test_saved_content_is_public_immediately(
         },
         "has_cv": False,
         "photo_url": None,
+        "contact_image_url": None,
+        "contact_focus": {"x": 50, "y": 50},  # not sent: kept as it was
         "auto_translated": ["en", "nl"],
         "translation_failed": False,
     }

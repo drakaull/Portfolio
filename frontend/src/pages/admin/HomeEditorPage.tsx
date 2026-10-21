@@ -15,7 +15,7 @@ import type { TranslationKey } from '../../i18n/en.ts'
 import { useTranslation, type Lang } from '../../i18n/useTranslation.ts'
 import adminStyles from './Admin.module.css'
 import { SessionExpiredAlert, UnsavedChangesDialog } from './EditorParts.tsx'
-import { CvField, PhotoField } from './FileField.tsx'
+import { CvField, ImageField, PhotoField } from './FileField.tsx'
 import styles from './Editor.module.css'
 import { PhotoFraming } from './PhotoFraming.tsx'
 import { TranslationTabs } from './TranslationTabs.tsx'
@@ -37,8 +37,9 @@ function toForm({
   linkedin_url,
   github_url,
   photo_focus,
+  contact_focus,
 }: AdminHomeContent): HomeContentForm {
-  return { headline, intro, linkedin_url, github_url, photo_focus }
+  return { headline, intro, linkedin_url, github_url, photo_focus, contact_focus }
 }
 
 export function HomeEditorPage() {
@@ -53,6 +54,8 @@ export function HomeEditorPage() {
   const [hasPhoto, setHasPhoto] = useState(false)
   // Bumped on each upload, so the framing tool never shows a cached older photo.
   const [photoVersion, setPhotoVersion] = useState(0)
+  const [hasContactImage, setHasContactImage] = useState(false)
+  const [contactVersion, setContactVersion] = useState(0)
   // Bumped on each save: remounts the translation tabs, which clears their messages.
   const [saves, setSaves] = useState(0)
   const [saveNotice, setSaveNotice] = useState<SaveNotice | null>(null)
@@ -64,6 +67,7 @@ export function HomeEditorPage() {
         setForm(toForm(content))
         setHasCv(content.has_cv)
         setHasPhoto(content.photo_url !== null)
+        setHasContactImage(content.contact_image_url !== null)
       })
       .catch(() => setLoadFailed(true))
   }, [])
@@ -236,6 +240,37 @@ export function HomeEditorPage() {
             onChange={(photo_focus) => update({ photo_focus })}
           />
         </PhotoField>
+        <ImageField
+          id="contact-image"
+          url="/api/admin/contact-image"
+          legend="admin.contactImage.legend"
+          present={hasContactImage}
+          onChange={(present) => {
+            setHasContactImage(present)
+            if (!present) return
+            setContactVersion((count) => count + 1)
+            // Framed from the centre by the server, like the photo.
+            const centred = (current: HomeContentForm | null) =>
+              current && { ...current, contact_focus: PHOTO_FOCUS_CENTRE }
+            setSaved(centred)
+            setForm(centred)
+          }}
+        >
+          <PhotoFraming
+            src={`/api/images/contact/page?preview=${contactVersion}`}
+            focus={form.contact_focus}
+            onChange={(contact_focus) => update({ contact_focus })}
+            width={240}
+            height={330}
+            texts={{
+              label: 'admin.framing.label',
+              preview: 'admin.image.preview',
+              result: 'admin.contactImage.framingResult',
+              hint: 'admin.framing.hint',
+              notNeeded: 'admin.framing.notNeeded',
+            }}
+          />
+        </ImageField>
         <CvField present={hasCv} onChange={setHasCv} />
 
         <div className={styles.actions}>

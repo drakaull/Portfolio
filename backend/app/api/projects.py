@@ -5,9 +5,11 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.api.dependencies import get_project_repository
+from app.api.home import PhotoFocus
 from app.domain.language import Lang
 from app.domain.project import Project, ProjectContext
 from app.infra.repositories.project import ProjectRepository
+from app.infra.storage import image_url
 
 router = APIRouter(tags=["projects"])
 
@@ -33,6 +35,8 @@ class ProjectOut(BaseModel):
     created_at: datetime
     pushed_at: datetime
     stars: int
+    image_url: str | None  # the screenshot, versioned
+    image_focus: PhotoFocus
 
     @classmethod
     def from_domain(cls, project: Project, lang: Lang) -> "ProjectOut":
@@ -56,6 +60,8 @@ class ProjectOut(BaseModel):
             created_at=repository.created_at,
             pushed_at=repository.pushed_at,
             stars=repository.stars,
+            image_url=image_url("projects", str(project.id)),
+            image_focus=PhotoFocus(x=project.image_focus_x, y=project.image_focus_y),
         )
 
 

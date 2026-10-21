@@ -23,3 +23,6 @@ class HomeContent:
     github_url: str
     photo_focus_x: int = PHOTO_FOCUS_CENTRE
     photo_focus_y: int = PHOTO_FOCUS_CENTRE
+    # Framing of the contact page image, like the photo's.
+    contact_focus_x: int = PHOTO_FOCUS_CENTRE
+    contact_focus_y: int = PHOTO_FOCUS_CENTRE

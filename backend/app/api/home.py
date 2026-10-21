@@ -8,7 +8,7 @@ from app.api.dependencies import get_home_repository
 from app.domain.home import PHOTO_FOCUS_MAX, PHOTO_FOCUS_MIN, HomeContent
 from app.domain.language import Lang, localize
 from app.infra.repositories.home import HomeContentRepository
-from app.infra.storage import cv_file, cv_url, photo_file, photo_url
+from app.infra.storage import cv_file, cv_url, image_url, photo_file, photo_url
 
 router = APIRouter(tags=["home"])
 
@@ -34,6 +34,8 @@ class HomeContentOut(BaseModel):
     cv_url: str | None
     photo_url: str | None  # versioned: changes when the photo is replaced
     photo_focus: PhotoFocus
+    contact_image_url: str | None  # versioned, like photo_url
+    contact_focus: PhotoFocus
 
     @classmethod
     def from_domain(cls, content: HomeContent, lang: Lang, cv_url: str | None) -> "HomeContentOut":
@@ -45,6 +47,8 @@ class HomeContentOut(BaseModel):
             cv_url=cv_url,
             photo_url=photo_url(),
             photo_focus=PhotoFocus.from_domain(content),
+            contact_image_url=image_url("contact", "page"),
+            contact_focus=PhotoFocus(x=content.contact_focus_x, y=content.contact_focus_y),
         )
 
 
@@ -58,7 +62,7 @@ async def get_home(
     return HomeContentOut.from_domain(content, lang, cv_url=cv_url())
 
 
-def _cache_control(version: str | None) -> str:
+def cache_control(version: str | None) -> str:
     """A versioned address (?v=…, from cv_url / photo_url) changes with its file: safe to cache for
     long. Any other one (e.g. the admin's links) must be checked again each time."""
     return "public, max-age=31536000, immutable" if version else "no-cache"
@@ -79,7 +83,7 @@ async def get_cv(v: str | None = None) -> FileResponse:
         headers={
             "Content-Security-Policy": "sandbox",
             "X-Content-Type-Options": "nosniff",
-            "Cache-Control": _cache_control(v),
+            "Cache-Control": cache_control(v),
         },
     )
 
@@ -92,5 +96,5 @@ async def get_photo(v: str | None = None) -> FileResponse:
     return FileResponse(
         path,
         media_type="image/webp",
-        headers={"X-Content-Type-Options": "nosniff", "Cache-Control": _cache_control(v)},
+        headers={"X-Content-Type-Options": "nosniff", "Cache-Control": cache_control(v)},
     )

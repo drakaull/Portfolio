@@ -32,6 +32,8 @@ async def test_home_returns_content_in_requested_language(
         "cv_url": None,
         "photo_url": None,
         "photo_focus": {"x": 50, "y": 50},
+        "contact_image_url": None,
+        "contact_focus": {"x": 50, "y": 50},
     }
 
 

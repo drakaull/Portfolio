@@ -19,17 +19,48 @@
   border-color: var(--color-accent);
 }
 
+/* Image on the right on wide screens, on top on phones. */
+.withImage {
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  grid-template-areas: 'body image';
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* Named only with an image: an unknown area would add an implicit column. */
+.withImage .body {
+  grid-area: body;
+}
+
+.body {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.image {
+  grid-area: image;
+  display: block;
+  justify-self: center;
+  /* The image keeps its own shape, as large as the 2:1 area allows (no empty bands). */
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 9rem;
+}
+
+@media (max-width: 40rem) {
+  .withImage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'image' 'body';
+  }
+}
+
+/* The badge first, on the left, above the title. */
 .meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
-/* The badge stays on the right, with or without the years before it. */
-.meta > :last-child {
-  margin-left: auto;
+  gap: var(--space-2) var(--space-3);
 }
 
 .years {
@@ -54,4 +85,11 @@
   color: var(--color-accent);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
+}
+
+/* Logos are made for a light background: in the dark theme they sit on a light tile. */
+:global([data-theme='dark']) .image {
+  padding: var(--space-2);
+  background: #bdb4a2;
+  border-radius: var(--radius-sm);
 }

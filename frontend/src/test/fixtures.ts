@@ -11,6 +11,7 @@ export const ENTRIES: Experience[] = [
     end_year: 2026,
     summary: 'Stockage hybride chaud/froid.',
     technologies: ['Amazon S3', 'Python', 'NoSQL', 'Docker', 'FastAPI'],
+    logo_url: '/api/images/logos/icare-student-job-2026?v=1',
   },
   {
     slug: 'helha-computer-science',
@@ -21,5 +22,6 @@ export const ENTRIES: Experience[] = [
     end_year: null,
     summary: 'Développement d’applications.',
     technologies: [],
+    logo_url: null,
   },
 ]

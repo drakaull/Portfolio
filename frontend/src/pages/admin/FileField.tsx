@@ -176,6 +176,39 @@ export function CvField(props: { present: boolean; onChange: (present: boolean) 
   )
 }
 
+/** Texts shared by the other images; only the legend differs. */
+const imageTexts = (legend: TranslationKey): FileTexts => ({
+  legend,
+  online: 'admin.image.online',
+  none: 'admin.image.none',
+  upload: 'admin.image.upload',
+  replace: 'admin.image.replace',
+  uploaded: 'admin.image.uploaded',
+  removed: 'admin.image.removed',
+  tooLarge: 'admin.image.tooLarge',
+  wrongType: 'admin.image.notImage',
+  remove: 'admin.image.remove',
+  confirmRemove: 'admin.image.confirmRemove',
+})
+
+/** An image of the site other than the photo: a logo, a screenshot, the contact image. */
+export function ImageField({
+  legend,
+  ...props
+}: {
+  id: string
+  url: string // admin endpoint: PUT uploads, DELETE removes
+  legend: TranslationKey
+  present: boolean
+  onChange: (present: boolean) => void
+  preview?: ReactNode
+  children?: ReactNode
+}) {
+  return (
+    <FileField accept="image/jpeg,image/png,image/webp" texts={imageTexts(legend)} {...props} />
+  )
+}
+
 /** The photo's framing tool (or anything else) goes in `children`, shown while a photo is online. */
 export function PhotoField(props: {
   present: boolean

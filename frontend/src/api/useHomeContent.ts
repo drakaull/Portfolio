@@ -15,6 +15,8 @@ export type HomeContent = {
   cv_url: string | null
   photo_url: string | null // versioned: changes when the photo is replaced
   photo_focus: PhotoFocus
+  contact_image_url: string | null // the contact page image, versioned
+  contact_focus: PhotoFocus
 }
 
 type Result = { lang: Lang; content: HomeContent } | { lang: Lang; error: true }
