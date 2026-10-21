@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 from pydantic import BaseModel
 
 from app.api.dependencies import get_experience_repository
+from app.api.home import PhotoFocus
 from app.domain.experience import SLUG_MAX_LENGTH, SLUG_PATTERN, Experience, ExperienceKind
 from app.domain.language import Lang, localize
 from app.infra.repositories.experience import ExperienceRepository
@@ -23,7 +24,8 @@ class ExperienceOut(BaseModel):
     end_year: int | None
     summary: str
     technologies: list[str]
-    logo_url: str | None  # the organisation's logo, versioned
+    logo_url: str | None  # the organisation's image, versioned
+    logo_focus: PhotoFocus
 
     @classmethod
     def from_domain(cls, entry: Experience, lang: Lang) -> "ExperienceOut":
@@ -37,6 +39,7 @@ class ExperienceOut(BaseModel):
             summary=localize(entry.summary, lang),
             technologies=list(entry.technologies),
             logo_url=image_url("logos", entry.slug),
+            logo_focus=PhotoFocus(x=entry.logo_focus_x, y=entry.logo_focus_y),
         )
 
 

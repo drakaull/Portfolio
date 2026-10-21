@@ -1,5 +1,6 @@
 import type { TargetLang, Translated } from './adminHome.ts'
 import type { ExperienceKind } from './experiences.ts'
+import type { PhotoFocus } from './useHomeContent.ts'
 import { useJson } from './useJson.ts'
 
 /** An experience as the admin edits it: every language of each translated text. */
@@ -14,6 +15,7 @@ export type AdminExperience = {
   summary: Translated
   description: Translated // Markdown
   logo_url: string | null // versioned public URL
+  logo_focus: PhotoFocus // framing of the image
 }
 
 /** What a save returns: the stored entry plus what automatic translation did. */
@@ -33,7 +35,7 @@ export type ExperienceBody = Omit<
 }
 
 /** Top-level fields the server can reject. */
-export type ExperienceField = Exclude<keyof AdminExperience, 'logo_url'>
+export type ExperienceField = Exclude<keyof AdminExperience, 'logo_url' | 'logo_focus'>
 
 export type ExperienceSaveResult =
   | { status: 'saved'; entry: AdminExperienceSaved }

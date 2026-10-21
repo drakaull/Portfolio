@@ -271,15 +271,15 @@ export const nl: Record<TranslationKey, string> = {
   'admin.image.preview': 'Huidige afbeelding',
   'admin.image.upload': 'Een afbeelding uploaden (JPEG, PNG of WebP, max. 5 MB)',
   'admin.image.replace': 'De afbeelding vervangen (JPEG, PNG of WebP, max. 5 MB)',
-  'admin.image.uploaded':
-    'Afbeelding geüpload: rechtgezet, verkleind en ontdaan van metadata.',
+  'admin.image.uploaded': 'Afbeelding geüpload: rechtgezet, verkleind en ontdaan van metadata.',
   'admin.image.removed': 'Afbeelding verwijderd.',
   'admin.image.tooLarge':
     'De afbeelding is groter dan 5 MB (of 40 megapixels): exporteer ze kleiner en probeer opnieuw.',
   'admin.image.notImage': 'Dit bestand is geen JPEG-, PNG- of WebP-afbeelding.',
   'admin.image.remove': 'De afbeelding verwijderen',
   'admin.image.confirmRemove': 'De afbeelding van de site verwijderen?',
-  'admin.logo.legend': 'Logo van de organisatie',
+  'admin.logo.legend': 'Afbeelding van de organisatie',
+  'admin.logo.framingResult': 'Op de pagina Ervaring',
   'admin.screenshot.legend': 'Schermafbeelding van het project',
   'admin.screenshot.framingResult': 'Op de pagina Projecten',
   'admin.contactImage.legend': 'Afbeelding van de contactpagina',
@@ -287,8 +287,7 @@ export const nl: Record<TranslationKey, string> = {
   'admin.framing.label': 'Uitsnede van de afbeelding',
   'admin.framing.hint':
     'Sleep het kader (of gebruik de pijltjestoetsen, Shift om sneller te gaan) om het zichtbare deel op de site te kiezen. Sla daarna op.',
-  'admin.framing.notNeeded':
-    'De afbeelding heeft al de vorm van het kader: niets bij te snijden.',
+  'admin.framing.notNeeded': 'De afbeelding heeft al de vorm van het kader: niets bij te snijden.',
   'admin.cv.legend': 'Cv',
   'admin.cv.online': 'Er staat een cv online.',
   'admin.cv.none': 'Geen online cv.',

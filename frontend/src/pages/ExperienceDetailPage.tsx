@@ -1,6 +1,10 @@
 import { useParams } from 'react-router'
 import { useExperience } from '../api/experiences.ts'
 import { Badge } from '../components/Badge/Badge.tsx'
+import {
+  EXPERIENCE_IMAGE_HEIGHT,
+  EXPERIENCE_IMAGE_WIDTH,
+} from '../components/ExperienceCard/ExperienceCard.tsx'
 import { MarkdownText } from '../components/MarkdownText/MarkdownText.tsx'
 import { PageHeader } from '../components/PageHeader/PageHeader.tsx'
 import { Bone, Loading } from '../components/Skeleton/Skeleton.tsx'
@@ -44,6 +48,17 @@ export function ExperienceDetailPage() {
           <span>{entry.organization}</span>
         </p>
       </PageHeader>
+      {entry.logo_url && (
+        // Decorative, like on the card: the organisation's name is in the header.
+        <img
+          className={styles.image}
+          src={entry.logo_url}
+          alt=""
+          width={EXPERIENCE_IMAGE_WIDTH * 2}
+          height={EXPERIENCE_IMAGE_HEIGHT * 2}
+          style={{ objectPosition: `${entry.logo_focus.x}% ${entry.logo_focus.y}%` }}
+        />
+      )}
       <div className={styles.description}>
         <MarkdownText>{entry.description}</MarkdownText>
       </div>

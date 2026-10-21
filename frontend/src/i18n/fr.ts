@@ -272,15 +272,15 @@ export const fr: Record<TranslationKey, string> = {
   'admin.image.preview': 'Image actuelle',
   'admin.image.upload': 'Envoyer une image (JPEG, PNG ou WebP, 5 Mo max)',
   'admin.image.replace': "Remplacer l'image (JPEG, PNG ou WebP, 5 Mo max)",
-  'admin.image.uploaded':
-    'Image envoyée : redressée, réduite et nettoyée de ses métadonnées.',
+  'admin.image.uploaded': 'Image envoyée : redressée, réduite et nettoyée de ses métadonnées.',
   'admin.image.removed': 'Image retirée.',
   'admin.image.tooLarge':
     "L'image dépasse 5 Mo (ou 40 mégapixels) : exportez-la plus petite, puis réessayez.",
   'admin.image.notImage': "Ce fichier n'est pas une image JPEG, PNG ou WebP.",
   'admin.image.remove': "Retirer l'image",
   'admin.image.confirmRemove': "Retirer l'image du site ?",
-  'admin.logo.legend': "Logo de l'organisation",
+  'admin.logo.legend': "Image de l'organisation",
+  'admin.logo.framingResult': 'Sur la page Parcours',
   'admin.screenshot.legend': 'Capture du projet',
   'admin.screenshot.framingResult': 'Sur la page Projets',
   'admin.contactImage.legend': 'Image de la page Contact',

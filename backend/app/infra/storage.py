@@ -169,8 +169,8 @@ def delete_photo() -> None:
 
 # --- Other images: experience logos, project screenshots, contact page image -------------------
 
-# Longest side kept for each kind: a logo is shown small, the others up to a card's width.
-IMAGE_MAX_SIDE = {"logos": 256, "projects": PHOTO_MAX_SIDE, "contact": PHOTO_MAX_SIDE}
+# Longest side kept for each kind: every image fills a card or a page column.
+IMAGE_MAX_SIDE = {"logos": PHOTO_MAX_SIDE, "projects": PHOTO_MAX_SIDE, "contact": PHOTO_MAX_SIDE}
 ImageKind = Literal["logos", "projects", "contact"]
 # Image keys are experience slugs, project ids or "page": never anything from the upload.
 _IMAGE_KEY = re.compile(r"[a-z0-9-]{1,100}")

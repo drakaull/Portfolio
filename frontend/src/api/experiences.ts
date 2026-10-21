@@ -1,4 +1,5 @@
 import type { Lang } from '../i18n/useTranslation.ts'
+import type { PhotoFocus } from './useHomeContent.ts'
 import { useJson } from './useJson.ts'
 
 export type ExperienceKind = 'job' | 'student_job' | 'internship' | 'education'
@@ -12,6 +13,8 @@ export type Experience = {
   end_year: number | null
   summary: string
   technologies: string[]
+  logo_url: string | null // the organisation's image, versioned
+  logo_focus: PhotoFocus
 }
 
 export type ExperienceDetail = Experience & { description: string }

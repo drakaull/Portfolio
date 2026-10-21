@@ -264,15 +264,15 @@ export const en = {
   'admin.image.preview': 'Current image',
   'admin.image.upload': 'Upload an image (JPEG, PNG or WebP, 5 MB max)',
   'admin.image.replace': 'Replace the image (JPEG, PNG or WebP, 5 MB max)',
-  'admin.image.uploaded':
-    'Image uploaded: turned upright, resized and cleaned of its metadata.',
+  'admin.image.uploaded': 'Image uploaded: turned upright, resized and cleaned of its metadata.',
   'admin.image.removed': 'Image removed.',
   'admin.image.tooLarge':
     'The image is larger than 5 MB (or 40 megapixels): export it smaller, then retry.',
   'admin.image.notImage': 'This file is not a JPEG, PNG or WebP image.',
   'admin.image.remove': 'Remove the image',
   'admin.image.confirmRemove': 'Remove the image from the site?',
-  'admin.logo.legend': 'Organisation logo',
+  'admin.logo.legend': 'Organisation image',
+  'admin.logo.framingResult': 'On the Experience page',
   'admin.screenshot.legend': 'Project screenshot',
   'admin.screenshot.framingResult': 'On the Projects page',
   'admin.contactImage.legend': 'Contact page image',

@@ -18,6 +18,7 @@ const ENTRIES: AdminExperience[] = [
     summary: text('Résumé'),
     description: text(''),
     logo_url: null,
+    logo_focus: { x: 50, y: 50 },
   },
   {
     slug: 'ateliers-ai',
@@ -30,6 +31,7 @@ const ENTRIES: AdminExperience[] = [
     summary: text('Résumé'),
     description: text(''),
     logo_url: null,
+    logo_focus: { x: 50, y: 50 },
   },
 ]
 

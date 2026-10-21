@@ -26,14 +26,14 @@ def stored(storage_dir: Path, kind: str, key: str) -> Image.Image:
 # --- logos ---------------------------------------------------------------------------------
 
 
-async def test_logo_is_cleaned_kept_small_and_shown_with_its_experience(
+async def test_logo_is_cleaned_and_shown_with_its_experience(
     admin_client: AsyncClient, storage_dir: Path
 ) -> None:
     logo = image_bytes("PNG", (800, 400), mode="RGBA")
     assert (await put(admin_client, f"/api/admin/experiences/{SLUG}/logo", logo)).status_code == 204
 
     saved = stored(storage_dir, "logos", SLUG)
-    assert (saved.format, max(saved.size)) == ("WEBP", 256)  # logos are shown small
+    assert (saved.format, saved.size) == ("WEBP", (800, 400))  # small enough: kept as is
     assert saved.mode == "RGBA"  # transparency kept
     public = (await admin_client.get("/api/experiences", params={"lang": "fr"})).json()
     url = next(e for e in public if e["slug"] == SLUG)["logo_url"]
@@ -61,6 +61,27 @@ async def test_logo_of_an_unknown_experience_is_404(admin_client: AsyncClient) -
     url = "/api/admin/experiences/nobody-2000/logo"
     assert (await put(admin_client, url, image_bytes("PNG"))).status_code == 404
     assert (await admin_client.delete(url)).status_code == 404
+
+
+async def test_logo_framing_starts_centred_and_is_saved_with_the_entry(
+    admin_client: AsyncClient,
+) -> None:
+    url = f"/api/admin/experiences/{SLUG}"
+    entry = (await admin_client.get(url)).json()
+    body = {
+        k: entry[k] for k in ("kind", "organization", "start_year", "end_year", "title", "summary")
+    }
+    await admin_client.put(url, json={**body, "logo_focus": {"x": 10, "y": 90}})
+
+    await put(admin_client, f"{url}/logo", image_bytes("PNG"))
+    assert (await admin_client.get(url)).json()["logo_focus"] == {"x": 50, "y": 50}
+
+    await admin_client.put(url, json={**body, "logo_focus": {"x": 20, "y": 30}})
+    await admin_client.put(url, json=body)  # no framing sent: kept
+    public = (await admin_client.get(f"/api/experiences/{SLUG}", params={"lang": "fr"})).json()
+    assert public["logo_focus"] == {"x": 20, "y": 30}
+    bad = await admin_client.put(url, json={**body, "logo_focus": {"x": 0, "y": -1}})
+    assert bad.status_code == 422
 
 
 # --- project screenshots -------------------------------------------------------------------

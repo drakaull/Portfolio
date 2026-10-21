@@ -14,6 +14,8 @@ const DETAIL: ExperienceDetail = {
   summary: 'Résumé.',
   description: 'Conception d’un stockage **hybride**.\n\n- Données IoT',
   technologies: ['Python', 'Docker'],
+  logo_url: '/api/images/logos/icare-internship-2026?v=1',
+  logo_focus: { x: 50, y: 50 },
 }
 
 function mockDetail() {
@@ -34,6 +36,7 @@ describe('experience detail page', () => {
     expect(screen.getByText('Stage')).toBeDefined()
     expect(screen.getByText('2026')).toBeDefined()
     expect(screen.getByText('I-care Group')).toBeDefined()
+    expect(document.querySelector(`img[src="${DETAIL.logo_url}"]`)).not.toBeNull()
     expect(screen.getByText('hybride').tagName).toBe('STRONG')
     expect(screen.getByText('Docker')).toBeDefined()
     expect(screen.getByRole('link', { name: /Retour au parcours/ }).getAttribute('href')).toBe(
