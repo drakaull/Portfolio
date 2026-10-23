@@ -26,10 +26,13 @@ services:
       SITE_ADDRESS: ${SITE_ADDRESS:?set SITE_ADDRESS in .env}
       SITE_URL: ${SITE_URL:?set SITE_URL in .env}
       REDIRECT_ADDRESSES: ${REDIRECT_ADDRESSES:?set REDIRECT_ADDRESSES in .env}
+      LIFE_ADDRESS: ${LIFE_ADDRESS:?set LIFE_ADDRESS in .env}
       ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env}
     volumes:
       - caddy-data:/data # HTTPS certificates: keep them, Let's Encrypt limits new ones
       - caddy-config:/config
+      # Static sites built on the server (the Game of Life: deploy/update-life.sh), read only.
+      - ${HOME}/sites:/srv/sites:ro
     depends_on:
       backend:
         condition: service_healthy
