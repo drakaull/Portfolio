@@ -30,6 +30,7 @@
 11. [Mettre le site à jour](#11-mettre-le-site-à-jour)
 12. [Restaurer une sauvegarde](#12-restaurer-une-sauvegarde)
 13. [Dépannage](#13-dépannage)
+14. [Le jeu de la vie (life.leonard-fontaine.com)](#14-le-jeu-de-la-vie-lifeleonard-fontainecom)
 
 ---
 
@@ -525,3 +526,116 @@ $ docker compose logs -f backend        # suivre les journaux en direct (Ctrl+C 
 $ docker compose restart backend        # redémarrer un service
 $ docker compose exec db psql -U portfolio -d portfolio    # console de la base (\q pour quitter)
 ```
+
+---
+
+## 14. Le jeu de la vie (life.leonard-fontaine.com)
+
+Le [jeu de la vie](https://github.com/drakaull/game-of-life) est un **site statique** (une page
+HTML, du JavaScript, du CSS et des polices) : pas de backend, pas de base de données. Le même Caddy
+le sert sur son propre sous-domaine, avec ses propres en-têtes de sécurité (bloc
+`{$LIFE_ADDRESS}` dans `deploy/Caddyfile`) et, comme le site, **sans journal d'accès** : aucune
+adresse IP de visiteur n'est gardée.
+
+Le jeu est **construit sur le serveur**, à partir d'un tag de version publié sur GitHub, par
+`deploy/update-life.sh` :
+
+1. il récupère le dépôt du jeu dans `~/game-of-life` et se place sur le tag demandé ;
+2. il lance les tests, le lint et la vérification du formatage, puis le build, dans un conteneur
+   Node **jetable** (Node n'est pas installé sur le serveur ; l'image est la même que celle du
+   portfolio) ;
+3. il remplace `~/sites/life` **d'un coup** par le nouveau `dist/` : le site n'est jamais à moitié
+   copié et aucun fichier d'une ancienne version ne reste.
+
+Caddy lit `~/sites` en lecture seule (monté sur `/srv/sites`) : il n'a pas besoin de redémarrer
+quand le jeu change.
+
+### 14.1 Mise en place (une seule fois)
+
+**1. Le DNS.** Dans la zone DNS de `leonard-fontaine.com` (comme à l'étape 6), ajoute :
+
+| Sous-domaine | Type | Cible |
+|---|---|---|
+| `life` | `A` | `<IP>` |
+| `life` | `AAAA` | `<IPv6>` |
+
+Puis attends qu'il réponde, depuis ton PC :
+
+```powershell
+PS> Resolve-DnsName life.leonard-fontaine.com
+```
+
+Les deux adresses doivent apparaître **avant la suite** : Caddy demande le certificat HTTPS dès
+qu'il connaît le nouveau nom.
+
+**2. Le code du portfolio et le réglage.** Sur le serveur :
+
+```bash
+$ ssh portfolio
+$ cd ~/portfolio && git pull
+$ cd deploy
+$ nano .env
+```
+
+Ajoute la ligne suivante sous `REDIRECT_ADDRESSES` (ce n'est pas un secret, juste l'adresse),
+puis enregistre (`Ctrl+O`, `Entrée`, `Ctrl+X`) :
+
+```
+LIFE_ADDRESS=life.leonard-fontaine.com
+```
+
+Sans cette ligne, `docker compose` refuse de démarrer et le dit (« set LIFE_ADDRESS in .env »).
+
+**3. Construire le jeu, avant de relancer Caddy** (sinon Docker créerait `~/sites` lui-même, au
+nom de `root`, et le script ne pourrait plus y écrire) :
+
+```bash
+$ ./update-life.sh v1.0.0
+```
+
+La première fois, il télécharge le dépôt et les dépendances (une à deux minutes). Il finit par
+« Game of Life v1.0.0 online ». S'il s'arrête avant, rien n'est changé en ligne : lis l'erreur.
+
+**4. Relancer Caddy** pour qu'il prenne le nouveau bloc et obtienne le certificat :
+
+```bash
+$ docker compose up -d --build
+$ docker image prune -f
+```
+
+**5. Vérifier** (depuis le serveur ou ton PC) :
+
+```bash
+$ curl -I https://life.leonard-fontaine.com
+```
+
+Attendus : `HTTP/2 200`, `cache-control: no-cache` et tous les en-têtes du bloc Caddy
+(`strict-transport-security`, `content-security-policy`, `referrer-policy: no-referrer`,
+`x-content-type-options`, `x-frame-options`, `permissions-policy`), et **pas** d'en-tête
+`server`. Sur un fichier de `/assets/` (son nom est dans le code source de la page) :
+`cache-control: public, max-age=31536000, immutable`.
+
+Puis ouvre le jeu dans Chrome et Firefox, sur ordinateur et téléphone : il fonctionne, la console
+(F12) n'affiche aucune erreur « Content Security Policy », l'onglet Réseau ne montre que des
+requêtes vers `life.leonard-fontaine.com`, et « ← Portfolio » ramène au site.
+
+**6. Le portfolio.** Le champ **Website** du dépôt GitHub `game-of-life` contient déjà
+`https://life.leonard-fontaine.com`. Dans l'admin du portfolio : Projets → **Synchroniser**, puis
+rends le jeu visible. Sa carte affiche alors le lien « Site ↗ ».
+
+### 14.2 Mettre le jeu à jour
+
+Quand une nouvelle version du jeu est publiée (un tag, par exemple `v1.1.0`) :
+
+```bash
+$ ssh portfolio
+$ cd ~/portfolio/deploy
+$ ./update-life.sh v1.1.0
+```
+
+C'est tout : la nouvelle version est en ligne dès la fin du script, sans redémarrage. Pour
+revenir à une version précédente, relance le script avec son tag.
+
+Le jeu n'a aucune donnée à sauvegarder : il se reconstruit à tout moment depuis GitHub, donc il
+n'est pas dans les sauvegardes de l'étape 9.
+
