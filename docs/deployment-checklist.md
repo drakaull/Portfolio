@@ -23,6 +23,7 @@ All required items were done and verified on the live server on 2026-10-15, befo
 - [x] **Dependency audit**: `npm audit` (frontend) and a Python audit (e.g. `uvx pip-audit`) with no unresolved critical/high finding.
 - [x] **Unknown URLs return HTTP 404** from the server for the SPA's not-found page (or `noindex`), so search engines do not index soft 404s.
 - [x] **Icons at the site root**: `/favicon.svg`, `/favicon.ico`, `/apple-touch-icon.png`, `/icon-192.png`, `/icon-512.png`, `/maskable-512.png` and `/site.webmanifest` (served as `application/manifest+json`) all answer 200 on the live site, and the CSP (`img-src`, `manifest-src`) allows them from `'self'`.
+- [ ] **Game of Life on `life.leonard-fontaine.com`** (`docs/deployment.md` section 14): DNS `life` (A + AAAA), `LIFE_ADDRESS` in the server's `.env`, `./update-life.sh <tag>` before `docker compose up -d --build`; then the game's own checks (headers, cache rules, no CSP error, every request to its own host) and the portfolio admin (sync, make visible).
 
 ## Recommended
 
