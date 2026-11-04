@@ -31,6 +31,7 @@
 12. [Restaurer une sauvegarde](#12-restaurer-une-sauvegarde)
 13. [Dépannage](#13-dépannage)
 14. [Le jeu de la vie (life.leonard-fontaine.com)](#14-le-jeu-de-la-vie-lifeleonard-fontainecom)
+15. [ScoreFoot.gg (scorefoot.leonard-fontaine.com)](#15-scorefootgg-scorefootleonard-fontainecom)
 
 ---
 
@@ -638,4 +639,76 @@ revenir à une version précédente, relance le script avec son tag.
 
 Le jeu n'a aucune donnée à sauvegarder : il se reconstruit à tout moment depuis GitHub, donc il
 n'est pas dans les sauvegardes de l'étape 9.
+
+---
+
+## 15. ScoreFoot.gg (scorefoot.leonard-fontaine.com)
+
+[ScoreFoot.gg](https://github.com/drakaull/scorefoot.gg) (dépôt **privé**) est un site de
+statistiques de football : un site Next.js (`web`), une API .NET en lecture seule (`api`) et sa
+base PostgreSQL (`db`). C'est **son propre projet Docker Compose**, dans `~/scorefoot`, avec ses
+propres règles : on n'y modifie rien depuis le portfolio, les changements passent par son dépôt.
+
+Le lien avec ce dépôt est un **réseau Docker partagé, `edge`** : seul le service `web` de ScoreFoot
+le rejoint (sous le nom `scorefoot-web`), et Caddy aussi. Caddy reçoit les visiteurs de
+`scorefoot.leonard-fontaine.com` et leur transmet `scorefoot-web:3000` (bloc
+`{$SCOREFOOT_ADDRESS}` de `deploy/Caddyfile`). ScoreFoot ne publie **aucun port** sur le serveur ;
+`api` et `db` ne sont joignables que par `web`. Caddy pose les en-têtes de sécurité, sauf la
+`Content-Security-Policy`, que Next.js envoie lui-même (un nouveau nonce à chaque page). Comme
+ailleurs, **aucun journal d'accès**.
+
+Les données ne changent pas en production (la tâche `sync`, qui télécharge depuis API-Football, ne
+tourne jamais sur le serveur, et sa clé n'y est jamais). Les exports faits sur le PC
+(`scorefoot.dump` : la base ; `images.tgz` : les photos et logos) **sont donc la sauvegarde** :
+une copie sur le PC (`Documents\Sauvegardes portfolio\scorefoot\`), une sur un support externe,
+une sur le serveur (`~/backups/scorefoot/`). On en refait seulement si les données changent.
+
+### 15.1 Mise en place (faite le 4 novembre 2026, pour mémoire)
+
+1. **DNS** : `scorefoot` → `A` `<IP>` et `AAAA` `<IPv6>` (comme à l'étape 14.1).
+2. **Accès au dépôt privé** : une **clé de déploiement** propre au serveur, en lecture seule
+   (`~/.ssh/scorefoot_deploy`, déclarée dans le dépôt GitHub → Settings → Deploy keys), et le
+   surnom `github-scorefoot` dans `~/.ssh/config`. Test : `ssh -T git@github-scorefoot`.
+3. **Le code** : `git clone git@github-scorefoot:drakaull/scorefoot.gg.git ~/scorefoot`, puis
+   `git checkout <tag>`.
+4. **Le `.env`** de `~/scorefoot` (lisible par toi seul) : `COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml`,
+   `API_FOOTBALL_KEY=` vide, `POSTGRES_DB` / `POSTGRES_USER` à `scorefoot`, et un
+   `POSTGRES_PASSWORD` généré sur le serveur (`openssl rand -hex 32`), rangé dans le gestionnaire
+   de mots de passe.
+5. **Le réseau** : `docker network create edge` (une seule fois ; il doit exister avant de démarrer
+   ScoreFoot **et** Caddy).
+6. **Les données** : envoi des exports avec `scp` (empreintes `sha256sum` / `Get-FileHash`
+   comparées), puis :
+   ```bash
+   $ cd ~/scorefoot && docker compose up -d db
+   $ docker compose exec -T db sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --no-owner' < ~/backups/scorefoot/scorefoot.dump
+   $ docker compose run --rm --no-deps -T --entrypoint tar sync xzf - -C /data/images < ~/backups/scorefoot/images.tgz
+   ```
+7. **Démarrage** : `docker compose up -d --build` (environ 3 minutes de build).
+8. **Caddy** : `SCOREFOOT_ADDRESS=scorefoot.leonard-fontaine.com` dans `~/portfolio/deploy/.env`,
+   puis `docker compose up -d --build` dans `~/portfolio/deploy`.
+
+### 15.2 Mettre ScoreFoot à jour
+
+Quand une nouvelle version est publiée (un tag, par exemple `v1.0.3`) :
+
+```bash
+$ ssh portfolio
+$ cd ~/scorefoot
+$ git fetch --tags && git -c advice.detachedHead=false checkout v1.0.3
+$ docker compose up -d --build
+$ docker image prune -f
+```
+
+Caddy n'a pas besoin de redémarrer. Si les **données** changent (nouvelle saison), refais les
+exports sur le PC, garde les trois copies, puis restaure : base vidée et rechargée, images
+remplacées (à préparer avec le Claude de ScoreFoot, qui dira si le schéma a changé).
+
+### 15.3 Si quelque chose ne va pas
+
+| Symptôme | Où regarder |
+|---|---|
+| « 502 » sur scorefoot.leonard-fontaine.com | ScoreFoot est arrêté ou redémarre : `cd ~/scorefoot && docker compose ps`, puis `docker compose logs --tail 50 web` et `… api`. |
+| Caddy refuse de démarrer : `network edge declared as external, but could not be found` | Le réseau a disparu : `docker network create edge`, puis relance ScoreFoot et Caddy. |
+| Pages lentes au premier affichage | Normal après un démarrage (environ 2 s la première fois). |
 

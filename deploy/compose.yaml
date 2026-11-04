@@ -27,6 +27,7 @@ services:
       SITE_URL: ${SITE_URL:?set SITE_URL in .env}
       REDIRECT_ADDRESSES: ${REDIRECT_ADDRESSES:?set REDIRECT_ADDRESSES in .env}
       LIFE_ADDRESS: ${LIFE_ADDRESS:?set LIFE_ADDRESS in .env}
+      SCOREFOOT_ADDRESS: ${SCOREFOOT_ADDRESS:?set SCOREFOOT_ADDRESS in .env}
       ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env}
     volumes:
       - caddy-data:/data # HTTPS certificates: keep them, Let's Encrypt limits new ones
@@ -38,6 +39,7 @@ services:
         condition: service_healthy
     networks:
       - web
+      - edge # other projects' public services (ScoreFoot), see docs/deployment.md
 
   backend:
     logging: *logging
@@ -93,6 +95,10 @@ networks:
   # No route to the Internet: the database talks to the backend only.
   data:
     internal: true
+  # Shared with other compose projects on this server: only their public service joins it.
+  # Created once by hand: docker network create edge
+  edge:
+    external: true
 
 volumes:
   db-data:

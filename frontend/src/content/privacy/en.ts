@@ -33,6 +33,7 @@ Attempts to sign in to the site's administration area, reserved for Léonard Fon
 - **Publisher:** Léonard Fontaine, Belgium.
 - **Contact:** contact@leonard-fontaine.com, or the [contact form](/en/contact).
 - **Hosting:** OVH SAS, 2 rue Kellermann, 59100 Roubaix, France.
+- **Sites covered:** this notice and policy also apply to life.leonard-fontaine.com (the Game of Life) and scorefoot.leonard-fontaine.com (ScoreFoot.gg), which follow the same rules: no cookies, no audience measurement, no visit logs. To prevent abuse, ScoreFoot counts searches per IP address for a few seconds, in memory only, and never records it.
 
 ## Your rights
 

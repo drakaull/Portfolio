@@ -24,6 +24,7 @@ All required items were done and verified on the live server on 2026-10-15, befo
 - [x] **Unknown URLs return HTTP 404** from the server for the SPA's not-found page (or `noindex`), so search engines do not index soft 404s.
 - [x] **Icons at the site root**: `/favicon.svg`, `/favicon.ico`, `/apple-touch-icon.png`, `/icon-192.png`, `/icon-512.png`, `/maskable-512.png` and `/site.webmanifest` (served as `application/manifest+json`) all answer 200 on the live site, and the CSP (`img-src`, `manifest-src`) allows them from `'self'`.
 - [ ] **Game of Life on `life.leonard-fontaine.com`** (`docs/deployment.md` section 14): DNS `life` (A + AAAA), `LIFE_ADDRESS` in the server's `.env`, `./update-life.sh <tag>` before `docker compose up -d --build`; then the game's own checks (headers, cache rules, no CSP error, every request to its own host) and the portfolio admin (sync, make visible).
+- [ ] **ScoreFoot.gg on `scorefoot.leonard-fontaine.com`** (`docs/deployment.md` section 15): DNS `scorefoot` (A + AAAA), shared `edge` network created before Caddy and ScoreFoot start, `SCOREFOOT_ADDRESS` in the server's `.env`; then ScoreFoot's own checks (pages, redirects, 404, HTTPS, every request to its own host, ports 3000/5080/5432 closed) and a server reboot to see everything come back.
 
 ## Recommended
 

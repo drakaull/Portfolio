@@ -1,7 +1,7 @@
 # Caddy: the only service reachable from the Internet. It gets and renews the HTTPS certificates
 # by itself, serves the built site, forwards /api to the backend and adds the security headers.
 # The addresses come from deploy/.env (SITE_ADDRESS, SITE_URL, REDIRECT_ADDRESSES, LIFE_ADDRESS,
-# ACME_EMAIL).
+# SCOREFOOT_ADDRESS, ACME_EMAIL).
 
 {
 	# Let's Encrypt writes here about certificates that are about to expire.
@@ -78,4 +78,29 @@
 	header @unhashed Cache-Control "no-cache"
 
 	file_server
+}
+
+# ScoreFoot.gg (github.com/drakaull/scorefoot.gg, its own compose project in ~/scorefoot): its
+# Next.js service joins the shared "edge" network as scorefoot-web; nothing else of it is reachable.
+# Next.js sends its own Content-Security-Policy (a fresh nonce on each page), so none is set here.
+# Caddy passes the visitor's address in X-Forwarded-For: ScoreFoot rate-limits searches with it.
+# No log directive here either: no access log, so no visitor address is kept.
+{$SCOREFOOT_ADDRESS} {
+	encode zstd gzip
+
+	# A read-only site: nothing to upload.
+	request_body {
+		max_size 1MB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+		-Server
+	}
+
+	reverse_proxy scorefoot-web:3000
 }
