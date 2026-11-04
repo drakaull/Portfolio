@@ -33,6 +33,7 @@ Les tentatives de connexion à l'espace d'administration du site, réservé à L
 - **Éditeur :** Léonard Fontaine, Belgique.
 - **Contact :** contact@leonard-fontaine.com, ou le [formulaire de contact](/fr/contact).
 - **Hébergement :** OVH SAS, 2 rue Kellermann, 59100 Roubaix, France.
+- **Sites couverts :** ces mentions et cette politique valent aussi pour life.leonard-fontaine.com (le jeu de la vie) et scorefoot.leonard-fontaine.com (ScoreFoot.gg), qui suivent les mêmes règles : ni cookie, ni mesure d'audience, ni journal des visites. Pour éviter les abus, ScoreFoot compte les recherches par adresse IP pendant quelques secondes, en mémoire uniquement, sans jamais l'enregistrer.
 
 ## Vos droits
 

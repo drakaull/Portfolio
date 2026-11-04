@@ -33,6 +33,7 @@ Pogingen om je aan te melden bij de beheeromgeving van de site, die voorbehouden
 - **Uitgever:** Léonard Fontaine, België.
 - **Contact:** contact@leonard-fontaine.com, of het [contactformulier](/nl/contact).
 - **Hosting:** OVH SAS, 2 rue Kellermann, 59100 Roubaix, Frankrijk.
+- **Gedekte sites:** deze vermeldingen en dit beleid gelden ook voor life.leonard-fontaine.com (het spel van het leven) en scorefoot.leonard-fontaine.com (ScoreFoot.gg), die dezelfde regels volgen: geen cookies, geen bezoekersmetingen, geen logboek van bezoeken. Om misbruik te voorkomen telt ScoreFoot zoekopdrachten per IP-adres gedurende enkele seconden, alleen in het geheugen, zonder het ooit op te slaan.
 
 ## Je rechten
 
