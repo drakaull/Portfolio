@@ -6,6 +6,24 @@
 {
 	# Let's Encrypt writes here about certificates that are about to expire.
 	email {$ACME_EMAIL}
+
+	# There is no access log, but warnings and errors (a visitor who hangs up, an app that does not
+	# answer) describe the request: strip whatever identifies the visitor, keep the rest to debug.
+	log default {
+		format filter {
+			wrap json
+			fields {
+				request>remote_ip delete
+				request>remote_port delete
+				request>client_ip delete
+				request>headers>X-Forwarded-For delete
+				request>headers>User-Agent delete
+				request>headers>Referer delete
+				request>headers>Cookie delete
+				request>headers>Authorization delete
+			}
+		}
+	}
 }
 
 # Every other name (.be, www.) goes permanently to the one address of the site.
